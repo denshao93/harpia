@@ -1,0 +1,11 @@
+# Ignorando todos os arquivos que estão na pasta
+LC08_L1TP_215068_20151114_20170402_01_T1/
+# Para os arquivos temporarios criados para processamento de nuvens/sombra
+*.img
+# Ignorando os arquivos dos pacotes
+packages/
+# Ignorando o CloudShadow_python
+CloudShadow_python.py
+
+.idea
+__pycache__
