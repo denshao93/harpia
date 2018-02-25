@@ -1,0 +1,8 @@
+opencv-python==3.4.0.12
+python-fmask==0.4.5
+rasterio==0.36.0
+rios==1.4.4
+scikit-image==0.13.1
+scipy==0.17.0
+terralib==5.3.1
+
