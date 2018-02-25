@@ -43,10 +43,10 @@ class Connection:
     def get_scene_path_row_geom(self, path_row):
         """
         :param path_row: Path and row must be writed as: path/row (ex. 215/068)
-        :return:
+        :return: Fields from table lc_ba (landsat Bahia): id, path/row, ogr_geom
         """
         cursor = self.conn.cursor()
-        sql = "SELECT * FROM lc_ba WHERE path_row = '215/068';"
+        sql = "SELECT * FROM lc_ba WHERE path_row = '{path_row}';".format(path_row=path_row)
         cursor.execute(sql)
         qtd = cursor.fetchall()
         cursor.close()

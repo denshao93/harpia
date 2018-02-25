@@ -139,19 +139,21 @@ class PreProcess2TA:
                                                       file_name=self.file_name)
         os.system(command)
 
-    def run(self):
+    def run_cloud_shadow_fmask(self):
 
-        # self.create_folder_output_processed()
-        # self.create_folder_output_file_processed()
-        # self.uncompress_targz()
-        # self.stack_all_30m_band()
-        # self.stack_345_30m_band()
-        # self.stack_termal_band()
-        # self.create_angle_img()
-        # self.saturation_mask()
-        # self.landsat_toa()
-        # self.cloud_detection()
-        # self.cloud_raster2vector()
-        # self.get_segmentation_slico(10, 10)
-        self.get_segmentation_seeds(8, 25)
-        # self.del_folder_file_tmp()
+        self.create_folder_output_processed()
+        self.create_folder_output_file_processed()
+        self.uncompress_targz()
+        self.stack_all_30m_band()
+        self.stack_345_30m_band()
+        self.stack_termal_band()
+        self.create_angle_img()
+        self.saturation_mask()
+        self.landsat_toa()
+        self.cloud_detection()
+        self.cloud_raster2vector()
+
+    def run_segmentation(self):
+
+        self.get_segmentation_slico(10, 10)
+        # self.get_segmentation_seeds(8, 25)
