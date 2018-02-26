@@ -1,8 +1,12 @@
 import os
-from glob import glob
-import tarfile
 import shutil
-import LandsatFileInfo as lcinf
+import tarfile
+import geopandas
+import ogr, osr
+from glob import glob
+import LandsatFileInfo as LCinf
+import ConnectionTaDatabase as Conn
+
 
 
 class PreProcess2TA:
@@ -13,7 +17,7 @@ class PreProcess2TA:
         # OutputProcessed is a place where all processed output will be save (ex. compositions, segmentation)
         self.output_processed = set_output_processed_repo
 
-        self.file_name = lcinf.LandsatFileInfo(self.raster_file_path_targz).get_file_name()
+        self.file_name = LCinf.LandsatFileInfo(self.raster_file_path_targz).get_file_name()
         # Temporary folder to put files to process and remove after that
         self.tmp_raster_folder = '{}{}{}'.format('/tmp/', self.file_name, '/')
 
@@ -139,7 +143,28 @@ class PreProcess2TA:
                                                       file_name=self.file_name)
         os.system(command)
 
-    def run_cloud_shadow_fmask(self):
+    def get_geom_from_lc_ba_scene(self):
+
+        connection = Conn.Connection("host=localhost dbname=ta7 user=postgres password=postgres")
+        pathrow = LCinf.LandsatFileInfo(self.raster_file_path_targz).get_path_row_from_file()
+        path_row = '{}/{}'.format(pathrow[0], pathrow[1])
+        lc_scene_geom = connection.get_scene_path_row_geom(path_row)[0][2]
+        geometry = ogr.CreateGeometryFromWkt(lc_scene_geom)
+
+        return geometry
+
+    def read_segmentation_shp(self):
+        file_path = '{out}{file_name}-seeds.shp'.format(out=self.get_folder_output_file_processed(),
+                                                        file_name=self.file_name)
+        import shapefile
+        shp_geom = shapefile.Reader(file_path)
+
+        return shp_geom
+
+    def select_segments_by_lc_scene(self):
+        pass
+
+    def run_make_folder_input_data(self):
 
         self.create_folder_output_processed()
         self.create_folder_output_file_processed()
@@ -147,6 +172,9 @@ class PreProcess2TA:
         self.stack_all_30m_band()
         self.stack_345_30m_band()
         self.stack_termal_band()
+
+    def run_cloud_shadow_fmask(self):
+
         self.create_angle_img()
         self.saturation_mask()
         self.landsat_toa()
@@ -155,5 +183,6 @@ class PreProcess2TA:
 
     def run_segmentation(self):
 
-        self.get_segmentation_slico(10, 10)
+        # self.get_segmentation_slico(10, 10)
         # self.get_segmentation_seeds(8, 25)
+        self.read_segmentation_shp()

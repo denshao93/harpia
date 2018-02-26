@@ -46,7 +46,8 @@ class Connection:
         :return: Fields from table lc_ba (landsat Bahia): id, path/row, ogr_geom
         """
         cursor = self.conn.cursor()
-        sql = "SELECT * FROM lc_ba WHERE path_row = '{path_row}';".format(path_row=path_row)
+        sql = "SELECT fid, path_row, ST_AsText(ogr_geometry) FROM lc_ba WHERE path_row = '{path_row}';"\
+            .format(path_row=path_row)
         cursor.execute(sql)
         qtd = cursor.fetchall()
         cursor.close()
