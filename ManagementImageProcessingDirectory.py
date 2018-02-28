@@ -1,33 +1,30 @@
 import os
 from glob import glob
-import tarfile
 
 
-class HandleImageDirectory:
-
-    def __init__(self, folder):
-        self.folder = folder
-
-    def get_targz_files(self):
-
-        return glob('{}{}'.format(self.folder, '/*tar.gz'), recursive=True)
-
-    def get_tmp_folder(self):
-
-        dir_list = glob("~/")
-
-        if '{}{}'.format(dir_list, '/tmp/') not in dir_list:
-            os.mkdir('{}{}'.format(dir_list, '/tmp/'))
-            return True
+def get_targz_files_from_folder(folder):
+    """
+    Getting list of tar.gz files in folders recursively
+    :return: list of tar.gz files
+    """
+    return glob('{}{}'.format(folder, '/*tar.gz'), recursive=True)
 
 
-    def del_tmp_folder(self):
+def get_folder_name(folder):
 
-        os.rmdir('~/tmp')
+    return glob(folder, recursive=True)
 
-    def run(self):
-        self.get_tmp_folder()
-        return self.get_targz_files()
+
+def get_list_folder_name_from_processed_dir(folder):
+
+    list_folder = glob('{}{}'.format(folder, '/*/'))
+    list_folder_name = [i.split('/')[-2] for i in [i.split(',')[0] for i in list_folder]]
+    return list_folder_name
+
+
+
+
+
 
 
 

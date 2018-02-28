@@ -1,12 +1,11 @@
 import os
+import fiona
 import shutil
 import tarfile
-import geopandas
-import ogr, osr
 from glob import glob
 import LandsatFileInfo as LCinf
 import ConnectionTaDatabase as Conn
-
+from shapely.geometry import shape, MultiPolygon
 
 
 class PreProcess2TA:
@@ -17,9 +16,9 @@ class PreProcess2TA:
         # OutputProcessed is a place where all processed output will be save (ex. compositions, segmentation)
         self.output_processed = set_output_processed_repo
 
-        self.file_name = LCinf.LandsatFileInfo(self.raster_file_path_targz).get_file_name()
+        self.file_name_targz = LCinf.LandsatFileInfo(self.raster_file_path_targz).get_file_name()
         # Temporary folder to put files to process and remove after that
-        self.tmp_raster_folder = '{}{}{}'.format('/tmp/', self.file_name, '/')
+        self.tmp_raster_folder = '{}{}{}'.format('/tmp/', self.file_name_targz, '/')
 
     def create_folder_output_processed(self):
         """
@@ -32,17 +31,21 @@ class PreProcess2TA:
         if '{}{}'.format(self.output_processed, 'PROCESSADA') not in dir_list:
             os.mkdir('{}{}'.format(self.output_processed, "/PROCESSADA"))
 
+    def get_folder_output_processed_path(self):
+
+        return '{}{}'.format(self.output_processed, 'PROCESSADA')
+
     def create_folder_output_file_processed(self):
 
         dir_list = glob('{}{}'.format(self.output_processed, "/*/*"), recursive=True)
-        raster_output_processed_files = '{}{}{}'.format(self.output_processed, 'PROCESSADA/', self.file_name)
+        raster_output_processed_files = '{}{}{}'.format(self.output_processed, 'PROCESSADA/', self.file_name_targz)
 
         if raster_output_processed_files not in dir_list:
             os.mkdir(raster_output_processed_files)
 
-    def get_folder_output_file_processed(self):
+    def get_folder_output_file_processed_path(self):
 
-        return '{}{}{}{}'.format(self.output_processed, 'PROCESSADA/', self.file_name, '/')
+        return '{}{}{}{}'.format(self.output_processed, 'PROCESSADA/', self.file_name_targz, '/')
 
     def uncompress_targz(self):
 
@@ -68,8 +71,8 @@ class PreProcess2TA:
         """
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {out}{file_name}.TIF " \
                   "{tmp}LC08*_B[3-5].TIF".format(tmp=self.tmp_raster_folder,
-                                                 out=self.get_folder_output_file_processed(),
-                                                 file_name=self.file_name)
+                                                 out=self.get_folder_output_file_processed_path(),
+                                                 file_name=self.file_name_targz)
         os.system(command)
 
     def stack_termal_band(self):
@@ -103,13 +106,13 @@ class PreProcess2TA:
 
         command = "fmask_usgsLandsatStacked.py -t {tmp}thermal.img -a {tmp}toa.img -m {tmp}*_MTL.txt -z " \
                   "{tmp}angles.img -s {tmp}saturationmask.img -o {out}cloud.img"\
-            .format(tmp=self.tmp_raster_folder, out=self.get_folder_output_file_processed())
+            .format(tmp=self.tmp_raster_folder, out=self.get_folder_output_file_processed_path())
         os.system(command)
 
     def cloud_raster2vector(self):
 
         command = "gdal_polygonize.py {out}cloud.img {out}cs_{file_name}.shp"\
-            .format(out=self.get_folder_output_file_processed(), file_name=self.file_name)
+            .format(out=self.get_folder_output_file_processed_path(), file_name=self.file_name_targz)
         os.system(command)
 
     def del_folder_file_tmp(self):
@@ -126,8 +129,8 @@ class PreProcess2TA:
                   "{file_name}-slico.shp".format(r=region,
                                                  i=inter,
                                                  tmp=self.tmp_raster_folder,
-                                                 out=self.get_folder_output_file_processed(),
-                                                 file_name=self.file_name)
+                                                 out=self.get_folder_output_file_processed_path(),
+                                                 file_name=self.file_name_targz)
         os.system(command)
 
     def get_segmentation_seeds(self, region, inter):
@@ -139,8 +142,8 @@ class PreProcess2TA:
                   "{out}{file_name}-seeds.shp".format(r=region,
                                                       i=inter,
                                                       tmp=self.tmp_raster_folder,
-                                                      out=self.get_folder_output_file_processed(),
-                                                      file_name=self.file_name)
+                                                      out=self.get_folder_output_file_processed_path(),
+                                                      file_name=self.file_name_targz)
         os.system(command)
 
     def get_geom_from_lc_ba_scene(self):
@@ -149,17 +152,20 @@ class PreProcess2TA:
         pathrow = LCinf.LandsatFileInfo(self.raster_file_path_targz).get_path_row_from_file()
         path_row = '{}/{}'.format(pathrow[0], pathrow[1])
         lc_scene_geom = connection.get_scene_path_row_geom(path_row)[0][2]
-        geometry = ogr.CreateGeometryFromWkt(lc_scene_geom)
 
-        return geometry
+        return lc_scene_geom
 
     def read_segmentation_shp(self):
-        file_path = '{out}{file_name}-seeds.shp'.format(out=self.get_folder_output_file_processed(),
-                                                        file_name=self.file_name)
-        import shapefile
-        shp_geom = shapefile.Reader(file_path)
+        """
+        Reading segmentation results from output folder
+        :return: Segments from segmentation that intersect landsat scene interested to Bahia monitoring forest project
+        """
+        file_path = '{out}{file_name}-seeds.shp'.format(out=self.get_folder_output_file_processed_path(),
+                                                        file_name=self.file_name_targz)
+        # MultiPolygon from the list of Polygons
+        multipoly = MultiPolygon([shape(pol['geometry']) for pol in fiona.open(file_path)])
 
-        return shp_geom
+        return multipoly
 
     def select_segments_by_lc_scene(self):
         pass
@@ -185,4 +191,5 @@ class PreProcess2TA:
 
         # self.get_segmentation_slico(10, 10)
         # self.get_segmentation_seeds(8, 25)
-        self.read_segmentation_shp()
+        pass
+
