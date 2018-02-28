@@ -4,13 +4,13 @@ from ManagementImageProcessingDirectory import get_list_folder_name_from_process
 import PreProcess2TA as Pre2TA
 
 
-
 if __name__ == "__main__":
 
     # Runing pre-processing Landsat 8 repository for forest monitoring project to Bahia
     raster = Pre2TA.PreProcess2TA(raster_file_path_targz=sys.argv[1],
                                   set_output_processed_repo=sys.argv[2])
 
+    # TODO Adicionar o loop para colocar todos os arquivos tar.gz para rodar
     # Check if tar.gz file have already processed before
     # Comparing if file name exist in list of folder name processed
     processed_folder = raster.get_folder_output_processed_path()
