@@ -1,6 +1,6 @@
 import sys
 import time
-from ManagementImageProcessingDirectory import get_list_folder_name_from_processed_dir
+from ManagementDirectory import get_list_folder_name_from_processed_dir
 import PreProcess2TA as Pre2TA
 
 

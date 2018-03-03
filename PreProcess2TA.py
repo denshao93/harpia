@@ -22,8 +22,8 @@ class PreProcess2TA:
 
     def create_folder_output_processed(self):
         """
-        Creting folder to save all files processed from landsat raw files
-        :return:
+        Creting folder to save all files processed from landsat raw files (results from processing)
+        :return: Folder called as "PROCESSADA"
         """
 
         dir_list = glob('{}{}'.format(self.output_processed, "/*"), recursive=True)
@@ -53,7 +53,7 @@ class PreProcess2TA:
         tar.extractall('/tmp')
         tar.close()
 
-    def stack_all_30m_band(self):
+    def stack_all_30m_band_landsat(self):
         """
         Stacking all bands from landsat which has 30m spatial resolution.
         :return: File stacking with landsat bands from 1-7 and 9.
@@ -63,7 +63,7 @@ class PreProcess2TA:
                   "{tmp}LC08*_B[1-7,9].TIF".format(tmp=self.tmp_raster_folder)
         os.system(command)
 
-    def stack_345_30m_band(self):
+    def stack_345_30m_band_landsat(self):
         """
         Stacking all bands usefull for forest monitor from landsat which has 30m spatial resolution. They are bands
         from 3 to 6
@@ -171,15 +171,28 @@ class PreProcess2TA:
         pass
 
     def run_make_folder_input_data(self):
-
+        """
+        1) Create folder where all scene of landsat images will be saved
+        2) Create folder where files from only one landsat scene images will be saved (results of one scene)
+        3) Uncompress tar.gz file and save all bands of landsat in tmp folder
+        4) Create stacking from all image that have 30m of spatial resolution (size of pixel)
+        5) Create stacking bands 345 from landsat image
+        6) Create stacking bands from thermal landsat bands
+        :return:
+        """
         self.create_folder_output_processed()
         self.create_folder_output_file_processed()
         self.uncompress_targz()
-        self.stack_all_30m_band()
-        self.stack_345_30m_band()
+        self.stack_all_30m_band_landsat()
+        self.stack_345_30m_band_landsat()
         self.stack_termal_band()
 
     def run_cloud_shadow_fmask(self):
+        """
+        Run fsmak that will return classification which have five classes (cloud, shadow, water, "soil")
+        The output will be raster and vector
+        :return:
+        """
 
         self.create_angle_img()
         self.saturation_mask()
@@ -188,6 +201,10 @@ class PreProcess2TA:
         self.cloud_raster2vector()
 
     def run_segmentation(self):
+        """
+        Segmenting landsat image
+        :return:
+        """
 
         # self.get_segmentation_slico(10, 10)
         # self.get_segmentation_seeds(8, 25)
