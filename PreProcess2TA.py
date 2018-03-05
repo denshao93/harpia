@@ -189,7 +189,8 @@ class PreProcess2TA:
 
     def run_cloud_shadow_fmask(self):
         """
-        Run fsmak that will return classification which have five classes (cloud, shadow, water, "soil")
+        Run fsmak that will return classification of image processed which have five classes (cloud, shadow, water,
+         "soil")
         The output will be raster and vector
         :return:
         """
