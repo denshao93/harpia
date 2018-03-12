@@ -191,7 +191,7 @@ class PreProcess2TA:
         """
         Run fsmak that will return classification of image processed which have five classes (cloud, shadow, water,
          "soil")
-        The output will be raster and vector
+        The output will be raster and vectorda
         :return:
         """
 
