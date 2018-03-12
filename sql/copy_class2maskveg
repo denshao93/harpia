@@ -1,0 +1,25 @@
+DELETE FROM mask_veg;
+ALTER TABLE mask_veg ALTER COLUMN ogr_geometry SET DATA TYPE geometry;
+INSERT INTO mask_veg (fid, cell_oid, class_name, ogr_geometry)
+SELECT 
+	row_number() OVER () AS fid,
+	cell_oid,
+	class_name,
+	ogr_geometry
+	FROM 
+	(
+	SELECT
+    	cell_oid,
+    	class_name,
+    	(ST_Dump(ST_Union(t.spatial_data))).geom as ogr_geometry
+	FROM
+    	"class" as t
+	GROUP BY
+		cell_oid,
+    	class_name
+	) AS merge;
+	
+ALTER TABLE mask_veg
+ ALTER COLUMN ogr_geometry TYPE geometry(Polygon,4674) 
+  USING ST_SetSRID(ogr_geometry,4674);
+	
