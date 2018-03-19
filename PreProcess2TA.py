@@ -2,6 +2,7 @@ import os
 import fiona
 import shutil
 import tarfile
+import tempfile
 from glob import glob
 import LandsatFileInfo as LCinf
 import ConnectionTaDatabase as Conn
@@ -18,11 +19,12 @@ class PreProcess2TA:
 
         self.file_name_targz = LCinf.LandsatFileInfo(self.raster_file_path_targz).get_file_name()
         # Temporary folder to put files to process and remove after that
-        self.tmp_raster_folder = '{}{}{}'.format('/tmp/', self.file_name_targz, '/')
+        # self.tmp_raster_folder = '{}{}{}'.format('/tmp/', self.file_name_targz, '/')
+        self.tmp = tempfile.gettempdir()
 
     def create_folder_output_processed(self):
         """
-        Creting folder to save all files processed from landsat raw files (results from processing)
+        Creting folder to save all scenes processed from landsat raw files (results from processing)
         :return: Folder called as "PROCESSADA"
         """
 
@@ -47,11 +49,41 @@ class PreProcess2TA:
 
         return '{}{}{}{}'.format(self.output_processed, 'PROCESSADA/', self.file_name_targz, '/')
 
-    def uncompress_targz(self):
+    def get_folder_tmp_scene_name(self):
 
-        tar = tarfile.open(self.raster_file_path_targz, "r")
-        tar.extractall('/tmp')
-        tar.close()
+        return '{}{}{}'.format(self.tmp, self.file_name_targz, '/')
+
+    def uncompress_targz_image_as_epsg_4674(self):
+        """
+        This function uncompress tar.gz files donwloaded from USGS
+        Befeor it, all image files are converted from WGS 84 UTM 24N to SIRGAS 2000
+        :return:
+        """
+
+        try:
+            tmp = tempfile.mkdtemp()
+            output_folder_reprojetcted = '{}/{}'.format(self.tmp, self.file_name_targz)
+
+            if not os.path.exists(output_folder_reprojetcted):
+                os.mkdir('{}/{}'.format(self.tmp, self.file_name_targz))
+
+            with tarfile.open(self.raster_file_path_targz, "r") as tar:
+                tar.extractall('{}/'.format(tmp))
+
+            list_raster_folder = glob('{}{}'.format(tmp, '/*/*TIF'))
+
+            for tif in list_raster_folder:
+                img_name = tif.split('/')[-1]
+                command = "gdalwarp {img_src} {img_output}/{img_name}.TIF -s_srs EPSG:32624 -t_srs EPSG:4674" \
+                    .format(img_src=tif,
+                            img_output=output_folder_reprojetcted,
+                            img_name=img_name)
+                os.system(command)
+
+        except IOError:
+            print('IOError')
+        finally:
+            shutil.rmtree(tmp)
 
     def stack_all_30m_band_landsat(self):
         """
@@ -60,7 +92,7 @@ class PreProcess2TA:
         """
 
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}ref.img " \
-                  "{tmp}LC08*_B[1-7,9].TIF".format(tmp=self.tmp_raster_folder)
+                  "{tmp}LC08*_B[1-7,9].TIF".format(tmp=self.tmp)
         os.system(command)
 
     def stack_345_30m_band_landsat(self):
@@ -70,7 +102,7 @@ class PreProcess2TA:
         :return: File stacking with landsat bands from 3-6.
         """
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {out}{file_name}.TIF " \
-                  "{tmp}LC08*_B[3-5].TIF".format(tmp=self.tmp_raster_folder,
+                  "{tmp}LC08*_B[3-5].TIF".format(tmp=self.tmp,
                                                  out=self.get_folder_output_file_processed_path(),
                                                  file_name=self.file_name_targz)
         os.system(command)
@@ -81,32 +113,32 @@ class PreProcess2TA:
         :return: File stacking with landsat bands from 0 and 1.
         """
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}thermal.img " \
-                  "{tmp}LC08*_B1[0,1].TIF".format(tmp=self.tmp_raster_folder)
+                  "{tmp}LC08*_B1[0,1].TIF".format(tmp=self.tmp)
         os.system(command)
 
     def create_angle_img(self):
 
         command = "fmask_usgsLandsatMakeAnglesImage.py -m {tmp}*_MTL.txt -t {tmp}ref.img -o {tmp}angles.img"\
-            .format(tmp=self.tmp_raster_folder)
+            .format(tmp=self.tmp)
         os.system(command)
 
     def saturation_mask(self):
 
         command = "fmask_usgsLandsatSaturationMask.py -i {tmp}ref.img -m {tmp}*_MTL.txt -o {tmp}saturationmask.img"\
-            .format(tmp=self.tmp_raster_folder)
+            .format(tmp=self.tmp)
         os.system(command)
 
     def landsat_toa(self):
 
         command = "fmask_usgsLandsatTOA.py -i {tmp}ref.img -m {tmp}*_MTL.txt -z {tmp}angles.img -o {tmp}toa.img"\
-            .format(tmp=self.tmp_raster_folder)
+            .format(tmp=self.tmp)
         os.system(command)
 
     def cloud_detection(self):
 
         command = "fmask_usgsLandsatStacked.py -t {tmp}thermal.img -a {tmp}toa.img -m {tmp}*_MTL.txt -z " \
                   "{tmp}angles.img -s {tmp}saturationmask.img -o {out}cloud.img"\
-            .format(tmp=self.tmp_raster_folder, out=self.get_folder_output_file_processed_path())
+            .format(tmp=self.tmp, out=self.get_folder_output_file_processed_path())
         os.system(command)
 
     def cloud_raster2vector(self):
@@ -117,7 +149,7 @@ class PreProcess2TA:
 
     def del_folder_file_tmp(self):
 
-        shutil.rmtree(self.tmp_raster_folder)
+        shutil.rmtree(self.tmp)
 
     def get_segmentation_slico(self, region, inter):
         """
@@ -128,7 +160,7 @@ class PreProcess2TA:
         command = "~/gdal-segment/bin/gdal-segment -algo LSC -region {r} -niter {i} {tmp}ref.img -out {out}" \
                   "{file_name}-slico.shp".format(r=region,
                                                  i=inter,
-                                                 tmp=self.tmp_raster_folder,
+                                                 tmp=self.tmp,
                                                  out=self.get_folder_output_file_processed_path(),
                                                  file_name=self.file_name_targz)
         os.system(command)
@@ -141,7 +173,7 @@ class PreProcess2TA:
         command = "~/gdal-segment/bin/gdal-segment -algo SEEDS -region {r} -niter {i} {out}{file_name}.TIF -out " \
                   "{out}{file_name}-seeds.shp".format(r=region,
                                                       i=inter,
-                                                      tmp=self.tmp_raster_folder,
+                                                      tmp=self.tmp,
                                                       out=self.get_folder_output_file_processed_path(),
                                                       file_name=self.file_name_targz)
         os.system(command)
@@ -167,9 +199,6 @@ class PreProcess2TA:
 
         return multipoly
 
-    def select_segments_by_lc_scene(self):
-        pass
-
     def run_make_folder_input_data(self):
         """
         1) Create folder where all scene of landsat images will be saved
@@ -180,12 +209,13 @@ class PreProcess2TA:
         6) Create stacking bands from thermal landsat bands
         :return:
         """
-        self.create_folder_output_processed()
-        self.create_folder_output_file_processed()
-        self.uncompress_targz()
-        self.stack_all_30m_band_landsat()
-        self.stack_345_30m_band_landsat()
-        self.stack_termal_band()
+        # self.create_folder_output_processed()
+        # self.create_folder_output_file_processed()
+        self.uncompress_targz_image_as_epsg_4674()
+        # self.stack_all_30m_band_landsat()
+        # self.stack_345_30m_band_landsat()
+        # self.stack_termal_band()
+        # self.reproject_raster_from_folder()
 
     def run_cloud_shadow_fmask(self):
         """
