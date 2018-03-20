@@ -19,7 +19,6 @@ class PreProcess2TA:
 
         self.file_name_targz = LCinf.LandsatFileInfo(self.raster_file_path_targz).get_file_name()
         # Temporary folder to put files to process and remove after that
-        # self.tmp_raster_folder = '{}{}{}'.format('/tmp/', self.file_name_targz, '/')
         self.tmp = tempfile.gettempdir()
 
     def create_folder_output_processed(self):
@@ -209,13 +208,12 @@ class PreProcess2TA:
         6) Create stacking bands from thermal landsat bands
         :return:
         """
-        # self.create_folder_output_processed()
-        # self.create_folder_output_file_processed()
+        self.create_folder_output_processed()
+        self.create_folder_output_file_processed()
         self.uncompress_targz_image_as_epsg_4674()
-        # self.stack_all_30m_band_landsat()
-        # self.stack_345_30m_band_landsat()
-        # self.stack_termal_band()
-        # self.reproject_raster_from_folder()
+        self.stack_all_30m_band_landsat()
+        self.stack_345_30m_band_landsat()
+        self.stack_termal_band()
 
     def run_cloud_shadow_fmask(self):
         """
@@ -237,7 +235,5 @@ class PreProcess2TA:
         :return:
         """
 
-        # self.get_segmentation_slico(10, 10)
+        self.get_segmentation_slico(10, 10)
         # self.get_segmentation_seeds(8, 25)
-        pass
-

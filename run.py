@@ -19,8 +19,8 @@ if __name__ == "__main__":
     if raster.file_name_targz not in folder_name_list_processed_file:
         start = time.time()
         raster.run_make_folder_input_data()
-        # raster.run_cloud_shadow_fmask()
-        # raster.run_segmentation()
+        raster.run_cloud_shadow_fmask()
+        raster.run_segmentation()
         print("Time processing: ", (time.time()-start)/60)
     else:
         print("Arquivo já processado")
