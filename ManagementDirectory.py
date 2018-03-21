@@ -1,5 +1,6 @@
+import os
 import sys
-from glob import glob
+import tempfile as tmp
 
 
 class ManagementDirectory:
@@ -7,12 +8,12 @@ class ManagementDirectory:
     def __init__(self,
                  dir_all_targz,
                  raster_file_path_targz,
-                 output_dir_image_processed):
+                 output_root_dir_image_processed):
         """
         This class organizes folder in order to have structure directories to pre-processing landsast images
         :param dir_all_targz: Directory that store all tar.gz files downloaded from USGS.
         :param raster_file_path_targz: Path of tar.gz file stored in directory
-        :param output_dir_image_processed: The root directory where image processed will be stored organized
+        :param output_root_dir_image_processed: The root directory where image processed will be stored organized
                                            by name of satellite, year and path row (ex.from landsat 8:
                                            LC8/2017/215069).
         """
@@ -23,42 +24,70 @@ class ManagementDirectory:
         self.dir_all_targz = dir_all_targz
 
         # Output image processed is a place where image processed output will be stored (ex. compositions, segmentation)
-        self.output_dir_image_processed = output_dir_image_processed
+        self.output_dir_image_processed = output_root_dir_image_processed
 
-    def create_root_dir_processed(self, name_of_folder):
+    def create_root_dir_processed(self, dir_name):
         """
-        :param name_of_folder: Given directory name where all scene processed will be organized and stored
+        Creating directory where files will be organized. This is the processed directory ooutput.
+        The sugestion is that set name as PROCESSADA
+        :param dir_name: Giving name for directory where all scene processed will be organized and stored
         :return:
         """
+        dir_path = '{}/{}'.format(self.output_dir_image_processed, dir_name)
 
-        pass
+        if not os.path.exists(dir_path):
+            os.mkdir(dir_path)
 
-    def get_list_targz_files_from_dir_all_targz(self):
-        """
-        Getting list of tar.gz files in folders recursively
-        :return: list of tar.gz files
-        """
-        return glob('{}{}'.format(self.dir_all_targz, '/*tar.gz'), recursive=True)
+    def get_file_name_from_targz(self):
+
+        return os.path.basename(self.raster_file_path_targz)
+
+    def get_path_row_from_targz(self):
+
+        return self.get_file_name_from_targz()[10:15]
+
+    # TODO fazendo a criação da pasta com year/pathrow/namefile.tar.gz
+    def create_image_year_pathrow_dir(self):
+
+        dir_path = '{}/{}'.format(self.output_dir_image_processed)
+
+        if not os.path.exists(dir_path):
+            os.mkdir(dir_path)
+
+    def create_tmp_folder(self):
+
+        temp = tmp.TemporaryDirectory()
+
+        return temp
+
+    def close_tmp_folder(self):
+
+        self.create_tmp_folder().cleanup()
+
+    def get_tmp_folder_path(self):
+
+        self.create_tmp_folder()
+
+    def run_manage_directory(self):
+
+        # Making folder which will store files processed
+        self.create_root_dir_processed('PROCESSADA')
+        self.create_image_year_pathrow_dir()
+
+        # Creating tmp folder to put row image bands used to processed
+        self.create_tmp_folder()
 
 
-    def get_folder_name():
 
-        return glob(folder, recursive=True)
-
-
-    def get_list_folder_name_from_processed_dir(folder):
-
-        list_folder = glob('{}{}'.format(folder, '/*/'))
-        list_folder_name = [i.split('/')[-2] for i in [i.split(',')[0] for i in list_folder]]
-        return list_folder_name
 
 
 if __name__ == "__main__":
 
     mdir = ManagementDirectory(dir_all_targz=sys.argv[1],
                                raster_file_path_targz=sys.argv[2],
-                               output_dir_image_processed=sys.argv[3])
-    mdir.dir_all_targz
+                               output_root_dir_image_processed=sys.argv[3])
+
+
 
 
 

@@ -3,18 +3,27 @@ import sys
 
 class LandsatFileInfo:
 
-    def __init__(self, raster_file_path_targz):
-        # Input row file (landsat file compressed like dowloaded from USGS)
-        self.raster_file_path_targz = raster_file_path_targz
+    def __init__(self, metadata_path):
 
-    def get_file_name(self):
+        self.metadata_path = metadata_path
+
+    def read_lc8_metadata(self):
         """
-        Get file name
+        Reading metadata file (MTL.txt) from landsat 8 image
         :return:
         """
-        file_name = str(self.raster_file_path_targz).split('/')[-1][:-7]
+        f = open(self.metadata_path, 'r')  # open file for reading
+        output = {}  # Dict
+        for line in f.readlines():  # Iterates through every line in the string
+            if "=" in line:  # make sure line has data as wanted
+                l = line.split("=")  # Seperate by "=" and put into a list
+                output[l[0].strip()] = l[1].strip()  # First word is key, second word is value
 
-        return file_name
+        return output  # Returns a dictionary with the key, value pairs.
+
+        data = build_data(f)
+
+        return data
 
     def get_path_row_from_file(self):
         """
