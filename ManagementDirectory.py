@@ -24,7 +24,7 @@ class ManagementDirectory:
         self.dir_all_targz = dir_all_targz
 
         # Output image processed is a place where image processed output will be stored (ex. compositions, segmentation)
-        self.output_dir_image_processed = output_root_dir_image_processed
+        self.output_root_dir_image_processed = output_root_dir_image_processed
 
     def create_root_dir_processed(self, dir_name):
         """
@@ -33,52 +33,41 @@ class ManagementDirectory:
         :param dir_name: Giving name for directory where all scene processed will be organized and stored
         :return:
         """
-        dir_path = '{}/{}'.format(self.output_dir_image_processed, dir_name)
+        dir_path = '{}/{}'.format(self.output_root_dir_image_processed, dir_name)
 
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
 
     def get_file_name_from_targz(self):
 
-        return os.path.basename(self.raster_file_path_targz)
+        base = os.path.basename(self.raster_file_path_targz)
+
+        return '.'.join(base.split('.')[:-2])
 
     def get_path_row_from_targz(self):
 
-        return self.get_file_name_from_targz()[10:15]
+        return self.get_file_name_from_targz()[10:16]
 
-    # TODO fazendo a criação da pasta com year/pathrow/namefile.tar.gz
+    def get_image_year_aquisition_date(self):
+
+        return self.get_file_name_from_targz()[17:21]
+
     def create_image_year_pathrow_dir(self):
 
-        dir_path = '{}/{}'.format(self.output_dir_image_processed)
+        dir_path = '{}/PROCESSADA/{year}/' \
+                   '{path_row}/{file_name}/'.format(self.output_root_dir_image_processed,
+                                                    year=self.get_image_year_aquisition_date(),
+                                                    path_row=self.get_path_row_from_targz(),
+                                                    file_name=self.get_file_name_from_targz())
 
         if not os.path.exists(dir_path):
-            os.mkdir(dir_path)
-
-    def create_tmp_folder(self):
-
-        temp = tmp.TemporaryDirectory()
-
-        return temp
-
-    def close_tmp_folder(self):
-
-        self.create_tmp_folder().cleanup()
-
-    def get_tmp_folder_path(self):
-
-        self.create_tmp_folder()
+            os.makedirs(dir_path)
 
     def run_manage_directory(self):
 
         # Making folder which will store files processed
         self.create_root_dir_processed('PROCESSADA')
         self.create_image_year_pathrow_dir()
-
-        # Creating tmp folder to put row image bands used to processed
-        self.create_tmp_folder()
-
-
-
 
 
 if __name__ == "__main__":
