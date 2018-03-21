@@ -1,6 +1,5 @@
 import os
 import sys
-import tempfile as tmp
 
 
 class ManagementDirectory:
