@@ -1,20 +1,18 @@
 import sys
 import os
 import ManagementDirectory as md
+import PreProcess2TA as p2ta
 
 if __name__ == "__main__":
 
     # Runing pre-processing Landsat 8 repository for forest monitoring project to Bahia
-    # raster = Pre2TA.PreProcess2TA(raster_file_path_targz=sys.argv[1],
-    #                               set_output_processed_repo=sys.argv[2])
 
-    # TODO Adicionar o loop para colocar todos os arquivos tar.gz para rodar
+    # TODO ver se o arquivos já foi processado. Só processar aquilo que nunca foi processado
     # Check if tar.gz file have already processed before
     # Comparing if file name exist in list of folder name processed
 
     for subdir, dirs, files in os.walk(sys.argv[1]):
         for file in files:
-            # print os.path.join(subdir, file)
                 if file.endswith(".tar.gz"):
                     print(file)
                     file_path = subdir + os.sep + file
@@ -24,4 +22,16 @@ if __name__ == "__main__":
                                                   raster_file_path_targz=file_path)
 
                     mdir.run_manage_directory()
+
+
+                    # The path from processed image
+                    # TODO resolver o problema do bound methods que não permite gravar os arquivos na pasta criada
+                    image_output = mdir.get_image_year_pathrow_dir()
+
+                    preporcessing = p2ta.PreProcess2TA(image_file_path_targz=file_path,
+                                                       image_output_path=image_output)
+
+                    preporcessing.run_image_composition()
+
+
 

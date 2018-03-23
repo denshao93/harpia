@@ -4,53 +4,25 @@ import shutil
 import tarfile
 import tempfile
 from glob import glob
-import LandsatFileInfo as LCinf
-import ConnectionTaDatabase as Conn
+import LandsatFileInfo as LcInfo
+import Connection2Database as Conn
 from shapely.geometry import shape, MultiPolygon
 
 
 class PreProcess2TA:
 
-    def __init__(self, raster_file_path_targz, set_output_processed_repo):
+    def __init__(self, image_file_path_targz, image_output_path):
         # Input row file (landsat file compressed like dowloaded from USGS)
-        self.raster_file_path_targz = raster_file_path_targz
-        # OutputProcessed is a place where all processed output will be save (ex. compositions, segmentation)
-        self.output_processed = set_output_processed_repo
+        self.image_file_path_targz = image_file_path_targz
 
-        self.file_name_targz = LCinf.LandsatFileInfo(self.raster_file_path_targz).get_file_name()
         # Temporary folder to put files to process and remove after that
         self.tmp = tempfile.gettempdir()
 
-    def create_folder_output_processed(self):
-        """
-        Creting folder to save all scenes processed from landsat raw files (results from processing)
-        :return: Folder called as "PROCESSADA"
-        """
+    def get_file_name_from_targz(self):
 
-        dir_list = glob('{}{}'.format(self.output_processed, "/*"), recursive=True)
+        base = os.path.basename(self.raster_file_path_targz)
 
-        if '{}{}'.format(self.output_processed, 'PROCESSADA') not in dir_list:
-            os.mkdir('{}{}'.format(self.output_processed, "/PROCESSADA"))
-
-    def get_folder_output_processed_path(self):
-
-        return '{}{}'.format(self.output_processed, 'PROCESSADA')
-
-    def create_folder_output_file_processed(self):
-
-        dir_list = glob('{}{}'.format(self.output_processed, "/*/*"), recursive=True)
-        raster_output_processed_files = '{}{}{}'.format(self.output_processed, 'PROCESSADA/', self.file_name_targz)
-
-        if raster_output_processed_files not in dir_list:
-            os.mkdir(raster_output_processed_files)
-
-    def get_folder_output_file_processed_path(self):
-
-        return '{}{}{}{}'.format(self.output_processed, 'PROCESSADA/', self.file_name_targz, '/')
-
-    def get_folder_tmp_scene_name(self):
-
-        return '{}{}{}'.format(self.tmp, self.file_name_targz, '/')
+        return '.'.join(base.split('.')[:-2])
 
     def uncompress_targz_image_as_epsg_4674(self):
         """
@@ -61,13 +33,13 @@ class PreProcess2TA:
 
         try:
             tmp = tempfile.mkdtemp()
-            output_folder_reprojetcted = '{}/{}'.format(self.tmp, self.file_name_targz)
+            output_dir_reprojected = '{}/{}'.format(self.tmp, self.get_file_name_from_targz)
 
-            if not os.path.exists(output_folder_reprojetcted):
-                os.mkdir('{}/{}'.format(self.tmp, self.file_name_targz))
+            if not os.path.exists(output_dir_reprojected):
+                os.mkdir('{}/{}'.format(self.tmp, self.get_file_name_from_targz))
 
-            with tarfile.open(self.raster_file_path_targz, "r") as tar:
-                tar.extractall('{}/'.format(tmp))
+            with tarfile.open(self.image_file_path_targz, "r") as tar:
+                tar.extractall(tmp)
 
             list_raster_folder = glob('{}{}'.format(tmp, '/*/*TIF'))
 
@@ -75,7 +47,7 @@ class PreProcess2TA:
                 img_name = tif.split('/')[-1]
                 command = "gdalwarp {img_src} {img_output}/{img_name}.TIF -s_srs EPSG:32624 -t_srs EPSG:4674" \
                     .format(img_src=tif,
-                            img_output=output_folder_reprojetcted,
+                            img_output=output_dir_reprojected,
                             img_name=img_name)
                 os.system(command)
 
@@ -103,7 +75,7 @@ class PreProcess2TA:
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {out}{file_name}.TIF " \
                   "{tmp}LC08*_B[3-5].TIF".format(tmp=self.tmp,
                                                  out=self.get_folder_output_file_processed_path(),
-                                                 file_name=self.file_name_targz)
+                                                 file_name=self.get_file_name_from_targz)
         os.system(command)
 
     def stack_termal_band(self):
@@ -143,7 +115,7 @@ class PreProcess2TA:
     def cloud_raster2vector(self):
 
         command = "gdal_polygonize.py {out}cloud.img {out}cs_{file_name}.shp"\
-            .format(out=self.get_folder_output_file_processed_path(), file_name=self.file_name_targz)
+            .format(out=self.get_folder_output_file_processed_path(), file_name=self.get_file_name_from_targz)
         os.system(command)
 
     def del_folder_file_tmp(self):
@@ -161,7 +133,7 @@ class PreProcess2TA:
                                                  i=inter,
                                                  tmp=self.tmp,
                                                  out=self.get_folder_output_file_processed_path(),
-                                                 file_name=self.file_name_targz)
+                                                 file_name=self.get_file_name_from_targz)
         os.system(command)
 
     def get_segmentation_seeds(self, region, inter):
@@ -174,13 +146,13 @@ class PreProcess2TA:
                                                       i=inter,
                                                       tmp=self.tmp,
                                                       out=self.get_folder_output_file_processed_path(),
-                                                      file_name=self.file_name_targz)
+                                                      file_name=self.get_file_name_from_targz)
         os.system(command)
 
     def get_geom_from_lc_ba_scene(self):
 
         connection = Conn.Connection("host=localhost dbname=ta7 user=postgres password=postgres")
-        pathrow = LCinf.LandsatFileInfo(self.raster_file_path_targz).get_path_row_from_file()
+        pathrow = LcInfo.LandsatFileInfo(self.image_file_path_targz).get_path_row_from_file()
         path_row = '{}/{}'.format(pathrow[0], pathrow[1])
         lc_scene_geom = connection.get_scene_path_row_geom(path_row)[0][2]
 
@@ -192,13 +164,13 @@ class PreProcess2TA:
         :return: Segments from segmentation that intersect landsat scene interested to Bahia monitoring forest project
         """
         file_path = '{out}{file_name}-seeds.shp'.format(out=self.get_folder_output_file_processed_path(),
-                                                        file_name=self.file_name_targz)
+                                                        file_name=self.get_file_name_from_targz)
         # MultiPolygon from the list of Polygons
         multipoly = MultiPolygon([shape(pol['geometry']) for pol in fiona.open(file_path)])
 
         return multipoly
 
-    def run_make_folder_input_data(self):
+    def run_image_composition(self):
         """
         1) Create folder where all scene of landsat images will be saved
         2) Create folder where files from only one landsat scene images will be saved (results of one scene)
@@ -208,8 +180,6 @@ class PreProcess2TA:
         6) Create stacking bands from thermal landsat bands
         :return:
         """
-        self.create_folder_output_processed()
-        self.create_folder_output_file_processed()
         self.uncompress_targz_image_as_epsg_4674()
         self.stack_all_30m_band_landsat()
         self.stack_345_30m_band_landsat()

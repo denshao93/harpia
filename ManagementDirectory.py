@@ -51,6 +51,7 @@ class ManagementDirectory:
 
         return self.get_file_name_from_targz()[17:21]
 
+    # TODO ver com Ailton uma sugestão para a criação dessa pasta PROCESSADA.
     def create_image_year_pathrow_dir(self):
 
         dir_path = '{}/PROCESSADA/{year}/' \
@@ -61,6 +62,15 @@ class ManagementDirectory:
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
+
+    def get_image_year_pathrow_dir(self):
+
+        dir_path = '{}/PROCESSADA/{year}/' \
+                   '{path_row}/{file_name}'.format(self.output_root_dir_image_processed,
+                                                   year=self.get_image_year_aquisition_date(),
+                                                   path_row=self.get_path_row_from_targz(),
+                                                   file_name=self.get_file_name_from_targz())
+        return dir_path
 
     def run_manage_directory(self):
 
