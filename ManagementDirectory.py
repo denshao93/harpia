@@ -44,6 +44,11 @@ class ManagementDirectory:
         return '.'.join(base.split('.')[:-2])
 
     def get_path_row_from_targz(self):
+        """
+        pathrow is the name of scene from landsat (ex. 215/068)
+        This values are in the title of file
+        :return:
+        """
 
         return self.get_file_name_from_targz()[10:16]
 
