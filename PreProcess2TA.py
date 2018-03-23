@@ -33,10 +33,10 @@ class PreProcess2TA:
 
         try:
             tmp = tempfile.mkdtemp()
-            output_dir_reprojected = '{}/{}'.format(self.tmp, self.get_file_name_from_targz)
+            output_dir_reprojected = os.path.join(self.tmp, self.get_file_name_from_targz)
 
             if not os.path.exists(output_dir_reprojected):
-                os.mkdir('{}/{}'.format(self.tmp, self.get_file_name_from_targz))
+                os.mkdir(os.path.join(self.tmp, self.get_file_name_from_targz))
 
             with tarfile.open(self.image_file_path_targz, "r") as tar:
                 tar.extractall(tmp)

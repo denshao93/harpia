@@ -32,7 +32,7 @@ class ManagementDirectory:
         :param dir_name: Giving name for directory where all scene processed will be organized and stored
         :return:
         """
-        dir_path = '{}/{}'.format(self.output_root_dir_image_processed, dir_name)
+        dir_path = os.path.join(self.output_root_dir_image_processed, dir_name)
 
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
@@ -54,22 +54,22 @@ class ManagementDirectory:
     # TODO ver com Ailton uma sugestão para a criação dessa pasta PROCESSADA.
     def create_image_year_pathrow_dir(self):
 
-        dir_path = '{}/PROCESSADA/{year}/' \
-                   '{path_row}/{file_name}/'.format(self.output_root_dir_image_processed,
-                                                    year=self.get_image_year_aquisition_date(),
-                                                    path_row=self.get_path_row_from_targz(),
-                                                    file_name=self.get_file_name_from_targz())
+        dir_path = os.path.join(self.output_root_dir_image_processed,
+                                'PROCESSADA',
+                                self.get_image_year_aquisition_date(),
+                                self.get_path_row_from_targz(),
+                                self.get_file_name_from_targz())
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
     def get_image_year_pathrow_dir(self):
 
-        dir_path = '{}/PROCESSADA/{year}/' \
-                   '{path_row}/{file_name}'.format(self.output_root_dir_image_processed,
-                                                   year=self.get_image_year_aquisition_date(),
-                                                   path_row=self.get_path_row_from_targz(),
-                                                   file_name=self.get_file_name_from_targz())
+        dir_path = os.path.join(self.output_root_dir_image_processed,
+                                'PROCESSADA',
+                                self.get_image_year_aquisition_date(),
+                                self.get_path_row_from_targz(),
+                                self.get_file_name_from_targz())
         return dir_path
 
     def run_manage_directory(self):
