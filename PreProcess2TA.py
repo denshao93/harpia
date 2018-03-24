@@ -15,14 +15,16 @@ class PreProcess2TA:
         # Input row file (landsat file compressed like dowloaded from USGS)
         self.image_file_path_targz = image_file_path_targz
 
+        self.image_output_path = image_output_path
+
         # Temporary folder to put files to process and remove after that
-        self.tmp = tempfile.gettempdir()
+        self.tmp = '{}{}'.format(tempfile.gettempdir(), '/')
 
-    def get_file_name_from_targz(self):
+    def get_file_name_targz(self):
 
-        base = os.path.basename(self.raster_file_path_targz)
+        head, tail = os.path.split(self.image_file_path_targz)
 
-        return '.'.join(base.split('.')[:-2])
+        return tail.split('.')[0]
 
     def uncompress_targz_image_as_epsg_4674(self):
         """
@@ -33,10 +35,10 @@ class PreProcess2TA:
 
         try:
             tmp = tempfile.mkdtemp()
-            output_dir_reprojected = os.path.join(self.tmp, self.get_file_name_from_targz)
+            output_dir_reprojected = os.path.join(self.tmp, self.get_file_name_targz())
 
             if not os.path.exists(output_dir_reprojected):
-                os.mkdir(os.path.join(self.tmp, self.get_file_name_from_targz))
+                os.mkdir(os.path.join(self.tmp, self.get_file_name_targz()))
 
             with tarfile.open(self.image_file_path_targz, "r") as tar:
                 tar.extractall(tmp)
@@ -45,7 +47,7 @@ class PreProcess2TA:
 
             for tif in list_raster_folder:
                 img_name = tif.split('/')[-1]
-                command = "gdalwarp {img_src} {img_output}/{img_name}.TIF -s_srs EPSG:32624 -t_srs EPSG:4674" \
+                command = "gdalwarp {img_src} {img_output}/{img_name} -s_srs EPSG:32624 -t_srs EPSG:4674" \
                     .format(img_src=tif,
                             img_output=output_dir_reprojected,
                             img_name=img_name)
@@ -62,8 +64,11 @@ class PreProcess2TA:
         :return: File stacking with landsat bands from 1-7 and 9.
         """
 
-        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}ref.img " \
-                  "{tmp}LC08*_B[1-7,9].TIF".format(tmp=self.tmp)
+        print('stack_all_30m_band_landsat...')
+
+        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}{img_name}/ref.img " \
+                  "{tmp}{img_name}/LC08*_B[1-7,9].TIF".format(tmp=self.tmp,
+                                                              img_name=self.get_file_name_targz())
         os.system(command)
 
     def stack_345_30m_band_landsat(self):
@@ -72,10 +77,11 @@ class PreProcess2TA:
         from 3 to 6
         :return: File stacking with landsat bands from 3-6.
         """
-        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {out}{file_name}.TIF " \
-                  "{tmp}LC08*_B[3-5].TIF".format(tmp=self.tmp,
-                                                 out=self.get_folder_output_file_processed_path(),
-                                                 file_name=self.get_file_name_from_targz)
+        print('stack_345_30m_band_landsat...')
+        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {out}/{img_name}.TIF " \
+                  "{tmp}{img_name}/LC08*_B[3-5].TIF".format(tmp=self.tmp,
+                                                            out=self.image_output_path,
+                                                            img_name=self.get_file_name_targz())
         os.system(command)
 
     def stack_termal_band(self):
@@ -83,8 +89,9 @@ class PreProcess2TA:
         Stacking all thermal bands
         :return: File stacking with landsat bands from 0 and 1.
         """
-        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}thermal.img " \
-                  "{tmp}LC08*_B1[0,1].TIF".format(tmp=self.tmp)
+        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}{img_name}/thermal.img " \
+                  "{tmp}{img_name}/LC08*_B1[0,1].TIF".format(tmp=self.tmp,
+                                                             img_name=self.get_file_name_targz())
         os.system(command)
 
     def create_angle_img(self):
@@ -115,7 +122,7 @@ class PreProcess2TA:
     def cloud_raster2vector(self):
 
         command = "gdal_polygonize.py {out}cloud.img {out}cs_{file_name}.shp"\
-            .format(out=self.get_folder_output_file_processed_path(), file_name=self.get_file_name_from_targz)
+            .format(out=self.get_folder_output_file_processed_path(), file_name=self.get_file_name_targz)
         os.system(command)
 
     def del_folder_file_tmp(self):
@@ -133,7 +140,7 @@ class PreProcess2TA:
                                                  i=inter,
                                                  tmp=self.tmp,
                                                  out=self.get_folder_output_file_processed_path(),
-                                                 file_name=self.get_file_name_from_targz)
+                                                 file_name=self.get_file_name_targz)
         os.system(command)
 
     def get_segmentation_seeds(self, region, inter):
@@ -146,7 +153,7 @@ class PreProcess2TA:
                                                       i=inter,
                                                       tmp=self.tmp,
                                                       out=self.get_folder_output_file_processed_path(),
-                                                      file_name=self.get_file_name_from_targz)
+                                                      file_name=self.get_file_name_targz)
         os.system(command)
 
     def get_geom_from_lc_ba_scene(self):
@@ -164,7 +171,7 @@ class PreProcess2TA:
         :return: Segments from segmentation that intersect landsat scene interested to Bahia monitoring forest project
         """
         file_path = '{out}{file_name}-seeds.shp'.format(out=self.get_folder_output_file_processed_path(),
-                                                        file_name=self.get_file_name_from_targz)
+                                                        file_name=self.get_file_name_targz)
         # MultiPolygon from the list of Polygons
         multipoly = MultiPolygon([shape(pol['geometry']) for pol in fiona.open(file_path)])
 

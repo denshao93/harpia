@@ -4,20 +4,24 @@ import sys
 
 class ManagementDirectory:
 
+    # The name of folder where all satellite processed output will be organized and stored
+    # WARMING: If this folder has been change the place incorrectly, all files will be processed again.
+    dir_name_processed = 'PROCESSADA'
+
     def __init__(self,
                  dir_all_targz,
-                 raster_file_path_targz,
+                 image_file_path_targz,
                  output_root_dir_image_processed):
         """
         This class organizes folder in order to have structure directories to pre-processing landsast images
         :param dir_all_targz: Directory that store all tar.gz files downloaded from USGS.
-        :param raster_file_path_targz: Path of tar.gz file stored in directory
+        :param image_file_path_targz: Path of tar.gz file stored in directory
         :param output_root_dir_image_processed: The root directory where image processed will be stored organized
                                            by name of satellite, year and path row (ex.from landsat 8:
                                            LC8/2017/215069).
         """
         # Input row file (landsat file compressed (tar.gz) downloaded from USGS).
-        self.raster_file_path_targz = raster_file_path_targz
+        self.raster_file_path_targz = image_file_path_targz
 
         # Root directory where all landsat image downloaded were stored.
         self.dir_all_targz = dir_all_targz
@@ -37,11 +41,11 @@ class ManagementDirectory:
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
 
-    def get_file_name_from_targz(self):
+    def get_file_name_targz(self):
 
-        base = os.path.basename(self.raster_file_path_targz)
+        head, tail = os.path.split(self.raster_file_path_targz)
 
-        return '.'.join(base.split('.')[:-2])
+        return tail.split('.')[0]
 
     def get_path_row_from_targz(self):
         """
@@ -50,20 +54,20 @@ class ManagementDirectory:
         :return:
         """
 
-        return self.get_file_name_from_targz()[10:16]
+        return self.get_file_name_targz()[10:16]
 
     def get_image_year_aquisition_date(self):
 
-        return self.get_file_name_from_targz()[17:21]
+        return self.get_file_name_targz()[17:21]
 
     # TODO ver com Ailton uma sugestão para a criação dessa pasta PROCESSADA.
     def create_image_year_pathrow_dir(self):
 
         dir_path = os.path.join(self.output_root_dir_image_processed,
-                                'PROCESSADA',
+                                self.__class__.dir_name_processed,
                                 self.get_image_year_aquisition_date(),
                                 self.get_path_row_from_targz(),
-                                self.get_file_name_from_targz())
+                                self.get_file_name_targz())
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
@@ -71,23 +75,23 @@ class ManagementDirectory:
     def get_image_year_pathrow_dir(self):
 
         dir_path = os.path.join(self.output_root_dir_image_processed,
-                                'PROCESSADA',
+                                self.__class__.dir_name_processed,
                                 self.get_image_year_aquisition_date(),
                                 self.get_path_row_from_targz(),
-                                self.get_file_name_from_targz())
+                                self.get_file_name_targz())
         return dir_path
 
     def run_manage_directory(self):
 
         # Making folder which will store files processed
-        self.create_root_dir_processed('PROCESSADA')
+        self.create_root_dir_processed(self.__class__.dir_name_processed)
         self.create_image_year_pathrow_dir()
 
 
 if __name__ == "__main__":
 
     mdir = ManagementDirectory(dir_all_targz=sys.argv[1],
-                               raster_file_path_targz=sys.argv[2],
+                               image_file_path_targz=sys.argv[2],
                                output_root_dir_image_processed=sys.argv[3])
 
 

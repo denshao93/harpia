@@ -15,18 +15,18 @@ if __name__ == "__main__":
         for file in files:
                 if file.endswith(".tar.gz"):
                     print(file)
-                    file_path = os.path.join(subdir, os.sep, file)
+                    file_path = os.path.join(subdir, file)
 
                     mdir = md.ManagementDirectory(dir_all_targz=sys.argv[1],
                                                   output_root_dir_image_processed=sys.argv[2],
-                                                  raster_file_path_targz=file_path)
+                                                  image_file_path_targz=file_path)
 
                     mdir.run_manage_directory()
 
 
                     # The path from processed image
                     # TODO resolver o problema do bound methods que não permite gravar os arquivos na pasta criada
-                    image_output = str(mdir.get_image_year_pathrow_dir())
+                    image_output = mdir.get_image_year_pathrow_dir()
 
                     preporcessing = p2ta.PreProcess2TA(image_file_path_targz=file_path,
                                                        image_output_path=image_output)
