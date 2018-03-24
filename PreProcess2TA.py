@@ -22,9 +22,11 @@ class PreProcess2TA:
 
     def get_file_name_targz(self):
 
-        head, tail = os.path.split(self.image_file_path_targz)
+        basename = os.path.basename(self.image_file_path_targz)
 
-        return tail.split('.')[0]
+        file_name = basename.split('.')[0]
+
+        return file_name
 
     def uncompress_targz_image_as_epsg_4674(self):
         """
@@ -57,6 +59,9 @@ class PreProcess2TA:
             print('IOError')
         finally:
             shutil.rmtree(tmp)
+
+    def reproject_image_2_epsg_4675(self):
+        pass
 
     def stack_all_30m_band_landsat(self):
         """
