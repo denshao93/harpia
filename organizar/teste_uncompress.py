@@ -33,7 +33,8 @@ def extract_bands():
     except IOError as e:
         print(e)
     else:
-        t.extractall("/tmp/", members=[m for m in t.getmembers() if check())
+        # t.extractall("/tmp/", members=[m for m in t.getmembers() if check())
+        pass
 
 
 if __name__ == "__main__":

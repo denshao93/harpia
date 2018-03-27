@@ -8,6 +8,7 @@ import LandsatFileInfo as LcInfo
 import Connection2Database as Conn
 from shapely.geometry import shape, MultiPolygon
 
+# TODO rever essa classe tendo em bista o descompressão das imagens em uma classe separada
 
 class PreProcess2TA:
 
@@ -15,6 +16,7 @@ class PreProcess2TA:
         # Input row file (landsat file compressed like dowloaded from USGS)
         self.image_file_path_targz = image_file_path_targz
 
+        # The folder where output processed will be saved
         self.image_output_path = image_output_path
 
         # Temporary folder to put files to process and remove after that
@@ -28,6 +30,12 @@ class PreProcess2TA:
 
         return file_name
 
+    def create_dir_tmp_process_img(self):
+
+        tmp_img = tempfile.mkdtemp()
+
+        return tmp_img
+
     def uncompress_targz_image_as_epsg_4674(self):
         """
         This function uncompress tar.gz files donwloaded from USGS
@@ -35,33 +43,29 @@ class PreProcess2TA:
         :return:
         """
 
-        try:
-            tmp = tempfile.mkdtemp()
-            output_dir_reprojected = os.path.join(self.tmp, self.get_file_name_targz())
+        tmp = tempfile.mkdtemp()
+        output_dir_reprojected = os.path.join(self.tmp, self.get_file_name_targz())
 
-            if not os.path.exists(output_dir_reprojected):
-                os.mkdir(os.path.join(self.tmp, self.get_file_name_targz()))
+        if not os.path.exists(output_dir_reprojected):
+            os.mkdir(os.path.join(self.tmp, self.get_file_name_targz()))
 
-            with tarfile.open(self.image_file_path_targz, "r") as tar:
-                tar.extractall(tmp)
+        with tarfile.open(self.image_file_path_targz, "r") as tar:
+            tar.extractall(tmp)
 
-            list_raster_folder = glob('{}{}'.format(tmp, '/*/*TIF'))
+        mtl_path = os.path.join(tmp, '.*MTL.txt')
+        dst = os.path.join(self.tmp, self.get_file_name_targz())
+        shutil.copyfile(src=mtl_path, dst=dst)
 
-            for tif in list_raster_folder:
-                img_name = tif.split('/')[-1]
-                command = "gdalwarp {img_src} {img_output}/{img_name} -s_srs EPSG:32624 -t_srs EPSG:4674" \
-                    .format(img_src=tif,
-                            img_output=output_dir_reprojected,
-                            img_name=img_name)
-                os.system(command)
+        list_raster_folder = glob('{}{}'.format(tmp, '/*/*TIF'))
 
-        except IOError:
-            print('IOError')
-        finally:
-            shutil.rmtree(tmp)
+        for tif in list_raster_folder:
+            img_name = tif.split('/')[-1]
+            command = "gdalwarp {img_src} {img_output}/{img_name} -s_srs EPSG:32624 -t_srs EPSG:4674" \
+                .format(img_src=tif,
+                        img_output=output_dir_reprojected,
+                        img_name=img_name)
+            os.system(command)
 
-    def reproject_image_2_epsg_4675(self):
-        pass
 
     def stack_all_30m_band_landsat(self):
         """
@@ -101,27 +105,31 @@ class PreProcess2TA:
 
     def create_angle_img(self):
 
-        command = "fmask_usgsLandsatMakeAnglesImage.py -m {tmp}*_MTL.txt -t {tmp}ref.img -o {tmp}angles.img"\
-            .format(tmp=self.tmp)
+        command = "fmask_usgsLandsatMakeAnglesImage.py -m {tmp}{img_name}*_MTL.txt -t {tmp}ref.img " \
+                  "-o {tmp}angles.img"\
+            .format(tmp=self.tmp, img_name=self.get_file_name_targz())
         os.system(command)
 
     def saturation_mask(self):
 
-        command = "fmask_usgsLandsatSaturationMask.py -i {tmp}ref.img -m {tmp}*_MTL.txt -o {tmp}saturationmask.img"\
-            .format(tmp=self.tmp)
+        command = "fmask_usgsLandsatSaturationMask.py -i {tmp}ref.img -m {tmp}{img_name}/*_MTL.txt " \
+                  "-o {tmp}{img_name}/saturationmask.img"\
+            .format(tmp=self.tmp, img_name=self.get_file_name_targz())
         os.system(command)
 
     def landsat_toa(self):
 
-        command = "fmask_usgsLandsatTOA.py -i {tmp}ref.img -m {tmp}*_MTL.txt -z {tmp}angles.img -o {tmp}toa.img"\
-            .format(tmp=self.tmp)
+        command = "fmask_usgsLandsatTOA.py -i {tmp}{img_name}ref.img -m {tmp}{img_name}/*_MTL.txt " \
+                  "-z {tmp}{img_name}/angles.img -o {tmp}{img_name}/toa.img"\
+            .format(tmp=self.tmp, img_name=self.get_file_name_targz())
         os.system(command)
 
     def cloud_detection(self):
 
-        command = "fmask_usgsLandsatStacked.py -t {tmp}thermal.img -a {tmp}toa.img -m {tmp}*_MTL.txt -z " \
-                  "{tmp}angles.img -s {tmp}saturationmask.img -o {out}cloud.img"\
-            .format(tmp=self.tmp, out=self.get_folder_output_file_processed_path())
+        command = "fmask_usgsLandsatStacked.py -t {tmp}{img_name}/thermal.img -a {tmp}{img_name}/toa.img " \
+                  "-m {tmp}{img_name}/*_MTL.txt -z {tmp}{img_name}/angles.img " \
+                  "-s {tmp}{img_name}/saturationmask.img -o {out}/{img_name}/cloud.img"\
+            .format(tmp=self.tmp, out=self.image_output_path, img_name=self.get_file_name_targz())
         os.system(command)
 
     def cloud_raster2vector(self):
@@ -209,7 +217,7 @@ class PreProcess2TA:
         self.saturation_mask()
         self.landsat_toa()
         self.cloud_detection()
-        self.cloud_raster2vector()
+        # self.cloud_raster2vector()
 
     def run_segmentation(self):
         """

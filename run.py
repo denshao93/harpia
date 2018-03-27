@@ -25,13 +25,13 @@ if __name__ == "__main__":
 
 
                     # The path from processed image
-                    # TODO resolver o problema do bound methods que não permite gravar os arquivos na pasta criada
-                    image_output = mdir.get_image_year_pathrow_dir()
+                    image_output = mdir.create_image_year_pathrow_dir()
 
                     preporcessing = p2ta.PreProcess2TA(image_file_path_targz=file_path,
                                                        image_output_path=image_output)
 
                     preporcessing.run_image_composition()
+                    # preporcessing.run_cloud_shadow_fmask()
 
 
 
