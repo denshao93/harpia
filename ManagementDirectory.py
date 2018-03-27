@@ -41,11 +41,18 @@ class ManagementDirectory:
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
 
+        return dir_path
+
     def get_file_name_targz(self):
 
         head, tail = os.path.split(self.raster_file_path_targz)
 
         return tail.split('.')[0]
+
+    def get_satellite(self):
+
+        if self.get_file_name_targz()[:4]=="LC08":
+            return "LC08"
 
     def get_path_row_from_targz(self):
         """
@@ -60,11 +67,11 @@ class ManagementDirectory:
 
         return self.get_file_name_targz()[17:21]
 
-    # TODO ver com Ailton uma sugestão para a criação dessa pasta PROCESSADA.
     def create_image_year_pathrow_dir(self):
 
         dir_path = os.path.join(self.output_root_dir_image_processed,
                                 self.__class__.dir_name_processed,
+                                self.get_satellite(),
                                 self.get_image_year_aquisition_date(),
                                 self.get_path_row_from_targz(),
                                 self.get_file_name_targz())
@@ -72,13 +79,6 @@ class ManagementDirectory:
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
-    def get_image_year_pathrow_dir(self):
-
-        dir_path = os.path.join(self.output_root_dir_image_processed,
-                                self.__class__.dir_name_processed,
-                                self.get_image_year_aquisition_date(),
-                                self.get_path_row_from_targz(),
-                                self.get_file_name_targz())
         return dir_path
 
     def run_manage_directory(self):
@@ -88,11 +88,11 @@ class ManagementDirectory:
         self.create_image_year_pathrow_dir()
 
 
-if __name__ == "__main__":
-
-    mdir = ManagementDirectory(dir_all_targz=sys.argv[1],
-                               image_file_path_targz=sys.argv[2],
-                               output_root_dir_image_processed=sys.argv[3])
+# if __name__ == "__main__":
+#
+#     mdir = ManagementDirectory(dir_all_targz=sys.argv[1],
+#                                image_file_path_targz=sys.argv[2],
+#                                output_root_dir_image_processed=sys.argv[3])
 
 
 
