@@ -1,7 +1,6 @@
 import sys
 import os
 import ManagementDirectory as md
-import PreProcess2TA as p2ta
 
 if __name__ == "__main__":
 
@@ -25,13 +24,9 @@ if __name__ == "__main__":
 
 
                     # The path from processed image
-                    image_output = mdir.create_image_year_pathrow_dir()
+                    image_output = mdir.create_dir_satellite_year_pathrow_image()
 
-                    preporcessing = p2ta.PreProcess2TA(image_file_path_targz=file_path,
-                                                       image_output_path=image_output)
 
-                    preporcessing.run_image_composition()
-                    # preporcessing.run_cloud_shadow_fmask()
 
 
 

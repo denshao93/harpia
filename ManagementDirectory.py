@@ -67,7 +67,7 @@ class ManagementDirectory:
 
         return self.get_file_name_targz()[17:21]
 
-    def create_image_year_pathrow_dir(self):
+    def create_dir_satellite_year_pathrow_image(self):
 
         dir_path = os.path.join(self.output_root_dir_image_processed,
                                 self.__class__.dir_name_processed,
@@ -85,7 +85,7 @@ class ManagementDirectory:
 
         # Making folder which will store files processed
         self.create_root_dir_processed(self.__class__.dir_name_processed)
-        self.create_image_year_pathrow_dir()
+        self.create_dir_satellite_year_pathrow_image()
 
 
 # if __name__ == "__main__":
