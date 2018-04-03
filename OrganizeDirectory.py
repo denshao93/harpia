@@ -2,14 +2,13 @@ import os
 import sys
 
 
-class ManagementDirectory:
+class OrganizeDirectory:
 
     # The name of folder where all satellite processed output will be organized and stored
     # WARMING: If this folder has been change the place incorrectly, all files will be processed again.
     dir_name_processed = 'PROCESSADA'
 
     def __init__(self,
-                 dir_all_targz,
                  image_file_path_targz,
                  output_root_dir_image_processed):
         """
@@ -22,9 +21,6 @@ class ManagementDirectory:
         """
         # Input row file (landsat file compressed (tar.gz) downloaded from USGS).
         self.raster_file_path_targz = image_file_path_targz
-
-        # Root directory where all landsat image downloaded were stored.
-        self.dir_all_targz = dir_all_targz
 
         # Output image processed is a place where image processed output will be stored (ex. compositions, segmentation)
         self.output_root_dir_image_processed = output_root_dir_image_processed
@@ -90,8 +86,7 @@ class ManagementDirectory:
 
 # if __name__ == "__main__":
 #
-#     mdir = ManagementDirectory(dir_all_targz=sys.argv[1],
-#                                image_file_path_targz=sys.argv[2],
+#     mdir = ManagementDirectory(image_file_path_targz=sys.argv[2],
 #                                output_root_dir_image_processed=sys.argv[3])
 
 

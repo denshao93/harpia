@@ -1,5 +1,7 @@
-import sys
 import os
+import sys
+import utils as u
+import ComposeBands as cmp
 import OrganizeDirectory as md
 
 if __name__ == "__main__":
@@ -14,16 +16,19 @@ if __name__ == "__main__":
         for file in files:
                 if file.endswith(".tar.gz"):
                     print(file)
-                    file_path = os.path.join(subdir, file)
+                    file_path_targz = os.path.join(subdir, file)
+                    scene_image_name = u.file_name_without_extention(file_path_targz)
 
-                    mdir = md.ManagementDirectory(dir_all_targz=sys.argv[1],
-                                                  output_root_dir_image_processed=sys.argv[2],
-                                                  image_file_path_targz=file_path)
+                    mdir = md.OrganizeDirectory(output_root_dir_image_processed=sys.argv[2],
+                                                image_file_path_targz=file_path_targz)
 
                     mdir.run_manage_directory()
 
                     # The path from processed image
-                    image_output = mdir.create_dir_satellite_year_pathrow_image()
+                    image_output_path = mdir.create_dir_satellite_year_pathrow_image()
+
+                    compose = cmp.ComposeBands(image_output_path=image_output_path,
+                                               scene_image_name=scene_image_name)
 
 
 

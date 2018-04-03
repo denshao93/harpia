@@ -10,14 +10,14 @@ from shapely.geometry import shape, MultiPolygon
 # TODO rever essa classe tendo em vista o descompressão das imagens em uma classe separada
 class ComposeBands:
 
-    def __init__(self, image_output_path, file_name):
+    def __init__(self, image_output_path, scene_image_name):
         # The folder where output processed will be saved
         self.image_output_path = image_output_path
 
         # Temporary folder to put files to process and remove after that
         self.tmp = u.UncompressFileAsEpsg4674.dir_tmp_img_epsg_4674
 
-        self.file_name = file_name
+        self.file_name = scene_image_name
 
     def stack_all_30m_band_landsat(self):
         """
