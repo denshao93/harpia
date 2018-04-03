@@ -20,23 +20,26 @@ if __name__ == "__main__":
                     file_path_targz = os.path.join(subdir, file)
                     scene_image_name = u.file_name_without_extention(file_path_targz)
 
+                    # Ordering directory to receive results
                     mdir = md.OrganizeDirectory(output_root_dir_image_processed=sys.argv[2],
                                                 image_file_path_targz=file_path_targz)
-
                     mdir.run_manage_directory()
 
-                    # The path from processed image
+                    # The path where processed image (results) will be saved
                     image_output_path = mdir.create_dir_satellite_year_pathrow_image()
 
+                    # Uncompressing file which has landsat bands
                     uncompress = uncp.UncompressFileAsEpsg4674(image_file_path_targz=file_path_targz)
                     uncompress.run()
-
                     dir_tmp_img_epsg_4674 = uncompress.dir_tmp_img_epsg_4674
 
+                    # Creating image stacking from landsat bands
                     compose = cmp.ComposeBands(image_output_path=image_output_path,
                                                scene_image_name=scene_image_name,
                                                tmp_reprojected=dir_tmp_img_epsg_4674)
                     compose.run_image_composition()
+
+
 
 
 
