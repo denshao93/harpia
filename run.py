@@ -1,6 +1,7 @@
 import os
 import sys
 import utils as u
+import UncompressFileAsEpsg4674 as uncp
 import ComposeBands as cmp
 import OrganizeDirectory as md
 
@@ -27,8 +28,15 @@ if __name__ == "__main__":
                     # The path from processed image
                     image_output_path = mdir.create_dir_satellite_year_pathrow_image()
 
+                    uncompress = uncp.UncompressFileAsEpsg4674(image_file_path_targz=file_path_targz)
+                    uncompress.run()
+
+                    dir_tmp_img_epsg_4674 = uncompress.dir_tmp_img_epsg_4674
+
                     compose = cmp.ComposeBands(image_output_path=image_output_path,
-                                               scene_image_name=scene_image_name)
+                                               scene_image_name=scene_image_name,
+                                               tmp_reprojected=dir_tmp_img_epsg_4674)
+                    compose.run_image_composition()
 
 
 

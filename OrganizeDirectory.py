@@ -59,6 +59,10 @@ class OrganizeDirectory:
 
         return self.get_file_name_targz()[10:16]
 
+    def get_image_month_aquisition_date(self):
+
+        return self.get_file_name_targz()[21:23]
+
     def get_image_year_aquisition_date(self):
 
         return self.get_file_name_targz()[17:21]
@@ -69,6 +73,7 @@ class OrganizeDirectory:
                                 self.__class__.dir_name_processed,
                                 self.get_satellite(),
                                 self.get_image_year_aquisition_date(),
+                                self.get_image_month_aquisition_date(),
                                 self.get_path_row_from_targz(),
                                 self.get_file_name_targz())
 

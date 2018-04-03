@@ -17,8 +17,12 @@ class UncompressFileAsEpsg4674:
         self.tmp = tempfile.gettempdir()
 
         # Tmp directory useful to convert landsat imagens from UTM N to Sirgas2000
-        self.dir_tmp_img_utm_north = tempfile.mkdtemp()
-        self.dir_tmp_img_epsg_4674 = tempfile.mkdtemp()
+        self.dir_tmp_img_utm_north = tempfile.mkdtemp(prefix='raw_')
+        self.dir_tmp_img_epsg_4674 = tempfile.mkdtemp(prefix='reprojected_')
+
+    # def dir_tmp_img_epsg_4674(self):
+    #
+    #     return tempfile.mkdtemp()
 
     @staticmethod
     def get_file_basename(file_path):
