@@ -1,6 +1,6 @@
 import sys
 import os
-import ManagementDirectory as md
+import OrganizeDirectory as md
 
 if __name__ == "__main__":
 
@@ -21,7 +21,6 @@ if __name__ == "__main__":
                                                   image_file_path_targz=file_path)
 
                     mdir.run_manage_directory()
-
 
                     # The path from processed image
                     image_output = mdir.create_dir_satellite_year_pathrow_image()
