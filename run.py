@@ -1,9 +1,10 @@
 import os
 import sys
 import utils as u
-import UncompressFileAsEpsg4674 as uncp
+import CloudShadow as cs
 import ComposeBands as cmp
 import OrganizeDirectory as md
+import UncompressFileAsEpsg4674 as uncp
 
 if __name__ == "__main__":
 
@@ -38,6 +39,13 @@ if __name__ == "__main__":
                                                scene_image_name=scene_image_name,
                                                tmp_reprojected=dir_tmp_img_epsg_4674)
                     compose.run_image_composition()
+
+                    # Processing cloud shadow fmask
+                    cloud = cs.CloudShadow(dir_tmp_img_epsg_4674=dir_tmp_img_epsg_4674,
+                                           image_output_path=image_output_path,
+                                           file_name=scene_image_name)
+                    cloud.run_cloud_shadow_fmask()
+
 
 
 

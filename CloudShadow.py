@@ -3,32 +3,40 @@ import os
 
 class CloudShadow:
 
-    def __init__(self, file_name):
+    def __init__(self,
+                 dir_tmp_img_epsg_4674,
+                 image_output_path,
+                 file_name):
+
         self.file_name = file_name
 
+        self.tmp = dir_tmp_img_epsg_4674
+
+        self.image_output_path = image_output_path
+
     def create_angle_img(self):
-        command = "fmask_usgsLandsatMakeAnglesImage.py -m {tmp}{img_name}*_MTL.txt -t {tmp}ref.img " \
-                  "-o {tmp}angles.img" \
-            .format(tmp=self.tmp, img_name=self.file_name())
+        command = "fmask_usgsLandsatMakeAnglesImage.py -m {tmp}/*_MTL.txt -t {tmp}/ref.img " \
+                  "-o {tmp}/angles.img" \
+            .format(tmp=self.tmp)
         os.system(command)
 
     def saturation_mask(self):
-        command = "fmask_usgsLandsatSaturationMask.py -i {tmp}ref.img -m {tmp}{img_name}/*_MTL.txt " \
-                  "-o {tmp}{img_name}/saturationmask.img" \
-            .format(tmp=self.tmp, img_name=self.file_name())
+        command = "fmask_usgsLandsatSaturationMask.py -i {tmp}/ref.img -m {tmp}/*_MTL.txt " \
+                  "-o {tmp}/saturationmask.img" \
+            .format(tmp=self.tmp)
         os.system(command)
 
     def landsat_toa(self):
-        command = "fmask_usgsLandsatTOA.py -i {tmp}{img_name}ref.img -m {tmp}{img_name}/*_MTL.txt " \
-                  "-z {tmp}{img_name}/angles.img -o {tmp}{img_name}/toa.img" \
-            .format(tmp=self.tmp, img_name=self.file_name())
+        command = "fmask_usgsLandsatTOA.py -i {tmp}/ref.img -m {tmp}/*_MTL.txt " \
+                  "-z {tmp}/angles.img -o {tmp}/toa.img" \
+            .format(tmp=self.tmp)
         os.system(command)
 
     def cloud_detection(self):
-        command = "fmask_usgsLandsatStacked.py -t {tmp}{img_name}/thermal.img -a {tmp}{img_name}/toa.img " \
-                  "-m {tmp}{img_name}/*_MTL.txt -z {tmp}{img_name}/angles.img " \
-                  "-s {tmp}{img_name}/saturationmask.img -o {out}/{img_name}/cloud.img" \
-            .format(tmp=self.tmp, out=self.image_output_path, img_name=self.file_name())
+        command = "fmask_usgsLandsatStacked.py -t {tmp}/thermal.img -a {tmp}/toa.img " \
+                  "-m {tmp}/*_MTL.txt -z {tmp}/angles.img " \
+                  "-s {tmp}/saturationmask.img -o {out}/{img_name}_cloud.img" \
+            .format(tmp=self.tmp, out=self.image_output_path, img_name=self.file_name)
         os.system(command)
 
     def cloud_raster2vector(self):
