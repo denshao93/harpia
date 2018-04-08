@@ -89,12 +89,6 @@ class OrganizeDirectory:
         self.create_dir_satellite_year_pathrow_image()
 
 
-# if __name__ == "__main__":
-#
-#     mdir = ManagementDirectory(image_file_path_targz=sys.argv[2],
-#                                output_root_dir_image_processed=sys.argv[3])
-
-
 
 
 

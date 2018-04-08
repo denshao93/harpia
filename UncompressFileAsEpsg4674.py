@@ -77,7 +77,7 @@ class UncompressFileAsEpsg4674:
         self.uncompress_img_raw_utm_north()
         self.copy_metadata_file_from_landsat8()
         self.reproject_img_from_umt_north_to_sirgas2000()
-        self.close_tmp_dir(self.dir_tmp_img_utm_north)
+        # self.close_tmp_dir(self.dir_tmp_img_utm_north)
 
 
 if __name__ == "__main__":

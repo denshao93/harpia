@@ -1,5 +1,5 @@
 import os
-
+import fm
 
 class CloudShadow:
 
@@ -15,28 +15,28 @@ class CloudShadow:
         self.image_output_path = image_output_path
 
     def create_angle_img(self):
-        command = "fmask_usgsLandsatMakeAnglesImage.py -m {tmp}/*_MTL.txt -t {tmp}/ref.img " \
-                  "-o {tmp}/angles.img" \
+        print(".....Creating angle image....")
+        command = "fmask_usgsLandsatMakeAnglesImage.py -m {tmp}/*_MTL.txt -t {tmp}/ref.img -o {tmp}/angles.img" \
             .format(tmp=self.tmp)
         os.system(command)
 
     def saturation_mask(self):
-        command = "fmask_usgsLandsatSaturationMask.py -i {tmp}/ref.img -m {tmp}/*_MTL.txt " \
-                  "-o {tmp}/saturationmask.img" \
-            .format(tmp=self.tmp)
+        print(".....Creating saturation image....")
+        command = "fmask_usgsLandsatSaturationMask.py -i {tmp}/ref.img -m {tmp}/*_MTL.txt" \
+                  " -o {tmp}/saturationmask.img".format(tmp=self.tmp)
         os.system(command)
 
     def landsat_toa(self):
-        command = "fmask_usgsLandsatTOA.py -i {tmp}/ref.img -m {tmp}/*_MTL.txt " \
-                  "-z {tmp}/angles.img -o {tmp}/toa.img" \
-            .format(tmp=self.tmp)
+        print(".....Creating TOA image....")
+        command = "fmask_usgsLandsatTOA.py -i {tmp}/ref.img -m {tmp}/*_MTL.txt -z {tmp}/angles.img " \
+                  "-o {tmp}/toa.img".format(tmp=self.tmp)
         os.system(command)
 
     def cloud_detection(self):
-        command = "fmask_usgsLandsatStacked.py -t {tmp}/thermal.img -a {tmp}/toa.img " \
-                  "-m {tmp}/*_MTL.txt -z {tmp}/angles.img " \
-                  "-s {tmp}/saturationmask.img -o {out}/{img_name}_cloud.img" \
-            .format(tmp=self.tmp, out=self.image_output_path, img_name=self.file_name)
+        print(".....Creating cloud detection image....")
+        command = "fmask_usgsLandsatStacked.py -t {tmp}/thermal.img -a {tmp}/toa.img -m {tmp}/*_MTL.txt " \
+                  "-z {tmp}/angles.img -s {tmp}/saturationmask.img -o {out}/cloud.img"\
+            .format(tmp=self.tmp, out=self.image_output_path)
         os.system(command)
 
     def cloud_raster2vector(self):

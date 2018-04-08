@@ -17,7 +17,7 @@ if __name__ == "__main__":
     for subdir, dirs, files in os.walk(sys.argv[1]):
         for file in files:
                 if file.endswith(".tar.gz"):
-                    print(file)
+
                     file_path_targz = os.path.join(subdir, file)
                     scene_image_name = u.file_name_without_extention(file_path_targz)
 
