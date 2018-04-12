@@ -1,13 +1,6 @@
 import os
-import fiona
-import shutil
-import UncompressFile as u
-import LandsatFileInfo as LcInfo
-import Connection2Database as Conn
-from shapely.geometry import shape, MultiPolygon
 
 
-# TODO rever essa classe tendo em vista o descompressão das imagens em uma classe separada
 class ComposeBands:
 
     def __init__(self,
@@ -32,7 +25,7 @@ class ComposeBands:
 
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}/ref.img " \
                   "{tmp}/{file_name}/LC08*_B[1-7,9].TIF".format(tmp=self.dir_tmp_img,
-                                                               file_name=self.file_name)
+                                                                file_name=self.file_name)
 
         os.system(command)
 

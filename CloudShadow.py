@@ -41,7 +41,7 @@ class CloudShadow:
 
     def cloud_raster2vector(self):
         command = "gdal_polygonize.py {out}cloud.img {out}cs_{file_name}.shp" \
-            .format(out=self.get_folder_output_file_processed_path(), file_name=self.file_name)
+            .format(out=self.image_output_path, file_name=self.file_name)
         os.system(command)
 
     def run_cloud_shadow_fmask(self):
@@ -57,4 +57,3 @@ class CloudShadow:
         self.landsat_toa()
         self.cloud_detection()
         # self.cloud_raster2vector()
-

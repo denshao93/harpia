@@ -1,5 +1,4 @@
 import os
-import sys
 
 
 class OrganizeDirectory:
@@ -13,7 +12,6 @@ class OrganizeDirectory:
                  output_root_dir_image_processed):
         """
         This class organizes folder in order to have structure directories to pre-processing landsast images
-        :param dir_all_targz: Directory that store all tar.gz files downloaded from USGS.
         :param image_file_path_targz: Path of tar.gz file stored in directory
         :param output_root_dir_image_processed: The root directory where image processed will be stored organized
                                            by name of satellite, year and path row (ex.from landsat 8:
@@ -47,7 +45,7 @@ class OrganizeDirectory:
 
     def get_satellite(self):
 
-        if self.get_file_name_targz()[:4]=="LC08":
+        if self.get_file_name_targz()[:4] == "LC08":
             return "LC08"
 
     def get_path_row_from_targz(self):
@@ -87,10 +85,3 @@ class OrganizeDirectory:
         # Making folder which will store files processed
         self.create_root_dir_processed(self.__class__.dir_name_processed)
         self.create_dir_satellite_year_pathrow_image()
-
-
-
-
-
-
-
