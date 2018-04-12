@@ -23,7 +23,7 @@ class Segmentation:
         :return:
         """
         print("........Segmentanção.........")
-        command = "~/gdal-segment/bin/gdal-segment -algo LSC -region {r} -niter {i} {tmp}ref.img " \
+        command = "~/gdal-segment/bin/gdal-segment -algo LSC -region {r} -niter {i} {tmp}/ref.img " \
                   "-out {out}/{file_name}-slico.shp".format(r=region,
                                                             i=inter,
                                                             tmp=self.dir_tmp_image,
