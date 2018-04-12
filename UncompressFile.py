@@ -5,7 +5,7 @@ import tempfile
 from glob import glob
 
 
-class UncompressFileAsEpsg4674:
+class UncompressFile:
 
     def __init__(self, image_file_path_targz):
 

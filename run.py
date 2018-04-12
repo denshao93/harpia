@@ -1,10 +1,11 @@
 import os
 import sys
 import utils as u
+import Segmetation as S
 import CloudShadow as Cs
 import ComposeBands as Cmp
-import OrganizeDirectory as Od
 import UncompressFile as Uc
+import OrganizeDirectory as Od
 
 
 if __name__ == "__main__":
@@ -30,7 +31,7 @@ if __name__ == "__main__":
                     image_output_path = mdir.create_dir_satellite_year_pathrow_image()
 
                     # Uncompressing file which has landsat bands
-                    uncompress = Uc.UncompressFileAsEpsg4674(image_file_path_targz=file_path_targz)
+                    uncompress = Uc.UncompressFile(image_file_path_targz=file_path_targz)
                     uncompress.run()
                     dir_tmp_img = uncompress.dir_tmp_img
 
@@ -47,3 +48,7 @@ if __name__ == "__main__":
                     cloud.run_cloud_shadow_fmask()
 
                     # Segmentation
+                    s = S.Segmentation(image_output_path=image_output_path,
+                                       dir_tmp_image=dir_tmp_img,
+                                       file_name=scene_image_name)
+                    s.run_segmentation()
