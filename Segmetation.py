@@ -1,5 +1,5 @@
 import os
-import UncompressFileAsEpsg4674 as u
+import UncompressFile as u
 
 
 class Segmentation:

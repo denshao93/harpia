@@ -1,7 +1,7 @@
 import os
 import fiona
 import shutil
-import UncompressFileAsEpsg4674 as u
+import UncompressFile as u
 import LandsatFileInfo as LcInfo
 import Connection2Database as Conn
 from shapely.geometry import shape, MultiPolygon
@@ -13,12 +13,12 @@ class ComposeBands:
     def __init__(self,
                  image_output_path,
                  scene_image_name,
-                 tmp_reprojected):
+                 dir_tmp_img):
         # The folder where output processed will be saved
         self.image_output_path = image_output_path+"/"
 
         # Temporary folder to put files to process and remove after that
-        self.tmp_reprojected = tmp_reprojected
+        self.dir_tmp_img = dir_tmp_img
 
         self.file_name = scene_image_name
 
@@ -31,7 +31,8 @@ class ComposeBands:
         print('....stack_all_30m_band_landsat...')
 
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}/ref.img " \
-                  "{tmp}/LC08*_B[1-7,9].TIF".format(tmp=self.tmp_reprojected)
+                  "{tmp}/{file_name}/LC08*_B[1-7,9].TIF".format(tmp=self.dir_tmp_img,
+                                                               file_name=self.file_name)
 
         os.system(command)
 
@@ -43,9 +44,10 @@ class ComposeBands:
         """
         print('...stack_345_30m_band_landsat...')
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {out}/{img_name}.TIF " \
-                  "{tmp}/LC08*_B[3-5].TIF".format(tmp=self.tmp_reprojected,
-                                                  out=self.image_output_path,
-                                                  img_name=self.file_name)
+                  "{tmp}/{file_name}/LC08*_B[3-5].TIF".format(tmp=self.dir_tmp_img,
+                                                              out=self.image_output_path,
+                                                              img_name=self.file_name,
+                                                              file_name=self.file_name)
         os.system(command)
 
     def stack_termal_band(self):
@@ -54,7 +56,8 @@ class ComposeBands:
         :return: File stacking with landsat bands from 0 and 1.
         """
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}/thermal.img " \
-                  "{tmp}/LC08*_B[0,1].TIF".format(tmp=self.tmp_reprojected)
+                  "{tmp}/{file_name}/LC08*_B[0,1].TIF".format(tmp=self.dir_tmp_img,
+                                                              file_name=self.file_name)
         os.system(command)
 
     def run_image_composition(self):

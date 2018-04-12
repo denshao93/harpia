@@ -4,7 +4,7 @@ import utils as u
 import CloudShadow as cs
 import ComposeBands as cmp
 import OrganizeDirectory as md
-import UncompressFileAsEpsg4674 as uncp
+import UncompressFile as uncp
 
 if __name__ == "__main__":
 
@@ -32,16 +32,16 @@ if __name__ == "__main__":
                     # Uncompressing file which has landsat bands
                     uncompress = uncp.UncompressFileAsEpsg4674(image_file_path_targz=file_path_targz)
                     uncompress.run()
-                    dir_tmp_img_epsg_4674 = uncompress.dir_tmp_img_epsg_4674
+                    dir_tmp_img = uncompress.dir_tmp_img
 
                     # Creating image stacking from landsat bands
                     compose = cmp.ComposeBands(image_output_path=image_output_path,
                                                scene_image_name=scene_image_name,
-                                               tmp_reprojected=dir_tmp_img_epsg_4674)
+                                               dir_tmp_img=dir_tmp_img)
                     compose.run_image_composition()
 
                     # Processing cloud shadow fmask
-                    cloud = cs.CloudShadow(dir_tmp_img_epsg_4674=dir_tmp_img_epsg_4674,
+                    cloud = cs.CloudShadow(dir_tmp_img=dir_tmp_img,
                                            image_output_path=image_output_path,
                                            file_name=scene_image_name)
                     cloud.run_cloud_shadow_fmask()
