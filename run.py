@@ -18,7 +18,7 @@ if __name__ == "__main__":
     for subdir, dirs, files in os.walk(sys.argv[1]):
         for file in files:
                 if file.endswith(".tar.gz"):
-
+                    print("Processing "+file)
                     file_path_targz = os.path.join(subdir, file)
                     scene_image_name = u.file_name_without_extention(file_path_targz)
 
@@ -51,4 +51,4 @@ if __name__ == "__main__":
                     s = S.Segmentation(image_output_path=image_output_path,
                                        dir_tmp_image=dir_tmp_img,
                                        file_name=scene_image_name)
-                    s.run_segmentation()
+                    # s.run_segmentation()

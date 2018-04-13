@@ -43,6 +43,13 @@ class ComposeBands:
                                                               file_name=self.file_name)
         os.system(command)
 
+    def get_image_pyramid_from_stack_345_30m_band_landsat(self):
+        print('...Pyramid...')
+        command = "gdaladdo -r nearest {out}/{file_name}.TIF 2 4 8 16 32 64 128 256 512 1024"\
+            .format(out=self.image_output_path, file_name=self.file_name)
+
+        os.system(command)
+
     def stack_termal_band(self):
         """
         Stacking all thermal bands
@@ -62,4 +69,5 @@ class ComposeBands:
         """
         self.stack_all_30m_band_landsat()
         self.stack_345_30m_band_landsat()
+        self.get_image_pyramid_from_stack_345_30m_band_landsat()
         self.stack_termal_band()
