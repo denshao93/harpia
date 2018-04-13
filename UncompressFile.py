@@ -39,8 +39,15 @@ class UncompressFile:
         This function uncompress tar.gz files donwloaded from USGS
         :return:
         """
-        with tarfile.open(self.image_file_path_targz, "r") as tar:
-            tar.extractall(self.dir_tmp_img)
+        path = os.path.join(self.dir_tmp_img, self.get_file_basename(self.image_file_path_targz))
+        os.mkdir(path)
+
+        try:
+            with tarfile.open(self.image_file_path_targz, "r") as tar:
+                tar.extractall(path)
+        except:
+            with tarfile.open(self.image_file_path_targz, "r") as tar:
+                tar.extractall(self.dir_tmp_img)
 
     def reproject_img_from_umt_north_to_sirgas2000(self):
 
