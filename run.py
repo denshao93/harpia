@@ -1,7 +1,8 @@
 import os
 import sys
+import argparse
 import utils as u
-import Segmetation as S
+import Segmetation as Se
 import CloudShadow as Cs
 import ComposeBands as Cmp
 import UncompressFile as Uc
@@ -10,10 +11,7 @@ import OrganizeDirectory as Od
 
 if __name__ == "__main__":
 
-    # Runing pre-processing Landsat 8 repository for forest monitoring project to Bahia
-
-    # Check if tar.gz file have already processed before
-    # Comparing if file name exist in list of folder name processed
+    # Running pre-processing Landsat 8 repository for forest monitoring project to Bahia
 
     for subdir, dirs, files in os.walk(sys.argv[1]):
         for file in files:
@@ -48,7 +46,7 @@ if __name__ == "__main__":
                     cloud.run_cloud_shadow_fmask()
 
                     # Segmentation
-                    s = S.Segmentation(image_output_path=image_output_path,
+                    s = Se.Segmentation(image_output_path=image_output_path,
                                        dir_tmp_image=dir_tmp_img,
                                        file_name=scene_image_name)
                     # s.run_segmentation()
