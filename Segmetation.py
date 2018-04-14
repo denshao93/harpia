@@ -23,7 +23,7 @@ class Segmentation:
         :return:
         """
         print("........Segmentanção.........")
-        command = "~/gdal-segment/bin/gdal-segment -algo LSC -region {r} -niter {i} {tmp}/ref.img " \
+        command = "~/gdal-segment/bin/gdal-segment -algo SLIC -region {r} -niter {i} {tmp}/teste.tif " \
                   "-out {out}/{file_name}-slico.shp".format(r=region,
                                                             i=inter,
                                                             tmp=self.dir_tmp_image,
@@ -34,14 +34,15 @@ class Segmentation:
     def get_segmentation_seeds(self, region, inter):
         """
         Seeds is a kind of algorith to segmentation
+        The image have to have 3 bands or gray with 
         :return:
         """
-        command = "~/gdal-segment/bin/gdal-segment -algo SEEDS -region {r} -niter {i} {out}{file_name}.TIF -out " \
-                  "{out}{file_name}-seeds.shp".format(r=region,
-                                                      i=inter,
-                                                      tmp=self.dir_tmp_image,
-                                                      out=self.image_output_path,
-                                                      file_name=self.file_name)
+        command = "~/gdal-segment/bin/gdal-segment -algo SEEDS -region {r} -niter {i} {out}/{file_name}.tif -out " \
+                  "{out}/{file_name}-seeds.shp".format(r=region,
+                                                       i=inter,
+                                                       tmp=self.dir_tmp_image,
+                                                       out=self.image_output_path,
+                                                       file_name=self.file_name)
         os.system(command)
 
     def run_segmentation(self):
@@ -50,5 +51,15 @@ class Segmentation:
         :return:
         """
 
-        self.get_segmentation_slico(100, 100)
-        # self.get_segmentation_seeds(8, 25)
+        self.get_segmentation_slico(8, 2)
+        # self.get_segmentation_seeds(10, 5)
+
+
+if __name__ == "__main__":
+
+    s = Segmentation(image_output_path="~/Downloads",
+                     dir_tmp_image="~/Downloads/",
+                     file_name="teste")
+    s.run_segmentation()
+
+
