@@ -49,4 +49,4 @@ if __name__ == "__main__":
                     s = Se.Segmentation(image_output_path=image_output_path,
                                        dir_tmp_image=dir_tmp_img,
                                        file_name=scene_image_name)
-                    # s.run_segmentation()
+                    s.run_segmentation()

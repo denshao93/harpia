@@ -16,15 +16,45 @@ class Segmentation:
 
         self.file_name = file_name
 
-    def get_segmentation_slico(self, region, inter):
+    def get_segmentation_slic(self, region, inter):
         """
-        Slico is a kind of algorith to segmentation
-        The object created is great compactness
+        Slic is a kind of algorith to segmentation
+        Very good to separate object from
         :return:
         """
         print("........Segmentanção.........")
-        command = "~/gdal-segment/bin/gdal-segment -algo SLIC -region {r} -niter {i} {tmp}/teste.tif " \
-                  "-out {out}/{file_name}-slico.shp".format(r=region,
+        command = "~/gdal-segment/bin/gdal-segment -algo SLIC -region {r} -niter {i} {tmp}/{file_name}.tif " \
+                  "-out {out}/{file_name}-slic.shp".format(r=region,
+                                                            i=inter,
+                                                            tmp=self.dir_tmp_image,
+                                                            out=self.image_output_path,
+                                                            file_name=self.file_name)
+        os.system(command)
+
+    def get_segmentation_lsc(self, region, inter):
+        """
+        Slic is a kind of algorith to segmentation
+        Very good to separate object from
+        :return:
+        """
+        print("........Segmentanção.........")
+        command = "~/gdal-segment/bin/gdal-segment -algo LSC -region {r} -niter {i} {tmp}{file_name}.tif " \
+                  "-out {out}/{file_name}-lsc.shp".format(r=region,
+                                                            i=inter,
+                                                            tmp=self.dir_tmp_image,
+                                                            out=self.image_output_path,
+                                                            file_name=self.file_name)
+        os.system(command)
+    
+    def get_segmentation_mslic(self, region, inter):
+        """
+        Slic is a kind of algorith to segmentation
+        Very good to separate object from
+        :return:
+        """
+        print("........Segmentanção.........")
+        command = "~/gdal-segment/bin/gdal-segment -algo MSLIC -region {r} -niter {i} {tmp}{file_name}.tif " \
+                  "-out {out}/{file_name}-mslic.shp".format(r=region,
                                                             i=inter,
                                                             tmp=self.dir_tmp_image,
                                                             out=self.image_output_path,
@@ -50,8 +80,9 @@ class Segmentation:
         Segmenting landsat image
         :return:
         """
-
-        self.get_segmentation_slico(8, 2)
+        # self.get_segmentation_lsc(10, 30)
+        self.get_segmentation_mslic(10, 10)
+        # self.get_segmentation_slic(8, 2)
         # self.get_segmentation_seeds(10, 5)
 
 
