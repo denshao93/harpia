@@ -1,6 +1,5 @@
 import psycopg2
-
-# conn = None
+import LandsatFileInfo as LCinfo
 
 
 class Connection:
@@ -52,10 +51,17 @@ class Connection:
         qtd = cursor.fetchall()
         cursor.close()
         return qtd
+    
+    def create_scene_path_row_schema(self, schema_name):
+                
+        cursor = self.conn.cursor()
+        sql = "CREATE SCHEMA IF NOT EXISTS lc8_{path_row};".format(schema_name=schema_name)
+        cursor.execute(sql)
+        cursor.close()
 
 
 if __name__ == '__main__':
 
-    conn = Connection("host=localhost dbname=ta7 user=postgres password=postgres")
-    print(conn.get_scene_path_row_geom('215/068'))
+    conn_rascunho = Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
+    conn_rascunho.create_scene_path_row_schema("215_068")
 

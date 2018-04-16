@@ -2,12 +2,12 @@ import os
 
 
 class Segmentation:
-
+    
     def __init__(self,
                  image_output_path,
                  dir_tmp_image,
                  file_name):
-
+        
         # The folder where output processed will be saved
         self.image_output_path = image_output_path
 
@@ -23,7 +23,7 @@ class Segmentation:
         :return:
         """
         print("........Segmentanção.........")
-        command = "~/gdal-segment/bin/gdal-segment -algo SLIC -region {r} -niter {i} {tmp}/{file_name}.tif " \
+        command = "~/gdal-segment/bin/gdal-segment -algo SLIC -region {r} -niter {i} {tmp}/ref.img " \
                   "-out {out}/{file_name}-slic.shp".format(r=region,
                                                             i=inter,
                                                             tmp=self.dir_tmp_image,
@@ -81,8 +81,8 @@ class Segmentation:
         :return:
         """
         # self.get_segmentation_lsc(10, 30)
-        self.get_segmentation_mslic(10, 10)
-        # self.get_segmentation_slic(8, 2)
+        # self.get_segmentation_mslic(10, 10)
+        self.get_segmentation_slic(8, 2)
         # self.get_segmentation_seeds(10, 5)
 
 
