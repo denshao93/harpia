@@ -58,10 +58,36 @@ class Connection:
         sql = "CREATE SCHEMA IF NOT EXISTS lc8_{path_row};".format(schema_name=schema_name)
         cursor.execute(sql)
         cursor.close()
+        
+    def load_segmentation_database(self, shapefile_path, shapefile_name)   
+        
+        shapefile = osgeo.ogr.Open(shapefile_path)
+        layer = shapefile.GetLayer(0)
+
+        cursor = self.conn.cursor()
+        
+        cursor.execute("DELETE FROM {shapefile_name}".format(shapefile_name))
+        cursor.execute("CREATE TABLE {shapefile_name} (id SERIAL PRIMARY KEY,\
+                         geom GEOMETRY)".format(shapefile_name))
+
+        #First delete the existing contents of this table in case we want to run the code multiple times.
+        cursor.execute("DELETE FROM {shapefile_name}".format(shapefile_name))
+        
+
+        for i in range(layer.GetFeatureCount()):
+            feature = layer.GetFeature(i)
+            #Get feature geometry
+            geometry = feature.GetGeometryRef()
+            #Convert geometry to WKT format
+            wkt = geometry.ExportToWkt()
+            #Insert data into database, converting WKT geometry to a PostGIS geography
+            cursor.execute("INSERT INTO {shapefile_name} (geom) VALUES (ST_GeogFromText('{}'))".format(wkt))
+        self.open_connect.commit()
 
 
 if __name__ == '__main__':
 
     conn_rascunho = Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
     conn_rascunho.create_scene_path_row_schema("215_068")
+    
 
