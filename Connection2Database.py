@@ -1,4 +1,5 @@
 import psycopg2
+import ogr
 import LandsatFileInfo as LCinfo
 
 
@@ -55,25 +56,27 @@ class Connection:
     def create_scene_path_row_schema(self, schema_name):
                 
         cursor = self.conn.cursor()
-        sql = "CREATE SCHEMA IF NOT EXISTS lc8_{path_row};".format(schema_name=schema_name)
+        sql = "CREATE SCHEMA IF NOT EXISTS lc8_{path_row};".format(path_row=schema_name)
         cursor.execute(sql)
         cursor.close()
         
-    def load_segmentation_database(self, shapefile_path, shapefile_name)   
+    def load_segmentation_database(self, shapefile_path, shapefile_name):  
         
-        shapefile = osgeo.ogr.Open(shapefile_path)
-        layer = shapefile.GetLayer(0)
+        # shapefile = ogr.Open(shapefile_path)
+        from osgeo import ogr
+        file = ogr.Open("/home/dogosousa/Downloads/teste-slic.shp")
+        layer = file.GetLayer(0)
 
         cursor = self.conn.cursor()
         
-        cursor.execute("DELETE FROM {shapefile_name}".format(shapefile_name))
-        cursor.execute("CREATE TABLE {shapefile_name} (id SERIAL PRIMARY KEY,\
-                         geom GEOMETRY)".format(shapefile_name))
+        # cursor.execute("DELETE FROM \"lc8_215_068\".{shapefile_name};"\
+        #                 .format(shapefile_name=shapefile_name))
+        cursor.execute("CREATE TABLE IF NOT EXISTS lc8_215_068.{shapefile_name} \
+                        (id SERIAL PRIMARY KEY, geom GEOMETRY);".format(shapefile_name=shapefile_name))
 
         #First delete the existing contents of this table in case we want to run the code multiple times.
-        cursor.execute("DELETE FROM {shapefile_name}".format(shapefile_name))
+        # cursor.execute("DELETE FROM lc8_215_068.{shapefile_name};".format(shapefile_name=shapefile_name))
         
-
         for i in range(layer.GetFeatureCount()):
             feature = layer.GetFeature(i)
             #Get feature geometry
@@ -81,13 +84,17 @@ class Connection:
             #Convert geometry to WKT format
             wkt = geometry.ExportToWkt()
             #Insert data into database, converting WKT geometry to a PostGIS geography
-            cursor.execute("INSERT INTO {shapefile_name} (geom) VALUES (ST_GeogFromText('{}'))".format(wkt))
-        self.open_connect.commit()
+            cursor.execute("INSERT INTO lc8_215_068.{shapefile_name} (geom) \
+                            VALUES (ST_GeomFromText('{_wkt}'))"
+                            .format(shapefile_name=shapefile_name, _wkt=wkt))   
 
 
 if __name__ == '__main__':
 
     conn_rascunho = Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
     conn_rascunho.create_scene_path_row_schema("215_068")
+    conn_rascunho.load_segmentation_database(shapefile_path="~/Downloads/teste-slic.shp",
+                                             shapefile_name="teste_slic")
+
     
 

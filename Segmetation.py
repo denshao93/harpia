@@ -1,4 +1,5 @@
 import os
+import Connection2Database as Con
 
 
 class Segmentation:
@@ -23,7 +24,7 @@ class Segmentation:
         :return:
         """
         print("........Segmentanção.........")
-        command = "~/gdal-segment/bin/gdal-segment -algo SLIC -region {r} -niter {i} {tmp}/ref.img " \
+        command = "~/gdal-segment/bin/gdal-segment -algo SLIC -region {r} -niter {i} {tmp}teste.tif " \
                   "-out {out}/{file_name}-slic.shp".format(r=region,
                                                             i=inter,
                                                             tmp=self.dir_tmp_image,
@@ -82,7 +83,7 @@ class Segmentation:
         """
         # self.get_segmentation_lsc(10, 30)
         # self.get_segmentation_mslic(10, 10)
-        self.get_segmentation_slic(8, 2)
+        # self.get_segmentation_slic(8, 2)
         # self.get_segmentation_seeds(10, 5)
 
 
@@ -92,5 +93,11 @@ if __name__ == "__main__":
                      dir_tmp_image="~/Downloads/",
                      file_name="teste")
     s.run_segmentation()
+
+    conn = Con.Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
+
+    conn.create_scene_path_row_schema(schema_name="215_068")
+    conn.load_segmentation_database(shapefile_path="~/Downloads/",
+                                    shapefile_name="teste.shp")
 
 
