@@ -1,6 +1,6 @@
 import psycopg2
 import ogr
-import LandsatFileInfo as LCinfoo
+from SatelliteFileInfo import LandsatFileInfo as LCinfo
 import geo_utils as gu
 
 
@@ -43,11 +43,12 @@ class Connection:
 
     def get_scene_path_row_geom(self, path_row):
         """
-        :param path_row: Path and row must be writed as: path/row (ex. 215/068)
-        :return: Fields from table lc_ba (landsat Bahia): id, path/row, ogr_geom
+        :param path_row: Path and row must be writed as: pathrow (ex. 215068)
+        :return: Fields from table lc_ba (landsat Bahia): id, pr, ogr_geom
         """
         cursor = self.conn.cursor()
-        sql = "SELECT fid, path_row, ST_GeomFromWKB(ogr_geometry) FROM lc_ba WHERE path_row = '{path_row}';"\
+        # pr = path_row
+        sql = "SELECT fid, pr, ST_GeomFromWKB(ogr_geometry) FROM lc_ba WHERE pr = '{path_row}';"\
             .format(path_row=path_row)
         cursor.execute(sql)
         qtd = cursor.fetchall()
@@ -90,7 +91,7 @@ class Connection:
 if __name__ == '__main__':
 
     conn_rascunho = Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
-    conn_rascunho.create_scene_path_row_schema("215_068")
+    conn_rascunho.create_scene_path_row_schema("215068")
     conn_rascunho.load_segmentation_database(shapefile_path="~/Downloads/teste-slic.shp",
                                              shapefile_name="teste_slic")
 
