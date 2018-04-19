@@ -49,16 +49,26 @@ class Connection:
         cursor = self.conn.cursor()
         # pr = path_row
         sql = "SELECT fid, pr, ST_GeomFromWKB(ogr_geometry) FROM lc_ba WHERE pr = '{path_row}';"\
-            .format(path_row=path_row)
+              .format(path_row=path_row)
         cursor.execute(sql)
         qtd = cursor.fetchall()
         cursor.close()
         return qtd
     
-    def create_scene_path_row_schema(self, schema_name):
+    def create_scene_path_row_schema(self, satellite_name, path_row):
+        """Create the schema in draft database where segmentation will be save.
+           In Harpia project the draft database is called as ta7_rascunho
+        
+        Arguments:
+            satellite_name {string} -- The initials from satelite name (Lansat 8 = lc8)
+            _path_row {string} -- The index where find scene from Lansat 8.
+            They have to be all together (i.e. 215068) 
+        """
                 
         cursor = self.conn.cursor()
-        sql = "CREATE SCHEMA IF NOT EXISTS lc8_{path_row};".format(path_row=schema_name)
+        sql = "CREATE SCHEMA IF NOT EXISTS \
+               {satellite_name}_{path_row};".format(path_row=path_row,
+                                                    satellite_name=satellite_name)
         cursor.execute(sql)
         cursor.close()
         
@@ -91,7 +101,7 @@ class Connection:
 if __name__ == '__main__':
 
     conn_rascunho = Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
-    conn_rascunho.create_scene_path_row_schema("215068")
+    # conn_rascunho.create_scene_path_row_schema("215068")
     conn_rascunho.load_segmentation_database(shapefile_path="~/Downloads/teste-slic.shp",
                                              shapefile_name="teste_slic")
 

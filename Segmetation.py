@@ -87,17 +87,17 @@ class Segmentation:
         # self.get_segmentation_seeds(10, 5)
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    s = Segmentation(image_output_path="~/Downloads",
-                     dir_tmp_image="~/Downloads/",
-                     file_name="teste")
-    s.run_segmentation()
+#     s = Segmentation(image_output_path="~/Downloads",
+#                      dir_tmp_image="~/Downloads/",
+#                      file_name="teste")
+#     s.run_segmentation()
 
-    conn = Con.Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
+#     conn = Con.Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
 
-    conn.create_scene_path_row_schema(schema_name="215_068")
-    conn.load_segmentation_database(shapefile_path="~/Downloads/",
-                                    shapefile_name="teste.shp")
+#     # conn.create_scene_path_row_schema(satellite_name=,path_row="215068")
+#     conn.load_segmentation_database(shapefile_path="~/Downloads/",
+#                                     shapefile_name="teste.shp")
 
 
