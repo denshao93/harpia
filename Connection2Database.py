@@ -1,6 +1,7 @@
 import psycopg2
 import ogr
-import LandsatFileInfo as LCinfo
+import LandsatFileInfo as LCinfoo
+import geo_utils as gu
 
 
 class Connection:
@@ -62,10 +63,7 @@ class Connection:
         
     def load_segmentation_database(self, shapefile_path, shapefile_name):  
         
-        # shapefile = ogr.Open(shapefile_path)
-        from osgeo import ogr
-        file = ogr.Open("/home/dogosousa/Downloads/teste-slic.shp")
-        layer = file.GetLayer(0)
+        layer = gu.read_shape_file_ogr(shapefile_path)
 
         cursor = self.conn.cursor()
         

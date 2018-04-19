@@ -18,16 +18,17 @@ if __name__ == "__main__":
         for file in files:
                 if file.endswith(".tar.gz"):
                     print("Processing "+file)
+                    # Variables
                     file_path_targz = os.path.join(subdir, file)
                     scene_image_name = u.file_name_without_extention(file_path_targz)
-
-                    # Ordering directory to receive results
+                    
+                                        # Ordering directory to receive results
                     mdir = Od.OrganizeDirectory(output_root_dir_image_processed=sys.argv[2],
                                                 image_file_path_targz=file_path_targz)
-                    mdir.run_manage_directory()
-
                     # The path where processed image (results) will be saved
                     image_output_path = mdir.create_dir_satellite_year_pathrow_image()
+                    
+                    mdir.run_manage_directory()
 
                     # Uncompressing file which has landsat bands
                     uncompress = Uc.UncompressFile(image_file_path_targz=file_path_targz)

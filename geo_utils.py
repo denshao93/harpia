@@ -20,3 +20,10 @@ def project_geometry(vector_layer, source_src, target_src):
 
     except Exception as e:
         print("Error geo_utils project_geometry+: " + str(e))
+
+def read_shape_file_ogr(shape_file_path):
+
+    file = ogr.Open(shape_file_path)
+    layer = file.GetLayer(0)
+
+    return layer
