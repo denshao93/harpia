@@ -55,6 +55,7 @@ class Connection:
         cursor.close()
         return qtd
     
+    # 1)
     def create_scene_path_row_schema(self, satellite_name, path_row):
         """Create the schema in draft database where segmentation will be save.
            In Harpia project the draft database is called as ta7_rascunho
@@ -71,20 +72,48 @@ class Connection:
                                                     satellite_name=satellite_name)
         cursor.execute(sql)
         cursor.close()
+    # 2)
+    def create_table_scene_path_row_scene(self, satellite_name, path_row, file_name):
+        """Clear table to load segmentation 
         
-    def load_segmentation_database(self, shapefile_path, shapefile_name):  
+        Arguments:
+            satellite_name {string} -- The initials from satelite name (Lansat 8 = lc8)
+            _path_row {string} -- The index where find scene from Lansat 8.
+            They have to be all together (i.e. 215068) 
+        """
+        cursor = self.conn.cursor()
+        sql = "CREATE TABLE IF NOT EXISTS {satellite_name}_{path_row}.{file_name} \
+                                          (id SERIAL PRIMARY KEY, \
+                                           geom GEOMETRY);".format(path_row=path_row,
+                                                                   satellite_name=satellite_name,
+                                                                   file_name=file_name)
+        cursor.execute(sql)
+        cursor.close()
+    # 3)
+    def del_table_scene_path_row_scene(self, satellite_name, path_row, file_name):
+        """Clear table to load segmentation 
         
-        layer = gu.read_shape_file_ogr(shapefile_path)
+        Arguments:
+            satellite_name {string} -- The initials from satelite name (Lansat 8 = lc8)
+            _path_row {string} -- The index where find scene from Lansat 8.
+            They have to be all together (i.e. 215068) 
+        """
+        cursor = self.conn.cursor()
+        sql = "DELETE FROM {satellite_name}_{path_row}.{file_name};".format(path_row=path_row,
+                                                                            satellite_name=satellite_name,
+                                                                            file_name=file_name)
+        cursor.execute(sql)
+        cursor.close()
+
+    def load_segmentation_database(self, satellite_name,
+                                         path_row,
+                                         file_name, 
+                                         shapefile_path):  
+        
+        file = ogr.Open(shapefile_path)
+        layer = file.GetLayer(0)
 
         cursor = self.conn.cursor()
-        
-        # cursor.execute("DELETE FROM \"lc8_215_068\".{shapefile_name};"\
-        #                 .format(shapefile_name=shapefile_name))
-        cursor.execute("CREATE TABLE IF NOT EXISTS lc8_215_068.{shapefile_name} \
-                        (id SERIAL PRIMARY KEY, geom GEOMETRY);".format(shapefile_name=shapefile_name))
-
-        #First delete the existing contents of this table in case we want to run the code multiple times.
-        # cursor.execute("DELETE FROM lc8_215_068.{shapefile_name};".format(shapefile_name=shapefile_name))
         
         for i in range(layer.GetFeatureCount()):
             feature = layer.GetFeature(i)
@@ -93,17 +122,11 @@ class Connection:
             #Convert geometry to WKT format
             wkt = geometry.ExportToWkt()
             #Insert data into database, converting WKT geometry to a PostGIS geography
-            cursor.execute("INSERT INTO lc8_215_068.{shapefile_name} (geom) \
+            cursor.execute("INSERT INTO {satellite_name}_{path_row}.{file_name} (geom) \
                             VALUES (ST_GeomFromText('{_wkt}'))"
-                            .format(shapefile_name=shapefile_name, _wkt=wkt))   
-
-
-if __name__ == '__main__':
-
-    conn_rascunho = Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
-    # conn_rascunho.create_scene_path_row_schema("215068")
-    conn_rascunho.load_segmentation_database(shapefile_path="~/Downloads/teste-slic.shp",
-                                             shapefile_name="teste_slic")
+                            .format(path_row=path_row, satellite_name=satellite_name,
+                                    file_name=file_name, _wkt=wkt))
+            print("Adicionando "+ str(i))   
 
     
 
