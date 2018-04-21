@@ -32,27 +32,27 @@ if __name__ == "__main__":
 
                     # Uncompressing file which has landsat bands
                     uncompress = Uc.UncompressFile(image_file_path_targz=file_path_targz)
-                    uncompress.run()
+                    # uncompress.run()
                     dir_tmp_img = uncompress.dir_tmp_img
 
                     # Creating image stacking from landsat bands
                     compose = Cmp.ComposeBands(image_output_path=image_output_path,
                                                scene_image_name=file_name,
                                                dir_tmp_img=dir_tmp_img)
-                    compose.run_image_composition()
+                    # compose.run_image_composition()
 
                     # Processing cloud shadow fmask
                     cloud = Cs.CloudShadow(dir_tmp_img=dir_tmp_img,
                                            image_output_path=image_output_path,
                                            file_name=file_name)
-                    cloud.run_cloud_shadow_fmask()
+                    # cloud.run_cloud_shadow_fmask()
 
                     # Segmentation
                     s = Seg.Segmentation(image_output_path=image_output_path,
                                        dir_tmp_image=dir_tmp_img,
                                        file_name=file_name)
-                    s.run_segmentation()
-
+                    # s.run_segmentation()
+                    
                     # Getting information from Landsat image file
                     lcinfo = LCinfo(file_name=file_name)
                     path_row = '{path}{row}'.format(path=lcinfo.get_path_row_from_file()[0],

@@ -84,9 +84,10 @@ class Connection:
         cursor = self.conn.cursor()
         sql = "CREATE TABLE IF NOT EXISTS {satellite_name}_{path_row}.{file_name} \
                                           (id SERIAL PRIMARY KEY, \
-                                           geom GEOMETRY);".format(path_row=path_row,
-                                                                   satellite_name=satellite_name,
-                                                                   file_name=file_name)
+                                           geom GEOMETRY(MULTIPOLYGON)\
+                                           );".format(path_row=path_row,
+                                                      satellite_name=satellite_name,
+                                                      file_name=file_name)
         cursor.execute(sql)
         cursor.close()
     # 3)
@@ -121,7 +122,7 @@ class Connection:
             geometry = feature.GetGeometryRef()
             #Convert geometry to WKT format
             wkt = geometry.ExportToWkt()
-            #Insert data into database, converting WKT geometry to a PostGIS geography
+            #Insert data into database, converting WKT geometry to a PostGIS geometry
             cursor.execute("INSERT INTO {satellite_name}_{path_row}.{file_name} (geom) \
                             VALUES (ST_GeomFromText('{_wkt}'))"
                             .format(path_row=path_row, satellite_name=satellite_name,
