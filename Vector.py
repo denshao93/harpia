@@ -10,7 +10,7 @@ class Vector:
         Arguments:
             shapefile_path {string} -- Place where shape file can be seted
         """
-        self.shapefile_path = shapefile_path
+        self.shapefile_path = os.path.abspath(shapefile_path)
 
     def read_shape_file_ogr(self):
         """Reading vector (.shp) with ogr
@@ -23,38 +23,28 @@ class Vector:
 
         return layer
 
+    def get_srid_vector(self):
+        """Getting srid from vector file
+        
+        Returns:
+            [strig] -- Value from SRID 
+        """
+          # use Shapefile driver
+        driver = ogr.GetDriverByName("ESRI Shapefile")
 
-def get_srid_vector():
-    """Getting srid from vector file
-    
-    Returns:
-        [strig] -- Value from SRID 
-    """t
+        shp = self.shapefile_path
+        # open the file
+        ds = driver.Open(shp, 0)
+        # reference the only layer in a Shapefile
+        lyr = ds.GetLayer(0)
 
-    # use Shapefile driver
-    driver = ogr.GetDriverByName("ESRI Shapefile")
-    # reference Shapefile
-    shp = "/media/dogosousa/1AF3820C0AA79B17/PROCESSADA/LC08/2017/12/215068/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_L1TP_215068_20171205_20171222_01_T1.shp"
-    # open the file
-    ds = driver.Open(shp, 0)
-    # reference the only layer in a Shapefile
-    lyr = ds.GetLayer(0)
-    print(lyr.GetSpatialRef())
+        # EPSG Code if available
+        epsg = lyr.GetSpatialRef().GetAttrValue("AUTHORITY", 1)
 
-    # projected coordinate system
-    # proj_string = lyr.GetSpatialRef().GetAttrValue("PROJCS", 0)
-    # geographic coordinate system
-    # geog_string = lyr.GetSpatialRef().GetAttrValue("GEOGCS", 0)
-    # EPSG Code if available
-    epsg = lyr.GetSpatialRef().GetAttrValue("AUTHORITY", 1)
-    # datum
-    datum = lyr.GetSpatialRef().GetAttrValue("DATUM", 0)
-
-    print("\nFile: {0}\n\nProjected: {1}\nEPSG: {2}\n".format(lyr.GetName(),proj_string, epsg))
-    print("Geographic: {0}\nDatum: {1}\n".format(geog_string, datum))
-
+        return (epsg)
 
 if __name__ == '__main__':
     
-    get_srid_vector()
+    v = Vector(shapefile_path="../../../../media/dogosousa/1AF3820C0AA79B17/PROCESSADA/LC08/2017/12/215068/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_L1TP_215068_20171205_20171222_01_T1.shp")
 
+    print(v.get_srid_vector())
