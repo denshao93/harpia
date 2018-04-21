@@ -22,7 +22,9 @@ class SatelliteFileInfo:
         except Exception:
             print("Satellite type not found")
 
+
 class LandsatFileInfo(SatelliteFileInfo):
+    
 
     def __init__(self, file_name):
         
@@ -63,11 +65,3 @@ class LandsatFileInfo(SatelliteFileInfo):
             """
             
             return self.file_name[17:25]
-
-
-if __name__ == "__main__":
-
-    lc_info = LandsatFileInfo(file_name="LC07_00000000000000000000000")
-    print(lc_info.get_satellite_name())
-    print(lc_info.get_path_row_from_file(),
-          lc_info.get_aquisition_data_landsat())
