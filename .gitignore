@@ -1,6 +1,5 @@
 # Para os arquivos temporarios criados para processamento de nuvens/sombra
 *.img
 .idea
-.vscode
 *.pyc
 __pycache__

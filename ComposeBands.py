@@ -56,7 +56,7 @@ class ComposeBands:
         :return: File stacking with landsat bands from 0 and 1.
         """
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}/thermal.img " \
-                  "{tmp}/{file_name}/LC08*_B[0,1].TIF".format(tmp=self.dir_tmp_img,
+                  "{tmp}/{file_name}/LC08*_B1[0,1].TIF".format(tmp=self.dir_tmp_img,
                                                               file_name=self.file_name)
         os.system(command)
 
