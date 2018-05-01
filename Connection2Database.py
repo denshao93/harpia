@@ -1,5 +1,5 @@
 import psycopg2
-import ogr
+from osgeo import ogr
 from SatelliteFileInfo import LandsatFileInfo as LCinfo
 import geo_utils as gu
 

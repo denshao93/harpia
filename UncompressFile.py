@@ -39,15 +39,13 @@ class UncompressFile:
         This function uncompress tar.gz files donwloaded from USGS
         :return:
         """
-        path = os.path.join(self.dir_tmp_img, self.get_file_basename(self.image_file_path_targz))
-        os.mkdir(path)
-
+        # path = os.path.join(self.dir_tmp_img, self.get_file_basename(self.image_file_path_targz))
+        # os.mkdir(path)
         try:
             with tarfile.open(self.image_file_path_targz, "r") as tar:
-                tar.extractall(path)
-        except:
-            with tarfile.open(self.image_file_path_targz, "r") as tar:
                 tar.extractall(self.dir_tmp_img)
+        except:
+            print("Error to uncompress image files")
 
     def reproject_img_from_umt_north_to_sirgas2000(self):
 
@@ -57,7 +55,7 @@ class UncompressFile:
             img_name = tif.split('/')[-1]
             command = "gdalwarp {img_src} {img_output}/{img_name} -s_srs EPSG:32624 -t_srs EPSG:4674" \
                 .format(img_src=tif,
-                        img_output=self.dir_tmp_img_epsg_4674,
+                        # img_output=self.dir_tmp_img_epsg_4674,
                         img_name=img_name)
             os.system(command)
 

@@ -1,5 +1,5 @@
 import rasterio
-import gdal
+from osgeo import gdal
 import matplotlib.pyplot as plt
 
 
@@ -30,12 +30,12 @@ class Raster:
 
 if __name__ == '__main__':
     
-    r = Raster("/home/dogosousa/Downloads/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_L1TP_215068_20171205_20171222_01_T1_B1.TIF")
+    r = Raster("/media/dogosousa/56A22ED6A22EBA7F/BRUTA/CEBERS4/CBERS_4_MUX_20161205_148_113_L2/CBERS_4_MUX_20161205_148_113_L2.tif")
 
     src = r.read_image()
-    
-    plt.imshow(src)
-    plt.show(src)
+    print(src.get_crs())
+    # plt.imshow(src)
+    # plt.show(src)
 
 
         

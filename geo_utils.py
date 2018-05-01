@@ -1,4 +1,4 @@
-import ogr, osr
+from osgeo import ogr, osr
 
 
 def project_geometry(vector_layer, source_src, target_src):

@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "args": [
-                "/media/dogosousa/56A22ED6A22EBA7F/BRUTA/LC8/215068",
+                "/media/dogosousa/56A22ED6A22EBA7F/BRUTA/LC8/215068/",
                 "/media/dogosousa/56A22ED6A22EBA7F/"
             ]
         },
