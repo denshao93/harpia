@@ -12,9 +12,7 @@ import Connection2Database as con
 if __name__ == "__main__":
     
     # Running pre-processing Landsat 8 repository for forest monitoring project to Bahia
-
     for subdir, dirs, files in os.walk(sys.argv[1]):
-        
         for file in files:
             if file.endswith(".tar.gz"):
                 print("Processing "+file)

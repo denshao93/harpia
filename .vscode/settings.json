@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Projetos/preprocess2ta/env"
+    "python.venvPath": "/home/diogocaribe/.virtualenvs/envProcess2ta",
+    "python.pythonPath": "/home/diogocaribe/.virtualenvs/envProcess2ta/bin/python"
 }

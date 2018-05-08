@@ -42,7 +42,7 @@ class UncompressFile:
         # path = os.path.join(self.dir_tmp_img, self.get_file_basename(self.image_file_path_targz))
         # os.mkdir(path)
         try:
-            with tarfile.open(self.image_file_path_targz, "r") as tar:
+            with tarfile.open(self.image_file_path_targz, "r|gz") as tar:
                 tar.extractall(self.dir_tmp_img)
         except:
             print("Error to uncompress image files")
