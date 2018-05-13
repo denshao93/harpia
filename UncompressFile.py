@@ -6,58 +6,51 @@ from glob import glob
 
 
 class UncompressFile:
+    """Uncompress tar.gz file"""
 
-    def __init__(self, image_file_path_targz):
-
+    def __init__(self, image_file_path_targz, file_name):
+        """
+        Arguments:
+            image_file_path_targz {str} -- [description]
+            file_name {str} -- [description]
+        """
         # Input row file (landsat file compressed like dowloaded from USGS)
         self.image_file_path_targz = image_file_path_targz
 
         # Temporary folder to put files to process and remove after that
         self.tmp = tempfile.gettempdir()
 
-        # Tmp directory useful to convert landsat imagens from UTM N to Sirgas2000
+        # Tmp directory to put landsat imagens
         self.dir_tmp_img = tempfile.mkdtemp()
 
-    @staticmethod
-    def get_file_basename(file_path):
-
-        basename = os.path.basename(file_path)
-
-        file_name = basename.split('.')[0]
-
-        return file_name
-
-    @staticmethod
-    def get_file_name_extension(file_path):
-
-        file_name_extension = os.path.basename(file_path)
-
-        return file_name_extension
+        # File name
+        self.file_name = file_name
 
     def uncompress_img(self):
-        """
-        This function uncompress tar.gz files donwloaded from USGS
-        :return:
-        """
-        # path = os.path.join(self.dir_tmp_img, self.get_file_basename(self.image_file_path_targz))
-        # os.mkdir(path)
+        """This function uncompress tar.gz files donwloaded from USGS"""
         try:
-            with tarfile.open(self.image_file_path_targz, "r|gz") as tar:
+            with tarfile.open(self.image_file_path_targz, "r:gz") as tar:
                 tar.extractall(self.dir_tmp_img)
         except:
             print("Error to uncompress image files")
 
-    def reproject_img_from_umt_north_to_sirgas2000(self):
+    def check_uncompressed_file(self):
+        """Check if there is .tif files into tmp folder.
+        Returns:
+            [boolean] -- If False the uncompresstion was done corretly
+        """
+        return len(glob('{}{}'.format(self.dir_tmp_img, "/*.TIF"))) > 0
 
-        list_raster_folder = glob('{}{}'.format(self.dir_tmp_img, '/*/*TIF'))
+    def move_uncompressed_file_wrong_folder(self):
+        """If image files were uncompressed in wrong place, this method will put it
+        in place where all of code recognized
+        """
+        files = os.listdir(self.dir_tmp_img)
+        os.mkdir('{}/{}'.format(self.dir_tmp_img, self.file_name))
+        dst_folder = '{}/{}'.format(self.dir_tmp_img, self.file_name)
 
-        for tif in list_raster_folder:
-            img_name = tif.split('/')[-1]
-            command = "gdalwarp {img_src} {img_output}/{img_name} -s_srs EPSG:32624 -t_srs EPSG:4674" \
-                .format(img_src=tif,
-                        # img_output=self.dir_tmp_img_epsg_4674,
-                        img_name=img_name)
-            os.system(command)
+        for f in files:
+            shutil.move(self.dir_tmp_img+"/"+f, dst_folder)
 
     @staticmethod
     def close_tmp_dir(dir_path):
@@ -65,8 +58,16 @@ class UncompressFile:
 
     def run(self):
         self.uncompress_img()
-        # self.reproject_img_from_umt_north_to_sirgas2000()
-        # self.close_tmp_dir(self.dir_tmp_img_utm_north)
+        if self.check_uncompressed_file():
+            self.move_uncompressed_file_wrong_folder()
 
+# Exemple
+# if __name__ == '__main__':
+
+#     file = UncompressFile("/media/diogocaribe/56A22ED6A22EBA7F/BRUTA/LC8/215068/LC08_L1TP_215068_20171205_20171222_01_T1.tar.gz",
+#     "LC08_L1TP_215068_20171205_20171222_01_T1")
+#     file.run()
+    # file = UncompressFile("/media/diogocaribe/56A22ED6A22EBA7F/BRUTA/LC8/215068/LC08_L1TP_215068_20160913_20170321_01_T1.tar.gz")
+    # file.run()
 
 
