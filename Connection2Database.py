@@ -54,18 +54,18 @@ class Connection:
         qtd = cursor.fetchall()
         cursor.close()
         return qtd
-    
+
     # 1)
     def create_scene_path_row_schema(self, satellite_name, path_row):
         """Create the schema in draft database where segmentation will be save.
            In Harpia project the draft database is called as ta7_rascunho
-        
+
         Arguments:
             satellite_name {string} -- The initials from satelite name (Lansat 8 = lc8)
             _path_row {string} -- The index where find scene from Lansat 8.
-            They have to be all together (i.e. 215068) 
+            They have to be all together (i.e. 215068)
         """
-                
+
         cursor = self.conn.cursor()
         sql = "CREATE SCHEMA IF NOT EXISTS \
                {satellite_name}_{path_row};".format(path_row=path_row,
@@ -74,12 +74,12 @@ class Connection:
         cursor.close()
     # 2)
     def create_table_scene_path_row_scene(self, satellite_name, path_row, file_name):
-        """Clear table to load segmentation 
-        
+        """Clear table to load segmentation
+
         Arguments:
             satellite_name {string} -- The initials from satelite name (Lansat 8 = lc8)
             _path_row {string} -- The index where find scene from Lansat 8.
-            They have to be all together (i.e. 215068) 
+            They have to be all together (i.e. 215068)
         """
         cursor = self.conn.cursor()
         sql = "CREATE TABLE IF NOT EXISTS {satellite_name}_{path_row}.{file_name} \
@@ -92,8 +92,8 @@ class Connection:
         cursor.close()
     # 3)
     def del_table_scene_path_row_scene(self, satellite_name, path_row, file_name):
-        """Clear table to load segmentation 
-        
+        """Clear table to load segmentation
+
         Arguments:
             satellite_name {string} -- The initials from satelite name (Lansat 8 = lc8)
             _path_row {string} -- The index where find scene from Lansat 8.
@@ -108,14 +108,14 @@ class Connection:
 
     def load_segmentation_database(self, satellite_name,
                                          path_row,
-                                         file_name, 
-                                         shapefile_path):  
-        
+                                         file_name,
+                                         shapefile_path):
+
         file = ogr.Open(shapefile_path)
         layer = file.GetLayer(0)
 
         cursor = self.conn.cursor()
-        
+
         for i in range(layer.GetFeatureCount()):
             feature = layer.GetFeature(i)
             #Get feature geometry
@@ -127,7 +127,4 @@ class Connection:
                             VALUES (ST_GeomFromText('{_wkt}'))"
                             .format(path_row=path_row, satellite_name=satellite_name,
                                     file_name=file_name, _wkt=wkt))
-            print("Adicionando "+ str(i))   
-
-    
-
+            print("Adicionando "+ str(i))
