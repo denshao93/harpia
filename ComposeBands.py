@@ -60,6 +60,15 @@ class ComposeBands:
                                                               file_name=self.file_name)
         os.system(command)
 
+    def clip_raster_by_mask(self):
+
+        vector = "vetor/lc8_ba_4674_buffer.shp"
+        command = "gdalwarp -co COMPRESS=LZW -cutline {vector} -crop_to_cutline -dstnodata 0 "\
+                  "{tmp}/ref.img {tmp}/cut_ref.TIF".format(vector=vector,
+                                                                       tmp=self.dir_tmp_img,
+                                                                       file_name=self.file_name)
+        os.system(command)
+
     def run_image_composition(self):
         """
         1) Create stacking from all image that have 30m of spatial resolution (size of pixel)
@@ -71,3 +80,4 @@ class ComposeBands:
         self.stack_345_30m_band_landsat()
         self.get_image_pyramid_from_stack_345_30m_band_landsat()
         self.stack_termal_band()
+        self.clip_raster_by_mask()

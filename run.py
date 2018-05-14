@@ -30,6 +30,8 @@ if __name__ == "__main__":
                 uncompress = Un.UncompressFile(image_file_path_targz=file_path_targz,
                                                file_name=file_name)
                 uncompress.run()
+
+                # Temporary directory where image files were stored to be processed
                 dir_tmp_img = uncompress.dir_tmp_img
 
                 # Creating image stacking from landsat bands
@@ -37,6 +39,8 @@ if __name__ == "__main__":
                                            scene_image_name=file_name,
                                            dir_tmp_img=dir_tmp_img)
                 compose.run_image_composition()
+
+                # TODO:Clipar raster
 
                 # Processing cloud shadow fmask
                 cloud = Cs.CloudShadow(dir_tmp_img=dir_tmp_img,
