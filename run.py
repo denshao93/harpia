@@ -40,13 +40,15 @@ if __name__ == "__main__":
                                            dir_tmp_img=dir_tmp_img)
                 compose.run_image_composition()
 
-                # TODO:Clipar raster
+
 
                 # Processing cloud shadow fmask
                 cloud = Cs.CloudShadow(dir_tmp_img=dir_tmp_img,
                                         image_output_path=image_output_path,
                                         file_name=file_name)
                 cloud.run_cloud_shadow_fmask()
+
+                # TODO:Clipar raster
 
                 # Segmentation
                 s = Seg.Segmentation(image_output_path=image_output_path,

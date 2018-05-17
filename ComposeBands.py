@@ -63,8 +63,16 @@ class ComposeBands:
     def clip_raster_by_mask(self):
 
         vector = "vetor/lc8_ba_4674_buffer.shp"
-        command = "gdalwarp -co COMPRESS=LZW -cutline {vector} -crop_to_cutline -dstnodata 0 "\
-                  "{tmp}/ref.img {tmp}/cut_ref.TIF".format(vector=vector,
+        command = "gdalwarp -cutline {vector} -crop_to_cutline -dstnodata 0 -multi "\
+                  "{tmp}/ref.img {tmp}/cut_ref.vrt".format(vector=vector,
+                                                                       tmp=self.dir_tmp_img,
+                                                                       file_name=self.file_name)
+        os.system(command)
+
+    def compress_clieped_raster(self):
+
+        vector = "vetor/lc8_ba_4674_buffer.shp"
+        command = "gdal_translate -co compress=LZW -co NUM_THREADS=6 {tmp}/cut_ref.vrt {tmp}/cut_ref.tif".format(vector=vector,
                                                                        tmp=self.dir_tmp_img,
                                                                        file_name=self.file_name)
         os.system(command)
@@ -81,3 +89,4 @@ class ComposeBands:
         self.get_image_pyramid_from_stack_345_30m_band_landsat()
         self.stack_termal_band()
         self.clip_raster_by_mask()
+        self.compress_clieped_raster()
