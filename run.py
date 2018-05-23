@@ -35,20 +35,16 @@ if __name__ == "__main__":
                 dir_tmp_img = uncompress.dir_tmp_img
 
                 # Creating image stacking from landsat bands
-                compose = Cmp.ComposeBands(image_output_path=image_output_path,
+                compose = Cmp.ComposeBands(image_output_path_stored=image_output_path,
                                            scene_image_name=file_name,
                                            dir_tmp_img=dir_tmp_img)
                 compose.run_image_composition()
-
-
 
                 # Processing cloud shadow fmask
                 cloud = Cs.CloudShadow(dir_tmp_img=dir_tmp_img,
                                         image_output_path=image_output_path,
                                         file_name=file_name)
                 cloud.run_cloud_shadow_fmask()
-
-                # TODO:Clipar raster
 
                 # Segmentation
                 s = Seg.Segmentation(image_output_path=image_output_path,

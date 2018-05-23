@@ -24,7 +24,7 @@ class Segmentation:
         :return:
         """
         print("........Segmentanção.........")
-        command = "/home/diogocaribe/src/gdal-segment/bin/gdal-segment -algo SLIC -region {r} -niter {i} {tmp}{file_name}.tif " \
+        command = "~/gdal-segment/bin/gdal-segment -algo SLIC -region {r} -niter {i} {tmp}{file_name}.tif " \
                   "-out {out}/{file_name}-slic.shp".format(r=region,
                                                             i=inter,
                                                             tmp=self.dir_tmp_image,
@@ -39,7 +39,7 @@ class Segmentation:
         :return:
         """
         print("........Segmentanção.........")
-        command = "~/src/gdal-segment/bin/gdal-segment -algo LSC -region {r} -niter {i} {tmp}{file_name}.tif " \
+        command = "~/gdal-segment/bin/gdal-segment -algo LSC -region {r} -niter {i} {tmp}{file_name}.tif " \
                   "-out {out}/{file_name}-lsc.shp".format(r=region,
                                                             i=inter,
                                                             tmp=self.dir_tmp_image,
@@ -54,7 +54,7 @@ class Segmentation:
         :return:
         """
         print("........Segmentanção.........")
-        command = "~/src/gdal-segment/bin/gdal-segment -algo MSLIC -region {r} -niter {i} {tmp}{file_name}.tif " \
+        command = "~/gdal-segment/bin/gdal-segment -algo MSLIC -region {r} -niter {i} {tmp}{file_name}.tif " \
                   "-out {out}/{file_name}-mslic.shp".format(r=region,
                                                             i=inter,
                                                             tmp=self.dir_tmp_image,
@@ -68,7 +68,7 @@ class Segmentation:
         The image have to have 3 bands or gray with
         :return:
         """
-        command = "~/src/gdal-segment/bin/gdal-segment -algo SEEDS -region {r} -niter {i} {out}/{file_name}.tif -out " \
+        command = "~/gdal-segment/bin/gdal-segment -algo SEEDS -region {r} -niter {i} {out}/{file_name}.tif -out " \
                   "{out}/{file_name}-seeds.shp".format(r=region,
                                                        i=inter,
                                                        tmp=self.dir_tmp_image,
@@ -83,16 +83,16 @@ class Segmentation:
         """
         # self.get_segmentation_lsc(10, 30)
         # self.get_segmentation_mslic(10, 10)
-        self.get_segmentation_slic(50, 2)
+        self.get_segmentation_slic(5, 10)
         # self.get_segmentation_seeds(10, 5)
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    s = Segmentation(image_output_path="/tmp/tmpryx6xfw1/",
-                     dir_tmp_image="/tmp/tmpryx6xfw1/",
-                     file_name="cut_ref")
-    s.run_segmentation()
+#     s = Segmentation(image_output_path="/tmp/tmpb_v2x2ow/",
+#                      dir_tmp_image="/tmp/tmpb_v2x2ow/",
+#                      file_name="cut_ref")
+#     s.run_segmentation()
 
     # conn = Con.Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
 

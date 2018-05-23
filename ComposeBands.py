@@ -3,90 +3,74 @@ import os
 
 class ComposeBands:
 
-    def __init__(self,
-                 image_output_path,
-                 scene_image_name,
-                 dir_tmp_img):
+    def __init__(self, image_output_path_stored, scene_image_name, dir_tmp_img):
         # The folder where output processed will be saved
-        self.image_output_path = image_output_path+"/"
+        self.image_output_path_stored = image_output_path_stored
 
         # Temporary folder to put files to process and remove after that
         self.dir_tmp_img = dir_tmp_img
 
         self.file_name = scene_image_name
 
-    def stack_all_30m_band_landsat(self):
-        """
-        Stacking all bands from landsat which has 30m spatial resolution.
-        :return: File stacking with landsat bands from 1-7 and 9.
+        # Path where band files can be find.
+        self.tmp_raw_img_path = os.path.join(self.dir_tmp_img, self.file_name)
+
+    def stack_img(self, output_image_path, output_image_name, expression):
+        """Stacking bands from landsat in tmp folder.
+           The expression is the bands which will be stacked.
+
+        Arguments:
+            output_image_path {str} -- The path where image will be save.
+            output_image_name {str} -- The name of image output with extention (ie. ref.img).
+            expression {str} -- Regular expression which select files who will be put in output.
         """
 
-        print('....stack_all_30m_band_landsat...')
+        # Path where band files can be find.
+        # Here, it is the input for gdal_merge.
+        tmp_raw_img = os.path.join(self.tmp_raw_img_path, expression)
 
-        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}/ref.img " \
-                  "{tmp}/{file_name}/LC08*_B[1-7,9].TIF".format(tmp=self.dir_tmp_img,
-                                                                file_name=self.file_name)
+        # Output image
+        output_image_path = os.path.join(output_image_path, output_image_name)
+
+        command = "gdal_merge.py -ot Byte -separate -of HFA -co COMPRESSED=YES -o " \
+        "{output_image} {tmp_raw_img}".format(output_image=output_image_path,
+                                              tmp_raw_img=tmp_raw_img)
 
         os.system(command)
 
-    def stack_345_30m_band_landsat(self):
-        """
-        Stacking all bands usefull for forest monitor from landsat which has 30m spatial resolution. They are bands
-        from 3 to 6
-        :return: File stacking with landsat bands from 3-6.
-        """
-        print('...stack_345_30m_band_landsat...')
-        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {out}/{img_name}.TIF " \
-                  "{tmp}/{file_name}/LC08*_B[3-5].TIF".format(tmp=self.dir_tmp_img,
-                                                              out=self.image_output_path,
-                                                              img_name=self.file_name,
-                                                              file_name=self.file_name)
-        os.system(command)
+    def get_image_pyramid_from_stack_image_stored(self, image_path, image_name):
 
-    def get_image_pyramid_from_stack_345_30m_band_landsat(self):
         print('...Pyramid...')
-        command = "gdaladdo -r nearest {out}/{file_name}.TIF 2 4 8 16 32 64 128 256 512 1024"\
-            .format(out=self.image_output_path, file_name=self.file_name)
+        image_path = os.path.join(image_path, image_name)
+        command = "gdaladdo -r nearest {image} " \
+                  "2 4 8 16 32 64 128 256 512 1024".format(image=image_path)
 
         os.system(command)
 
-    def stack_termal_band(self):
-        """
-        Stacking all thermal bands
-        :return: File stacking with landsat bands from 0 and 1.
-        """
-        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {tmp}/thermal.img " \
-                  "{tmp}/{file_name}/LC08*_B1[0,1].TIF".format(tmp=self.dir_tmp_img,
-                                                              file_name=self.file_name)
-        os.system(command)
+    # def clip_raster_by_mask(self):
 
-    def clip_raster_by_mask(self):
+    #     vector = "vetor/square_215068.shp"
+    #     command = "gdalwarp -cutline {vector} -crop_to_cutline -dstnodata 0 -multi "\
+    #               "{tmp}/ref.img {tmp}/cut_ref.vrt".format(vector=vector,
+    #                                                                    tmp=self.dir_tmp_img,
+    #                                                                    file_name=self.file_name)
+    #     os.system(command)
 
-        vector = "vetor/lc8_ba_4674_buffer.shp"
-        command = "gdalwarp -cutline {vector} -crop_to_cutline -dstnodata 0 -multi "\
-                  "{tmp}/ref.img {tmp}/cut_ref.vrt".format(vector=vector,
-                                                                       tmp=self.dir_tmp_img,
-                                                                       file_name=self.file_name)
-        os.system(command)
+    # def compress_clieped_raster(self):
 
-    def compress_clieped_raster(self):
-
-        vector = "vetor/lc8_ba_4674_buffer.shp"
-        command = "gdal_translate -co compress=LZW -co NUM_THREADS=6 {tmp}/cut_ref.vrt {tmp}/cut_ref.tif".format(vector=vector,
-                                                                       tmp=self.dir_tmp_img,
-                                                                       file_name=self.file_name)
-        os.system(command)
+    #     command = "gdal_translate -ot Byte -scale -co compress=LZW -co NUM_THREADS=6 {tmp}/cut_ref.vrt " \
+    #     "{tmp}/cut_ref.tif".format(tmp=self.dir_tmp_img,
+    #                                file_name=self.file_name)
+    #     os.system(command)
 
     def run_image_composition(self):
-        """
-        1) Create stacking from all image that have 30m of spatial resolution (size of pixel)
-        2) Create stacking bands 345 from landsat image
-        3) Create stacking bands from thermal landsat bands
-        :return:
-        """
-        self.stack_all_30m_band_landsat()
-        self.stack_345_30m_band_landsat()
-        self.get_image_pyramid_from_stack_345_30m_band_landsat()
-        self.stack_termal_band()
-        self.clip_raster_by_mask()
-        self.compress_clieped_raster()
+
+        self.stack_img(output_image_path=self.dir_tmp_img,
+                       output_image_name="ref.img",
+                       expression="LC08*_B[1-7,9].TIF")
+        self.stack_img(self.dir_tmp_img, "thermal.img", "LC08*_B1[0,1].TIF")
+        self.stack_img(self.image_output_path_stored, self.file_name + ".TIF", expression="LC08*_B[3-5].TIF")
+        self.get_image_pyramid_from_stack_image_stored( image_path=self.image_output_path_stored,
+                                                        image_name=self.file_name + ".TIF")
+        # self.clip_raster_by_mask()
+        # self.compress_clieped_raster()
