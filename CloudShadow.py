@@ -35,7 +35,7 @@ class CloudShadow:
     def cloud_detection(self):
         print(".....Creating cloud detection image....")
         command = "fmask_usgsLandsatStacked.py -t {tmp}/thermal.img -a {tmp}/toa.img -m {tmp}/{file_name}/*_MTL.txt " \
-                  "-z {tmp}/angles.img -s {tmp}/saturationmask.img -o {out}/cloud.tif"\
+                  "-z {tmp}/angles.img -s {tmp}/saturationmask.img -o {out}/cloud.tif" \
             .format(tmp=self.tmp, out=self.image_output_path, file_name=self.file_name)
         os.system(command)
 

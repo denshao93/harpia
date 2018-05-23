@@ -32,9 +32,9 @@ class ComposeBands:
         # Output image
         output_image_path = os.path.join(output_image_path, output_image_name)
 
-        command = "gdal_merge.py -ot Byte -separate -of HFA -co COMPRESSED=YES -o " \
-        "{output_image} {tmp_raw_img}".format(output_image=output_image_path,
-                                              tmp_raw_img=tmp_raw_img)
+        command = "gdal_merge.py -of HFA -co COMPRESSED=YES -o {output_image} " \
+                  "{tmp_raw_img}".format(output_image=output_image_path,
+                                         tmp_raw_img=tmp_raw_img)
 
         os.system(command)
 
@@ -47,22 +47,6 @@ class ComposeBands:
 
         os.system(command)
 
-    # def clip_raster_by_mask(self):
-
-    #     vector = "vetor/square_215068.shp"
-    #     command = "gdalwarp -cutline {vector} -crop_to_cutline -dstnodata 0 -multi "\
-    #               "{tmp}/ref.img {tmp}/cut_ref.vrt".format(vector=vector,
-    #                                                                    tmp=self.dir_tmp_img,
-    #                                                                    file_name=self.file_name)
-    #     os.system(command)
-
-    # def compress_clieped_raster(self):
-
-    #     command = "gdal_translate -ot Byte -scale -co compress=LZW -co NUM_THREADS=6 {tmp}/cut_ref.vrt " \
-    #     "{tmp}/cut_ref.tif".format(tmp=self.dir_tmp_img,
-    #                                file_name=self.file_name)
-    #     os.system(command)
-
     def run_image_composition(self):
 
         self.stack_img(output_image_path=self.dir_tmp_img,
@@ -72,5 +56,4 @@ class ComposeBands:
         self.stack_img(self.image_output_path_stored, self.file_name + ".TIF", expression="LC08*_B[3-5].TIF")
         self.get_image_pyramid_from_stack_image_stored( image_path=self.image_output_path_stored,
                                                         image_name=self.file_name + ".TIF")
-        # self.clip_raster_by_mask()
-        # self.compress_clieped_raster()
+
