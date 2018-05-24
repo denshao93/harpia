@@ -83,16 +83,16 @@ class Segmentation:
         """
         # self.get_segmentation_lsc(10, 30)
         # self.get_segmentation_mslic(10, 10)
-        self.get_segmentation_slic(5, 10)
+        self.get_segmentation_slic(10, 10)
         # self.get_segmentation_seeds(10, 5)
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     s = Segmentation(image_output_path="/tmp/tmpb_v2x2ow/",
-#                      dir_tmp_image="/tmp/tmpb_v2x2ow/",
-#                      file_name="cut_ref")
-#     s.run_segmentation()
+    s = Segmentation(image_output_path="/tmp/tmpwcnf60qh/",
+                     dir_tmp_image="/tmp/tmpwcnf60qh/",
+                     file_name="cut_ref")
+    s.run_segmentation()
 
     # conn = Con.Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
 
