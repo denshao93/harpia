@@ -32,10 +32,10 @@ class ComposeBands:
         # Output image
         output_image_path = os.path.join(output_image_path, output_image_name)
 
-        command = "gdal_merge.py -of HFA -co COMPRESSED=YES -o {output_image} " \
+        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {output_image} " \
                   "{tmp_raw_img}".format(output_image=output_image_path,
                                          tmp_raw_img=tmp_raw_img)
-
+        print(command)
         os.system(command)
 
     def get_image_pyramid_from_stack_image_stored(self, image_path, image_name):

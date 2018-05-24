@@ -42,10 +42,10 @@ if __name__ == "__main__":
                 compose.run_image_composition()
 
                 # Processing cloud shadow fmask
-                # cloud = Cs.CloudShadow(dir_tmp_img=dir_tmp_img,
-                #                         image_output_path=image_output_path,
-                #                         file_name=file_name)
-                # cloud.run_cloud_shadow_fmask()
+                cloud = Cs.CloudShadow(dir_tmp_img=dir_tmp_img,
+                                        image_output_path=image_output_path,
+                                        file_name=file_name)
+                cloud.run_cloud_shadow_fmask()
 
                 # Clip raster
                 Cr.ClipRaster(scene_image_name=file_name, dir_tmp_img=dir_tmp_img).run()
