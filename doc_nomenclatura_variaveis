@@ -1,4 +1,6 @@
-full_scene_name = nome completo da cena 
+full_scene_name = nome completo da cena sem extenção
+img_file_name_stored = nome da imagem armazenada
+                       informações do <satelite>_<ponto/orbita>_<data_aquisição>
 
 Arquivos brutos:
 file_path_targz = Caminho absoluto do arquivos compactado

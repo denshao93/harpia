@@ -26,7 +26,7 @@ class ClipRaster(object):
 
         vector = "vetor/square_215068.shp"
 
-        command = "gdalwarp -cutline {vector} -crop_to_cutline -dstnodata 0 -multi " \
+        command = "gdalwarp -cutline {vector} -crop_to_cutline -multi " \
                   "{ref_img} {output_img}".format(vector=vector, ref_img=self.ref_img,
                                                 output_img=self.cut_img_vrt)
         os.system(command)

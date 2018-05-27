@@ -50,13 +50,8 @@ class Segmentation:
     def run_segmentation(self):
         """
         Segmenting landsat image
-        :return:
         """
         self.get_segmentation(region=10, inter=25, algorithm="SLIC")
-        # self.get_segmentation_lsc(10, 30)
-        # self.get_segmentation_mslic(10, 10)
-        # self.get_segmentation_slic(10, 10)
-        # self.get_segmentation_seeds(10, 5)
 
 
 # if __name__ == "__main__":
@@ -68,7 +63,7 @@ class Segmentation:
 
     # conn = Con.Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
 
-    # # conn.create_scene_path_row_schema(satellite_name=,path_row="215068")
+    # conn.create_scene_path_row_schema(satellite_name=,path_row="215068")
     # conn.load_segmentation_database(shapefile_path="~/Downloads/",
     #                                 shapefile_name="teste.shp")
 
