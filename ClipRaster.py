@@ -3,22 +3,29 @@ import os
 
 class ClipRaster(object):
 
-    def __init__(self, scene_image_name, dir_tmp_img):
+    def __init__(self, scene_image_name, dir_tmp_img, img_output_path_stored):
         # Temporary folder to put files to process and remove after that
         self.dir_tmp_img = dir_tmp_img
 
         self.file_name = scene_image_name
 
+        self.img_output_path_stored = img_output_path_stored
+
         # Path where band files can be find.
         self.tmp_raw_img_path = os.path.join(self.dir_tmp_img, self.file_name)
 
-        self.ref_img = os.path.join(self.dir_tmp_img, "ref.img")
+        self.ref_img = os.path.join(self.dir_tmp_img, self.file_name+".TIF")
         self.cut_img_vrt = os.path.join(self.dir_tmp_img, "cut_ref.vrt")
-        self.cut_img_tif = os.path.join(self.dir_tmp_img, "cut_ref.tif")
+
+        self.file_name_stored = '{}{}{}'.format(self.file_name[:5],
+                                                self.file_name[10:25], ".TIF")
+
+        self.cut_img_tif_path = os.path.join(self.img_output_path_stored,
+                                             self.file_name_stored)
 
     def clip_raster_by_mask(self):
 
-        vector = "vetor/lc8_ba_4674_buffer.shp"
+        vector = "vetor/square_215068.shp"
 
         command = "gdalwarp -cutline {vector} -crop_to_cutline -dstnodata 0 -multi " \
                   "{ref_img} {output_img}".format(vector=vector, ref_img=self.ref_img,
@@ -29,7 +36,7 @@ class ClipRaster(object):
 
         command = "gdal_translate -ot Byte -scale -co compress=LZW -co NUM_THREADS=6 {cut_img_vrt} " \
         "{cut_img_tif}".format(cut_img_vrt=self.cut_img_vrt,
-                                cut_img_tif=self.cut_img_tif)
+                                cut_img_tif=self.cut_img_tif_path)
         os.system(command)
 
     def del_img_vrt(self):
@@ -38,4 +45,4 @@ class ClipRaster(object):
     def run(self):
         self.clip_raster_by_mask()
         self.compress_clieped_raster()
-        self.del_img_vrt()
+        # self.del_img_vrt()
