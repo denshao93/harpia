@@ -49,11 +49,16 @@ class ComposeBands:
 
     def run_image_composition(self):
 
-        self.stack_img(output_image_path=self.dir_tmp_img,
-                       output_image_name="ref.img",
-                       expression="LC08*_B[1-7,9].TIF")
-        self.stack_img(self.dir_tmp_img, "thermal.img", "LC08*_B1[0,1].TIF")
-        self.stack_img(self.image_output_path_stored, self.file_name + ".TIF", expression="LC08*_B[3-5].TIF")
-        self.get_image_pyramid_from_stack_image_stored( image_path=self.image_output_path_stored,
-                                                        image_name=self.file_name + ".TIF")
+        # Stacking image to cloud/shadow
+        # self.stack_img(output_image_path=self.dir_tmp_img,
+        #                output_image_name="ref.img",
+        #                expression="LC08*_B[1-7,9].TIF")
+        # self.stack_img(self.dir_tmp_img, "thermal.img", "LC08*_B1[0,1].TIF")
+
+        # Stacking imagem to clip
+        self.stack_img(self.dir_tmp_img, self.file_name + ".TIF", expression="LC08*_B[3-6].TIF")
+
+        # Creating pyramid for image stored
+        # self.get_image_pyramid_from_stack_image_stored( image_path=self.image_output_path_stored,
+        #                                                 image_name=self.file_name + ".TIF")
 
