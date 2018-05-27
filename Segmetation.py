@@ -13,15 +13,13 @@ class Segmentation:
 
         self.file_name = file_name
 
-        self.img_output_path_stored = img_output_path_stored
+        # Image name
+        self.img_file_name_stored = '{}{}'.format(self.file_name[:5],
+                                                  self.file_name[10:25]+".TIF")
 
-        self.img_file_name_stored = '{}{}'.format(self.file_name,".TIF")
-
-        # self.vector_file_name_stored = '{}{}'.format(self.file_name[:5],
-        #                                         self.file_name[10:25])
-
-        self.img_tif_path_stored = os.path.join(self.img_output_path_stored,
-                                             self.img_file_name_stored)
+        # Vector name (without extention)
+        self.vector_file_name_stored = '{}{}'.format(self.file_name[:5],
+                                                self.file_name[10:25])
 
     def get_segmentation(self, region, inter, algorithm):
         """Segmentation function by gdal-segment
@@ -34,8 +32,9 @@ class Segmentation:
         """
 
         print("........Segmentanção.........")
-        seg_output = os.path.join(self.image_output_path,
-                                  self.file_name + "_" + algorithm + ".shp")
+        input_img = os.path.join(self.image_output_path, self.img_file_name_stored)
+        output_segmentation = os.path.join(self.image_output_path,
+                                  self.vector_file_name_stored + "_" + algorithm + ".shp")
         command = "/home/diogocaribe/gdal-segment/bin/gdal-segment " \
                     "-region {r} " \
                     "-niter {i} " \
@@ -44,8 +43,8 @@ class Segmentation:
                     "-out {seg_output}".format(r=region,
                                                              i=inter,
                                                              algo=algorithm,
-                                                             input_img=self.img_tif_path_stored,
-                                                             seg_output=seg_output)
+                                                             input_img=input_img,
+                                                             seg_output=output_segmentation)
         os.system(command)
 
     def run_segmentation(self):
@@ -60,12 +59,12 @@ class Segmentation:
         # self.get_segmentation_seeds(10, 5)
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    s = Segmentation(img_output_path_stored="/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/" \
-                                            "LC08/2017/12/215068/LC08_L1TP_215068_20171205_20171222_01_T1/",
-                     file_name="LC08_215068_20171205")
-    s.run_segmentation()
+#     s = Segmentation(img_output_path_stored="/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/" \
+#                                             "LC08/2017/12/215068/LC08_L1TP_215068_20171205_20171222_01_T1/",
+#                      file_name="LC08_L1TP_215068_20171205_20171222_01_T1")
+#     s.run_segmentation()
 
     # conn = Con.Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
 

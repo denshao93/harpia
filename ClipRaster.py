@@ -3,7 +3,7 @@ import os
 
 class ClipRaster(object):
 
-    def __init__(self, scene_image_name, dir_tmp_img, img_output_path_stored):
+    def __init__(self, scene_image_name, dir_tmp_img, img_output_path_stored, img_file_name_stored):
         # Temporary folder to put files to process and remove after that
         self.dir_tmp_img = dir_tmp_img
 
@@ -17,8 +17,7 @@ class ClipRaster(object):
         self.ref_img = os.path.join(self.dir_tmp_img, self.file_name+".TIF")
         self.cut_img_vrt = os.path.join(self.dir_tmp_img, "cut_ref.vrt")
 
-        self.file_name_stored = '{}{}{}'.format(self.file_name[:5],
-                                                self.file_name[10:25], ".TIF")
+        self.file_name_stored = '{}{}'.format(img_file_name_stored, ".TIF")
 
         self.cut_img_tif_path = os.path.join(self.img_output_path_stored,
                                              self.file_name_stored)
@@ -45,4 +44,4 @@ class ClipRaster(object):
     def run(self):
         self.clip_raster_by_mask()
         self.compress_clieped_raster()
-        # self.del_img_vrt()
+        self.del_img_vrt()
