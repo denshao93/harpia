@@ -24,7 +24,7 @@ if __name__ == "__main__":
                 mdir = Od.OrganizeDirectory(output_root_dir_image_processed=sys.argv[2],
                                             image_file_path_targz=file_path_targz)
                 # The path where processed image (results) will be saved
-                image_output_path = mdir.create_dir_satellite_year_pathrow_image()
+                img_output_path_stored = mdir.create_dir_satellite_year_pathrow_image()
                 mdir.run_manage_directory()
 
                 # Uncompressing file which has landsat bands
@@ -36,24 +36,26 @@ if __name__ == "__main__":
                 dir_tmp_img = uncompress.dir_tmp_img
 
                 # Creating image stacking from landsat bands
-                compose = Cmp.ComposeBands(image_output_path_stored=image_output_path,
+                compose = Cmp.ComposeBands(image_output_path_stored=img_output_path_stored,
                                            scene_image_name=file_name,
                                            dir_tmp_img=dir_tmp_img)
                 compose.run_image_composition()
 
                 # Processing cloud shadow fmask
-                cloud = Cs.CloudShadow(dir_tmp_img=dir_tmp_img,
-                                        image_output_path=image_output_path,
-                                        file_name=file_name)
-                cloud.run_cloud_shadow_fmask()
+                # cloud = Cs.CloudShadow(dir_tmp_img=dir_tmp_img,
+                #                         image_output_path=img_output_path_stored,
+                #                         file_name=file_name)
+                # cloud.run_cloud_shadow_fmask()
 
                 # Clip raster
-                Cr.ClipRaster(scene_image_name=file_name, dir_tmp_img=dir_tmp_img).run()
+                Cr.ClipRaster(scene_image_name=file_name,
+                              dir_tmp_img=dir_tmp_img,
+                              img_output_path_stored=img_output_path_stored).run()
 
                 # Segmentation
-                s = Seg.Segmentation(image_output_path=image_output_path,
-                                    dir_tmp_image=dir_tmp_img,
-                                    file_name=file_name)
+                # s = Seg.Segmentation(img_output_path_stored=img_output_path_stored,
+                #                     dir_tmp_image=dir_tmp_img,
+                #                     file_name=file_name)
                 # s.run_segmentation()
 
                 # Getting information from Landsat image file
