@@ -1,0 +1,11 @@
+full_scene_name = nome completo da cena 
+
+Arquivos brutos:
+file_path_targz = Caminho absoluto do arquivos compactado
+
+Arquivos tmp:
+dir_tmp = /tmp
+dir_tmp_img = /tmp/<nome_aleatorio_dado>
+
+Arquivos armazenados:
+dir_img_save = /PROCESSADA/LC08/<ano>/<mes>/<nome_cena>
