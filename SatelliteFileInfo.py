@@ -17,7 +17,7 @@ class SatelliteFileInfo:
         """
         try:
             if self.full_scene_name[0:4] == "LC08":
-                return "lc8"
+                return "lc08"
         except Exception:
             print("Satellite type not found")
 

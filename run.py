@@ -1,15 +1,17 @@
 import os
 import sys
 import utils as u
-import PyramidRaster as Pyramind
-import ClipRaster as Clip
 import CloudShadow as Cs
 import Segmetation as Seg
-import ComposeBands as Compose
+import ClipRaster as Clip
 import UncompressFile as Un
+import ComposeBands as Compose
 import OrganizeDirectory as Od
-from SatelliteFileInfo import LandsatFileInfo as LCinfo
+import PyramidRaster as Pyramind
 import Connection2Database as con
+import LoadSegmentationDatabase as LSegDB
+from SatelliteFileInfo import LandsatFileInfo as LCinfo
+
 
 if __name__ == "__main__":
 
@@ -71,25 +73,11 @@ if __name__ == "__main__":
                 s.run_segmentation()
 
                 # Getting information from Landsat image file
-                # lcinfo = LCinfo(file_name=file_name)
-                # path_row = '{path}{row}'.format(path=lcinfo.get_path_row_from_file()[0],
-                #                                 row=lcinfo.get_path_row_from_file()[1])
-                # satellite_name = lcinfo.get_satellite_name()
-
-                # Creating schema where segmentation will be load
-                # conn = con.Connection("host=localhost dbname=ta7_rascunho \
-                #                         user=postgres password=postgres")
-                # conn.create_scene_path_row_schema(satellite_name=satellite_name,
-                #                                     path_row=path_row)
-
-                # conn.create_table_scene_path_row_scene(satellite_name=satellite_name,
-                #                                         path_row=path_row, file_name=file_name)
-                # conn.del_table_scene_path_row_scene(satellite_name=satellite_name,
-                #                                     path_row=path_row, file_name=file_name)
-                # shapefile_path = '{image_output_path}/{file_name}.shp'.format(image_output_path=image_output_path,
-                #                                                                 file_name=file_name)
-                # conn.load_segmentation_database(satellite_name=satellite_name,
-                #                                 path_row=path_row, file_name=file_name,
-                #                                 shapefile_path=shapefile_path)
+                segmentation_file_path = os.path.join(img_output_path_stored,
+                                                      img_file_name_stored+"_SLIC.shp" )
+                load_seg = LSegDB.LoadSegmentationDatabase(segmentation_file_path=segmentation_file_path,
+                                    full_scene_name=full_image_scene_name,
+                                    img_file_name_stored=img_file_name_stored)
+                load_seg.run_load_segmentation()
 
 
