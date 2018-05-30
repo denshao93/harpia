@@ -1,8 +1,10 @@
-# Configurando o ambiente
+# Setting enviroment
 
 ___________________________________________________
 
-## Instalar gdal
+## Install gdal
+
+Gdal needs to support hdf5 format file
 
 ```sudo add-apt-repository -y ppa:ubuntugis/ppa
 sudo apt update
@@ -14,7 +16,7 @@ sudo apt-get install libhdf5-dev libhdf5-serial-dev
 
 ___________________________________________________
 
-## Instalar OpenCV
+## Install OpenCV
 
 ```sudo apt-get install build-essential
 sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
@@ -37,7 +39,7 @@ sudo make install
 
 ___________________________________________________
 
-## Instalar o gdal-segment
+## Install gdal-segment
 
 ```git clone https://github.com/cbalint13/gdal-segment.git
 cd gdal-segment
