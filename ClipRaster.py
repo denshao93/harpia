@@ -24,7 +24,7 @@ class ClipRaster(object):
 
     def clip_raster_by_mask(self):
 
-        vector = "vetor/square_215068.shp"
+        vector = "vetor/lc8_ba_32624.shp"
 
         command = "gdalwarp -cutline {vector} -crop_to_cutline -multi " \
                   "{ref_img} {output_img}".format(vector=vector, ref_img=self.ref_img,

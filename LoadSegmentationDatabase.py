@@ -8,7 +8,7 @@ class LoadSegmentationDatabase:
 
     def __init__(self, segmentation_file_path, full_scene_name, img_file_name_stored):
 
-        self.conn = psycopg2.connect("host='localhost' dbname='ta7_rascunho' user='postgres' password='postgres'")
+        self.conn = psycopg2.connect("host='172.16.0.175' dbname='ta7_rascunho' user='postgres' password='123456'")
         self._cur = self.conn.cursor()
         self.segmentation_file_path = segmentation_file_path
 
