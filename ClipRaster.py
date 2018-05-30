@@ -27,7 +27,7 @@ class ClipRaster(object):
         print("........Clip raster........")
         vector = "vetor/lc8_ba_32624.shp"
 
-        command = "gdalwarp -cutline {vector} -crop_to_cutline -multi " \
+        command = "gdalwarp -t_srs EPSG:4674 -cutline {vector} -crop_to_cutline -multi " \
                   "{ref_img} {output_img}".format(vector=vector, ref_img=self.ref_img,
                                                 output_img=self.cut_img_vrt)
         os.system(command)
