@@ -1,4 +1,5 @@
 import os
+import MonthDictionary as m
 
 
 class OrganizeDirectory:
@@ -65,13 +66,21 @@ class OrganizeDirectory:
 
         return self.get_file_name_targz()[17:21]
 
+    def get_mounth_folder_name(self):
+
+        string_mounth = m.month[int(self.get_image_month_aquisition_date())]
+
+        folder_name = '{}_{}'.format(self.get_image_month_aquisition_date(), string_mounth)
+
+        return folder_name
+
     def create_dir_satellite_year_pathrow_image(self):
 
         dir_path = os.path.join(self.output_root_dir_image_processed,
                                 self.__class__.dir_name_processed,
                                 self.get_satellite(),
                                 self.get_image_year_aquisition_date(),
-                                self.get_image_month_aquisition_date(),
+                                self.get_mounth_folder_name(),
                                 self.get_path_row_from_targz(),
                                 self.get_file_name_targz())
 
@@ -83,5 +92,6 @@ class OrganizeDirectory:
     def run_manage_directory(self):
 
         # Making folder which will store files processed
+        self.get_mounth_folder_name
         self.create_root_dir_processed(self.__class__.dir_name_processed)
         self.create_dir_satellite_year_pathrow_image()
