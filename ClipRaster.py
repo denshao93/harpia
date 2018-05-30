@@ -15,7 +15,7 @@ class ClipRaster(object):
         self.tmp_raw_img_path = os.path.join(self.dir_tmp_img, self.file_name)
 
         self.ref_img = os.path.join(self.dir_tmp_img, self.file_name+".TIF")
-        self.cut_img_vrt = os.path.join(self.dir_tmp_img, "cut_ref.vrt")
+        self.cut_img_vrt = os.path.join(self.dir_tmp_img, "cut_"+self.file_name)
 
         self.file_name_stored = '{}{}'.format(img_file_name_stored, ".TIF")
 
@@ -24,6 +24,7 @@ class ClipRaster(object):
 
     def clip_raster_by_mask(self):
 
+        print("........Clip raster........")
         vector = "vetor/lc8_ba_32624.shp"
 
         command = "gdalwarp -cutline {vector} -crop_to_cutline -multi " \
@@ -32,8 +33,9 @@ class ClipRaster(object):
         os.system(command)
 
     def compress_clieped_raster(self):
-
-        command = "gdal_translate -ot Byte -scale -co compress=LZW -co NUM_THREADS=6 {cut_img_vrt} " \
+        
+        print("........Compress raster........")
+        command = "gdal_translate -ot Byte -scale -co compress=LZW {cut_img_vrt} " \
         "{cut_img_tif}".format(cut_img_vrt=self.cut_img_vrt,
                                 cut_img_tif=self.cut_img_tif_path)
         os.system(command)
