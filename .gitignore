@@ -2,6 +2,7 @@
 *.img
 .idea
 .vscode
+organizar
 *.pyc
 env
 __pycache__
