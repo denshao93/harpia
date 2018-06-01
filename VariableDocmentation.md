@@ -13,3 +13,4 @@ dir_tmp_img = /tmp/<nome_aleatorio_dado>
 
 Arquivos armazenados:
 dir_img_save = /PROCESSADA/LC08/<ano>/<mes>/<nome_cena>
+img_file_name_save = <satellite>_<path><row>_<year><mounth><day><view_date>
