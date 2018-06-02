@@ -35,9 +35,10 @@ class ClipRaster(object):
     def compress_cliped_raster(self):
 
         print("........Compress raster........")
-        command = "gdal_translate -ot Byte -scale -co compress=LZW -b 3 -b 2 -b 1 {cut_img_vrt} " \
-        "{cut_img_tif}".format(cut_img_vrt=self.cut_img_vrt,
-                                cut_img_tif=self.cut_img_tif_path)
+        command =   "gdal_translate -ot Byte -scale -co compress=LZW -b 3 -b 2 -b 1 {cut_img_vrt} " \
+                    "{cut_img_tif}".format( cut_img_vrt=self.cut_img_vrt,
+                                            cut_img_tif=self.cut_img_tif_path)
+
         os.system(command)
 
     def del_img_vrt(self):
