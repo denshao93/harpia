@@ -30,9 +30,10 @@ class Raster:
 
 # if __name__ == '__main__':
 
-#     r = Raster("/media/dogosousa/56A22ED6A22EBA7F/BRUTA/CEBERS4/CBERS_4_MUX_20161205_148_113_L2/CBERS_4_MUX_20161205_148_113_L2.tif")
+    # r = Raster("/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/LC08/2017/12/215068/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_215068_20171205.TIF")
 
-#     src = r.read_image()
-#     print(src.get_crs())
-#     # plt.imshow(src)
-#     # plt.show(src)
+    # src = r.read_image()
+    # print(src.get_crs())
+    # r.image_mask_greater_than_0()
+    # plt.imshow(src)
+    # plt.show(src)

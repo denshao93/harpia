@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
                 # The name of image that will be save. Not all parameters will be saved in file name.
                 img_file_name_stored = '{}{}'.format(full_image_scene_name[:5],
-                                                       full_image_scene_name[10:25])
+                                                     full_image_scene_name[10:25])
 
                 # Ordering directory to receive results
                 mdir = Od.OrganizeDirectory(output_root_dir_image_processed=sys.argv[2],
@@ -79,5 +79,3 @@ if __name__ == "__main__":
                                     full_scene_name=full_image_scene_name,
                                     img_file_name_stored=img_file_name_stored)
                 load_seg.run_load_segmentation()
-
-
