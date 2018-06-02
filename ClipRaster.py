@@ -25,17 +25,17 @@ class ClipRaster(object):
     def clip_raster_by_mask(self):
 
         print("........Clip raster........")
-        vector = "vetor/lc8_ba_32624.shp"
+        vector = "vetor/square_215068.shp"
 
-        command = "gdalwarp -t_srs EPSG:4674 -cutline {vector} -crop_to_cutline -multi " \
-                  "{ref_img} {output_img}".format(vector=vector, ref_img=self.ref_img,
-                                                output_img=self.cut_img_vrt)
+        command =   "gdalwarp -t_srs EPSG:4674 -cutline {vector} -crop_to_cutline -multi " \
+                    "{ref_img} {output_img}".format(vector=vector, ref_img=self.ref_img,
+                                                    output_img=self.cut_img_vrt)
         os.system(command)
 
-    def compress_clieped_raster(self):
-        
+    def compress_cliped_raster(self):
+
         print("........Compress raster........")
-        command = "gdal_translate -ot Byte -scale -co compress=LZW {cut_img_vrt} " \
+        command = "gdal_translate -ot Byte -scale -co compress=LZW -b 3 -b 2 -b 1 {cut_img_vrt} " \
         "{cut_img_tif}".format(cut_img_vrt=self.cut_img_vrt,
                                 cut_img_tif=self.cut_img_tif_path)
         os.system(command)
@@ -45,5 +45,5 @@ class ClipRaster(object):
 
     def run(self):
         self.clip_raster_by_mask()
-        self.compress_clieped_raster()
+        self.compress_cliped_raster()
         self.del_img_vrt()
