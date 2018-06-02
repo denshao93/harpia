@@ -8,7 +8,7 @@ class LoadSegmentationDatabase:
 
     def __init__(self, segmentation_file_path, full_scene_name, img_file_name_stored):
 
-        self.conn = psycopg2.connect("host='172.16.0.175' dbname='ta7_rascunho' user='postgres' password='123456'")
+        self.conn = psycopg2.connect("host='localhost' dbname='ta7_rascunho' user='postgres' password='postgres'")
         self._cur = self.conn.cursor()
         self.segmentation_file_path = segmentation_file_path
 
@@ -44,7 +44,7 @@ class LoadSegmentationDatabase:
             They have to be all together (i.e. 215068)
         """
         cursor = self._cur
-        sql =   "CREATE TABLE IF NOT EXISTS {satellite_name}_{path_row}.{file_name}" \
+        sql =   "CREATE TABLE {satellite_name}_{path_row}.{file_name}" \
                 "(id SERIAL PRIMARY KEY, geom GEOMETRY(POLYGON));".format(path_row=self.path_row,
                                                                                 satellite_name=self.satellite_name,
                                                                                 file_name=self.img_file_name_stored)
@@ -68,6 +68,24 @@ class LoadSegmentationDatabase:
         self.conn.commit()
         # cursor.close()
 
+    def set_geom_srid_as_4674(self):
+        """Clear table to load segmentation
+
+        Arguments:
+            satellite_name {string} -- The initials from satelite name (Lansat 8 = lc8)
+            _path_row {string} -- The index where find scene from Lansat 8.
+            They have to be all together (i.e. 215068)
+        """
+        cursor = self._cur
+        sql =   "ALTER TABLE {satellite_name}_{path_row}.{file_name} " \
+                "ALTER COLUMN geom  TYPE geometry(POLYGON) USING ST_SetSRID(geom, 4674);" \
+                                                    .format(path_row=self.path_row,
+                                                            satellite_name=self.satellite_name,
+                                                            file_name=self.img_file_name_stored)
+        cursor.execute(sql)
+        self.conn.commit()
+        cursor.close()
+
     def load_segmentation_database(self):
 
         file = ogr.Open(self.segmentation_file_path)
@@ -89,13 +107,14 @@ class LoadSegmentationDatabase:
                                                                         _wkt=wkt))
             self.conn.commit()
             print("Adicionando "+ str(i))
-        cursor.close()
+        # cursor.close()
 
     def run_load_segmentation(self):
         self.create_scene_path_row_schema()
         self.create_table_scene_path_row_scene()
         self.del_table_scene_path_row_scene()
         self.load_segmentation_database()
+        self.set_geom_srid_as_4674()
 
 # if __name__ == "__main__":
 
