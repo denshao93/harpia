@@ -16,8 +16,14 @@ def project_geometry(vector_layer, source_src, target_src):
         vector_layer = str(vector_layer)
         geometry = ogr.CreateGeometryFromWkt(vector_layer)
         geometry.Transform(transform)
+        
+
+
+
 
         return geometry
+
+
 
     except Exception as e:
         print("Error geo_utils project_geometry+: " + str(e))
@@ -44,3 +50,22 @@ def create_polygon_from_bbox(bbox):
     bb_polygon = Polygon([np1, np2, np3, np4])
 
     return bb_polygon
+
+
+def create_polygon_from_bbox_1(bbox):
+
+    # Create ring
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+
+    ring.AddPoint(bbox[0], bbox[3])
+    ring.AddPoint(bbox[2], bbox[3])
+    ring.AddPoint(bbox[2], bbox[1])
+    ring.AddPoint(bbox[0], bbox[1])
+
+    # Create polygon
+    poly = ogr.Geometry(ogr.wkbPolygon)
+    polygon = poly.AddGeometry(ring)
+
+    print(poly.ExportToWkt())
+
+    return polygon

@@ -26,7 +26,7 @@ class Raster:
 
     def bounds_raster_polygon(self):
 
-        poly = gu.create_polygon_from_bbox(self.bounds_raster)
+        poly = gu.create_polygon_from_bbox_1(self.bounds_raster())
 
         return poly
 
