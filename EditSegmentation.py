@@ -7,6 +7,3 @@ class EditSegmentation:
     def usefull_area_image(self):
         """Save usefull area from image
         """
-        
-
-        
