@@ -1,6 +1,7 @@
 import rasterio
 from osgeo import gdal
-import matplotlib.pyplot as plt
+from shapely.geometry import Point, Polygon
+import geo_utils as gu
 
 
 class Raster:
@@ -21,19 +22,19 @@ class Raster:
 
         return image.crs
 
-    def image_mask_greater_than_0(self):
-        mask = self.image_path.ReadAsArray() > 0
-        plt.imshow(mask)
-        plt.show(mask)
-        return mask
+    def bounds_raster(self):
 
+        return self.read_image().bounds
 
-# if __name__ == '__main__':
+    def bounds_raster_polygon(self):
 
-    # r = Raster("/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/LC08/2017/12/215068/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_215068_20171205.TIF")
+        poly = gu.create_polygon_from_bbox(self.bounds_raster)
 
-    # src = r.read_image()
-    # print(src.get_crs())
-    # r.image_mask_greater_than_0()
-    # plt.imshow(src)
-    # plt.show(src)
+        return poly
+
+if __name__ == '__main__':
+
+    r = Raster("/home/diogocaribe/Documents/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_L1TP_215068_20171205_20171222_01_T1_B1.TIF")
+
+    src = r.read_image()
+    r.bounds_raster_polygon()
