@@ -17,13 +17,7 @@ def project_geometry(vector_layer, source_src, target_src):
         geometry = ogr.CreateGeometryFromWkt(vector_layer)
         geometry.Transform(transform)
         
-
-
-
-
         return geometry
-
-
 
     except Exception as e:
         print("Error geo_utils project_geometry+: " + str(e))
