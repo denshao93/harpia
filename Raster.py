@@ -1,6 +1,4 @@
 import rasterio
-from osgeo import gdal
-from shapely.geometry import Point, Polygon
 import geo_utils as gu
 
 
