@@ -81,15 +81,22 @@ class Raster:
     def bounds_raster_poly_geom(self):
 
         vct_output = os.path.join(self.dir_img_path, "trace_outline.shp")
-        vct = shapefile.Reader(vct_output)
+        shape = shapefile.Reader(vct_output)
 
-        return vct
+        #first feature of the shapefile
+        feature = shape.shapeRecords()[0]
+        first = feature.shape.__geo_interface__  
+
+        from shapely.geometry import shape
+        shp_geom = shape(first) # or shp_geom = shape(first) with PyShp)
+        print(shp_geom)
+        
+        return shp_geom
 
 if __name__ == '__main__':
 
-    r = Raster(image_path = "../../Documents/LC08_L1TP_215068_20171205_20171222_01_T1/" \
-    "LC08_L1TP_215068_20171205_20171222_01_T1_B1.TIF",
-    dir_img_path = "../../Documents/LC08_L1TP_215068_20171205_20171222_01_T1")
+    r = Raster(image_path = "../../Documents/LC08_L1TP_215069_20161015_20170319_01_T1/LC08_L1TP_215069_20161015_20170319_01_T1_B1.TIF",
+    dir_img_path = "../../Documents/LC08_L1TP_215069_20161015_20170319_01_T1")
 
     src = r.read_image()
     r.bounds_raster_polygon()
