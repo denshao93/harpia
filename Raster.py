@@ -19,18 +19,6 @@ class Raster:
 
         return image
 
-    def get_espg_image(self):
-
-        epsg = self.read_image().crs
-
-        return epsg
-
-    def bounds_raster(self):
-
-        bbox = self.read_image().bounds
-
-        return bbox
-
     def _bounds_raster_polygon(self):
 
         # Read the input raster into a Numpy array
@@ -65,7 +53,7 @@ class Raster:
         # Write projection information
         outdata.SetProjection(proj)
 
-    def bounds_raster_polygon(self):
+    def trace_outline_from_raster_shapefile(self):
 
         try:
             vct_output = os.path.join(self.dir_img_path, "trace_outline.shp")
@@ -78,17 +66,16 @@ class Raster:
         except Exception:
             print("Problem to run gdal_trace_outline")
 
-    def bounds_raster_poly_geom(self):
-
-        vct_output = os.path.join(self.dir_img_path, "trace_outline.shp")
-        shape = shapefile.Reader(vct_output)
+    def trace_outline_raster_poly_geom(self):
+        
+        vector = os.path.join(self.dir_img_path, "trace_outline.shp")
+        shape = shapefile.Reader(vector)
 
         #first feature of the shapefile
         feature = shape.shapeRecords()[0]
         first = feature.shape.__geo_interface__  
-
         from shapely.geometry import shape
-        shp_geom = shape(first) # or shp_geom = shape(first) with PyShp)
+        shp_geom = shape(first)
         print(shp_geom)
         
         return shp_geom
@@ -99,5 +86,5 @@ if __name__ == '__main__':
     dir_img_path = "../../Documents/LC08_L1TP_215069_20161015_20170319_01_T1")
 
     src = r.read_image()
-    r.bounds_raster_polygon()
-    r.bounds_raster_poly_geom()
+    r.trace_outline_from_raster_shapefile()
+    r.trace_outline_raster_poly_geom()
