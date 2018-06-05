@@ -1,5 +1,6 @@
 import os
-import gdal
+import shapefile
+from osgeo import gdal
 import rasterio
 import numpy as np
 import geo_utils as gu
@@ -7,9 +8,10 @@ import geo_utils as gu
 
 class Raster:
 
-    def __init__(self, image_path):
+    def __init__(self, dir_img_path, image_path):
 
         self.image_path = image_path
+        self.dir_img_path = dir_img_path
 
     def read_image(self):
 
@@ -22,14 +24,14 @@ class Raster:
         epsg = self.read_image().crs
 
         return epsg
-        
+
     def bounds_raster(self):
 
         bbox = self.read_image().bounds
 
         return bbox
 
-    def bounds_raster_polygon(self):
+    def _bounds_raster_polygon(self):
 
         # Read the input raster into a Numpy array
         infile = self.image_path
@@ -63,9 +65,32 @@ class Raster:
         # Write projection information
         outdata.SetProjection(proj)
 
+    def bounds_raster_polygon(self):
+
+        try:
+            vct_output = os.path.join(self.dir_img_path, "trace_outline.shp")
+            if os.path.isfile(vct_output) is not True:
+
+                command = "gdal_trace_outline {img_input} -ndv 0 -out-cs en -dp-toler 10 " \
+                "-ogr-out {vct_output}".format(img_input=self.image_path, vct_output=vct_output)
+
+                os.system(command)
+        except Exception:
+            print("Problem to run gdal_trace_outline")
+
+    def bounds_raster_poly_geom(self):
+
+        vct_output = os.path.join(self.dir_img_path, "trace_outline.shp")
+        vct = shapefile.Reader(vct_output)
+
+        return vct
+
 if __name__ == '__main__':
 
-    r = Raster("../../Documents/LC08_L1TP_215069_20161015_20170319_01_T1/LC08_L1TP_215069_20161015_20170319_01_T1_B1.TIF")
+    r = Raster(image_path = "../../Documents/LC08_L1TP_215068_20171205_20171222_01_T1/" \
+    "LC08_L1TP_215068_20171205_20171222_01_T1_B1.TIF",
+    dir_img_path = "../../Documents/LC08_L1TP_215068_20171205_20171222_01_T1")
 
     src = r.read_image()
-    print(r.bounds_raster_polygon())
+    r.bounds_raster_polygon()
+    r.bounds_raster_poly_geom()
