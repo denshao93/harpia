@@ -1,6 +1,7 @@
 import os
 import sys
 import utils as u
+import Raster as R
 import CloudShadow as Cs
 import Segmetation as Seg
 import ClipRaster as Clip
@@ -20,7 +21,7 @@ if __name__ == "__main__":
         for file in files:
             if file.endswith(".tar.gz"):
                 print("Processing "+file)
-                # Variables
+                
                 file_path_targz = os.path.join(subdir, file)
                 # The name of file with all parameters from tar.gz downloaded
                 full_image_scene_name = u.file_name_without_extention(file_path_targz)
@@ -28,11 +29,11 @@ if __name__ == "__main__":
                 # The name of image that will be save. Not all parameters will be saved in file name.
                 img_file_name_stored = '{}{}'.format(full_image_scene_name[:5],
                                                      full_image_scene_name[10:25])
-
+                
                 # Ordering directory to receive results
                 mdir = Od.OrganizeDirectory(output_root_dir_image_processed=sys.argv[2],
                                             image_file_path_targz=file_path_targz)
-
+                
                 # The path where processed image (results) will be saved
                 img_output_path_stored = mdir.create_dir_satellite_year_pathrow_image()
                 mdir.run_manage_directory()
@@ -41,7 +42,7 @@ if __name__ == "__main__":
                 uncompress = Un.UncompressFile(image_file_path_targz=file_path_targz,
                                                file_name=full_image_scene_name)
                 uncompress.run()
-
+                
                 # Temporary directory where image files were stored to be processed
                 dir_tmp_img = uncompress.dir_tmp_img
 
@@ -50,6 +51,11 @@ if __name__ == "__main__":
                                            scene_image_name=full_image_scene_name,
                                            dir_tmp_img=dir_tmp_img)
                 compose.run_image_composition()
+
+                #Creating outline trace from raster
+                img_path_trace_outline = os.path.join(dir_tmp_img, full_image_scene_name+".TIF")
+                vct_path_trace_outline = dir_tmp_img
+                R.Raster(image_path=img_path_trace_outline, dir_img_path=vct_path_trace_outline).trace_outline_from_raster_shapefile()
 
                 # Clip raster
                 Clip.ClipRaster(scene_image_name=full_image_scene_name,
