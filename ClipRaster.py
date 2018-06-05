@@ -1,4 +1,5 @@
 import os
+import Raster as r
 
 
 class ClipRaster(object):
@@ -21,6 +22,11 @@ class ClipRaster(object):
 
         self.cut_img_tif_path = os.path.join(self.img_output_path_stored,
                                              self.file_name_stored)
+
+    def intersection_ba_buffer_trace_outline(self):
+        
+        pass
+        
 
     def clip_raster_by_mask(self):
 

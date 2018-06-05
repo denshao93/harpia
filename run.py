@@ -7,6 +7,7 @@ import Segmetation as Seg
 import ClipRaster as Clip
 import UncompressFile as Un
 import ComposeBands as Compose
+import IntersectionTraceOutlineBa as inter
 import OrganizeDirectory as Od
 import PyramidRaster as Pyramind
 import Connection2Database as con
@@ -47,16 +48,19 @@ if __name__ == "__main__":
                 dir_tmp_img = uncompress.dir_tmp_img
 
                 # Creating image stacking from landsat bands
-                compose = Compose.ComposeBands(image_output_path_stored=img_output_path_stored,
-                                           scene_image_name=full_image_scene_name,
-                                           dir_tmp_img=dir_tmp_img)
-                compose.run_image_composition()
+                Compose.ComposeBands(image_output_path_stored=img_output_path_stored,
+                                    scene_image_name=full_image_scene_name,
+                                    dir_tmp_img=dir_tmp_img).run_image_composition()
 
                 #Creating outline trace from raster
                 img_path_trace_outline = os.path.join(dir_tmp_img, full_image_scene_name+".TIF")
-                vct_path_trace_outline = dir_tmp_img
-                R.Raster(image_path=img_path_trace_outline, dir_img_path=vct_path_trace_outline).trace_outline_from_raster_shapefile()
+                vct_dir_trace_outline = dir_tmp_img
+                R.Raster(image_path=img_path_trace_outline, dir_img_path=vct_dir_trace_outline).trace_outline_from_raster_shapefile()
 
+                trace_outline_path = os.path.join(dir_tmp_img, "trace_outline.shp")
+                inter.IntersectionTraceOulineBa(trace_outline_path=trace_outline_path).reproject_trace_outline_to_4674()
+                
+                
                 # Clip raster
                 Clip.ClipRaster(scene_image_name=full_image_scene_name,
                               dir_tmp_img=dir_tmp_img,

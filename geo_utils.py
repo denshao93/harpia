@@ -1,5 +1,7 @@
 from osgeo import ogr, osr
 from shapely.geometry import Point, Polygon
+import shapefile
+from shapely.geometry import shape
 
 
 def project_geometry(vector_layer, source_src, target_src):
@@ -29,23 +31,6 @@ def read_shape_file_ogr(shape_file_path):
 
     return layer
 
-def create_polygon_from_bbox(bbox):
-
-    p1 = Point(bbox[0], bbox[3])
-    p2 = Point(bbox[2], bbox[3])
-    p3 = Point(bbox[2], bbox[1])
-    p4 = Point(bbox[0], bbox[1])
-
-    np1 = (p1.coords.xy[0][0], p1.coords.xy[1][0])
-    np2 = (p2.coords.xy[0][0], p2.coords.xy[1][0])
-    np3 = (p3.coords.xy[0][0], p3.coords.xy[1][0])
-    np4 = (p4.coords.xy[0][0], p4.coords.xy[1][0])
-
-    bb_polygon = Polygon([np1, np2, np3, np4])
-
-    return bb_polygon
-
-
 def create_polygon_from_bbox_1(bbox):
 
     # Create ring
@@ -63,3 +48,14 @@ def create_polygon_from_bbox_1(bbox):
     print(poly.ExportToWkt())
 
     return polygon
+
+def read_shapefile_polyt_as_wkt(vector_path):
+    
+    vct = shapefile.Reader(vector_path)
+    feature = vct.shapeRecords()[0]
+    first = feature.shape.__geo_interface__  
+    
+    shp_geom = shape(first)
+    print(shp_geom)
+    
+    return shp_geom

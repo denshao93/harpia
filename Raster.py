@@ -69,14 +69,8 @@ class Raster:
     def trace_outline_raster_poly_geom(self):
         
         vector = os.path.join(self.dir_img_path, "trace_outline.shp")
-        shape = shapefile.Reader(vector)
-
-        #first feature of the shapefile
-        feature = shape.shapeRecords()[0]
-        first = feature.shape.__geo_interface__  
-        from shapely.geometry import shape
-        shp_geom = shape(first)
-        print(shp_geom)
+        
+        shp_geom = gu.read_shapefile_polyt_as_wkt(vector)
         
         return shp_geom
 
