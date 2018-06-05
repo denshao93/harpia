@@ -12,6 +12,8 @@ sudo apt upgrade
 sudo apt install gdal-bin python-gdal python3-gdal
 Suporte para o formato hdf5
 sudo apt-get install libhdf5-dev libhdf5-serial-dev
+
+sudo apt-get install dans-gdal-scripts
 ```
 
 ___________________________________________________
