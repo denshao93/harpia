@@ -33,4 +33,5 @@ class IntersectionTraceOutlineBa:
 
     def save_intersection_as_shapefile(self):
 
-        gu.save_wkt_as_shapefile(self.intersetion_pathrow_ba(), self.dir_tmp_img)
+        gu.save_wkt_as_shapefile(self.intersetion_pathrow_ba(),
+                                 self.dir_tmp_img, "intersect_pathrow_ba")
