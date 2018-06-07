@@ -44,7 +44,7 @@ class LoadSegmentationDatabase:
             They have to be all together (i.e. 215068)
         """
         cursor = self._cur
-        sql =   "CREATE TABLE {satellite_name}_{path_row}.{file_name}" \
+        sql =   "CREATE TABLE IF NOT EXISTS {satellite_name}_{path_row}.{file_name}" \
                 "(id SERIAL PRIMARY KEY, geom GEOMETRY(POLYGON));".format(path_row=self.path_row,
                                                                                 satellite_name=self.satellite_name,
                                                                                 file_name=self.img_file_name_stored)
@@ -99,6 +99,9 @@ class LoadSegmentationDatabase:
             geometry = feature.GetGeometryRef()
             #Convert geometry to WKT format
             wkt = geometry.ExportToWkt()
+
+            # TODO Colocar a toque como condição para carga no banco do poligono
+
             #Insert data into database, converting WKT geometry to a PostGIS geometry
             cursor.execute("INSERT INTO {satellite_name}_{path_row}.{file_name} (geom)" \
                             "VALUES (ST_GeomFromText('{_wkt}'))".format(path_row=self.path_row,
