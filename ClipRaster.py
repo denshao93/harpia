@@ -23,15 +23,10 @@ class ClipRaster(object):
         self.cut_img_tif_path = os.path.join(self.img_output_path_stored,
                                              self.file_name_stored)
 
-    def intersection_ba_buffer_trace_outline(self):
-        
-        pass
-        
-
     def clip_raster_by_mask(self):
 
         print("........Clip raster........")
-        vector = "vetor/square_215068.shp"
+        vector = os.path.join(self.dir_tmp_img, "intersect_pathrow_ba.shp")
 
         command =   "gdalwarp -t_srs EPSG:4674 -cutline {vector} -crop_to_cutline -multi " \
                     "{ref_img} {output_img}".format(vector=vector, ref_img=self.ref_img,
