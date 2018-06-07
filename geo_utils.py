@@ -63,21 +63,22 @@ def read_shapefile_poly(vector_path):
 
 def save_wkt_as_shapefile(wkt, dir_shapefile_output, file_name):
 
-        # Here's an example Shapely geometry
-        poly = loads(wkt)
 
-        # Define a polygon feature geometry with one attribute
-        schema = {
-            'geometry': 'Polygon',
-            'properties': {'id': 'int'},
-        }
+    # Here's an example Shapely geometry
+    poly = loads(wkt)
 
-        # Write a new Shapefile
-        shapefile_path = os.path.join(dir_shapefile_output, file_name+"shp")
+    # Define a polygon feature geometry with one attribute
+    schema = {
+        'geometry': 'Polygon',
+        'properties': {'id': 'int'},
+    }
 
-        with fiona.open(shapefile_path, 'w', 'ESRI Shapefile', schema) as c:
-            ## If there are multiple geometries, put the "for" loop here
-            c.write({
-                'geometry': mapping(poly),
-                'properties': {'id': 123},
-            })
+    # Write a new Shapefile
+    shapefile_path = os.path.join(dir_shapefile_output, file_name+".shp")
+
+    with fiona.open(shapefile_path, 'w', 'ESRI Shapefile', schema) as c:
+        ## If there are multiple geometries, put the "for" loop here
+        c.write({
+            'geometry': mapping(poly),
+            'properties': {'id': 123},
+        })
