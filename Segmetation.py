@@ -51,7 +51,7 @@ class Segmentation:
         """
         Segmenting landsat image
         """
-        self.get_segmentation(region=10, inter=25, algorithm="SLIC")
+        self.get_segmentation(region=8, inter=25, algorithm="SLIC")
 
 
 # if __name__ == "__main__":
