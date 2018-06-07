@@ -67,18 +67,9 @@ class Raster:
             print("Problem to run gdal_trace_outline")
 
     def trace_outline_raster_poly_geom(self):
-        
+
         vector = os.path.join(self.dir_img_path, "trace_outline.shp")
-        
+
         shp_geom = gu.read_shapefile_poly(vector)
-        
+
         return shp_geom
-
-# if __name__ == '__main__':
-
-#     r = Raster(image_path = "../../Documents/LC08_L1TP_215069_20161015_20170319_01_T1/LC08_L1TP_215069_20161015_20170319_01_T1_B1.TIF",
-#     dir_img_path = "../../Documents/LC08_L1TP_215069_20161015_20170319_01_T1")
-
-#     src = r.read_image()
-#     r.trace_outline_from_raster_shapefile()
-#     r.trace_outline_raster_poly_geom()
