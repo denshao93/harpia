@@ -1,14 +1,17 @@
+import os
 import psycopg2
 from osgeo import ogr
 import geo_utils as gu
+from shapely.wkt import loads
 from SatelliteFileInfo import LandsatFileInfo as LCinfo
 
 
 class LoadSegmentationDatabase:
 
-    def __init__(self, segmentation_file_path, full_scene_name, img_file_name_stored):
-
-        self.conn = psycopg2.connect("host='localhost' dbname='ta7_rascunho' user='postgres' password='postgres'")
+    def __init__(self, segmentation_file_path, full_scene_name, img_file_name_stored, dir_tmp_img):
+        
+        self.dir_tmp_img = dir_tmp_img
+        self.conn = psycopg2.connect("host='172.16.0.175' dbname='ta7_rascunho' user='postgres' password='123456'")
         self._cur = self.conn.cursor()
         self.segmentation_file_path = segmentation_file_path
 
@@ -92,7 +95,9 @@ class LoadSegmentationDatabase:
         layer = file.GetLayer(0)
 
         cursor = self._cur
-
+        intersect_pathrow_path = os.path.join(self.dir_tmp_img, "intersect_pathrow_ba.shp")
+        geom2 = gu.read_shapefile_poly(intersect_pathrow_path)
+        
         for i in range(layer.GetFeatureCount()):
             feature = layer.GetFeature(i)
             #Get feature geometry
@@ -101,15 +106,19 @@ class LoadSegmentationDatabase:
             wkt = geometry.ExportToWkt()
 
             # TODO Colocar a toque como condição para carga no banco do poligono
-
-            #Insert data into database, converting WKT geometry to a PostGIS geometry
-            cursor.execute("INSERT INTO {satellite_name}_{path_row}.{file_name} (geom)" \
-                            "VALUES (ST_GeomFromText('{_wkt}'))".format(path_row=self.path_row,
-                                                                        satellite_name=self.satellite_name,
-                                                                        file_name=self.img_file_name_stored,
-                                                                        _wkt=wkt))
-            self.conn.commit()
-            print("Adicionando "+ str(i))
+            geom1 = loads(wkt)
+                        
+            intersetc = geom1.intersects(geom2)
+            
+            if intersetc:
+                #Insert data into database, converting WKT geometry to a PostGIS geometry
+                cursor.execute("INSERT INTO {satellite_name}_{path_row}.{file_name} (geom)" \
+                                "VALUES (ST_GeomFromText('{_wkt}'))".format(path_row=self.path_row,
+                                                                            satellite_name=self.satellite_name,
+                                                                            file_name=self.img_file_name_stored,
+                                                                            _wkt=wkt))
+                self.conn.commit()
+                print("Adicionando "+ str(i))
         # cursor.close()
 
     def run_load_segmentation(self):
