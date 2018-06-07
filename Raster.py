@@ -70,7 +70,7 @@ class Raster:
         
         vector = os.path.join(self.dir_img_path, "trace_outline.shp")
         
-        shp_geom = gu.read_shapefile_polyt_as_wkt(vector)
+        shp_geom = gu.read_shapefile_poly(vector)
         
         return shp_geom
 
