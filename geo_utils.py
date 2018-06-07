@@ -1,7 +1,9 @@
-from osgeo import ogr, osr
-from shapely.geometry import Point, Polygon
+import os
+import fiona
 import shapefile
-from shapely.geometry import shape
+from osgeo import ogr, osr
+from shapely.wkt import loads
+from shapely.geometry import shape, Point, Polygon, mapping
 
 
 def project_geometry(vector_layer, source_src, target_src):
@@ -18,7 +20,7 @@ def project_geometry(vector_layer, source_src, target_src):
         vector_layer = str(vector_layer)
         geometry = ogr.CreateGeometryFromWkt(vector_layer)
         geometry.Transform(transform)
-        
+
         return geometry
 
     except Exception as e:
@@ -49,13 +51,33 @@ def create_polygon_from_bbox_1(bbox):
 
     return polygon
 
-def read_shapefile_polyt_as_wkt(vector_path):
-    
+def read_shapefile_poly(vector_path):
+
     vct = shapefile.Reader(vector_path)
     feature = vct.shapeRecords()[0]
-    first = feature.shape.__geo_interface__  
-    
+    first = feature.shape.__geo_interface__
+
     shp_geom = shape(first)
-    print(shp_geom)
-    
+
     return shp_geom
+
+def save_wkt_as_shapefile(wkt, dir_shapefile_output):
+
+        # Here's an example Shapely geometry
+        poly = loads(wkt)
+
+        # Define a polygon feature geometry with one attribute
+        schema = {
+            'geometry': 'Polygon',
+            'properties': {'id': 'int'},
+        }
+
+        # Write a new Shapefile
+        shapefile_path = os.path.join(dir_shapefile_output, "intersect_pathrow_ba.shp")
+
+        with fiona.open(shapefile_path, 'w', 'ESRI Shapefile', schema) as c:
+            ## If there are multiple geometries, put the "for" loop here
+            c.write({
+                'geometry': mapping(poly),
+                'properties': {'id': 123},
+            })
