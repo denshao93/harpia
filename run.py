@@ -57,8 +57,8 @@ if __name__ == "__main__":
                 vct_dir_trace_outline = dir_tmp_img
                 R.Raster(image_path=img_path_trace_outline, dir_img_path=vct_dir_trace_outline).trace_outline_from_raster_shapefile()
 
-                inter.IntersectionTraceOutlineBa(dir_tmp_img)
-
+                # Save intersection with Bahia and trace outline from imagem
+                inter.IntersectionTraceOutlineBa(dir_tmp_img).save_intersection_as_shapefile()
 
                 # Clip raster
                 Clip.ClipRaster(scene_image_name=full_image_scene_name,
