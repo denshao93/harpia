@@ -61,7 +61,7 @@ def read_shapefile_poly(vector_path):
 
     return shp_geom
 
-def save_wkt_as_shapefile(wkt, dir_shapefile_output):
+def save_wkt_as_shapefile(wkt, dir_shapefile_output, file_name):
 
         # Here's an example Shapely geometry
         poly = loads(wkt)
@@ -73,7 +73,7 @@ def save_wkt_as_shapefile(wkt, dir_shapefile_output):
         }
 
         # Write a new Shapefile
-        shapefile_path = os.path.join(dir_shapefile_output, "intersect_pathrow_ba.shp")
+        shapefile_path = os.path.join(dir_shapefile_output, file_name+"shp")
 
         with fiona.open(shapefile_path, 'w', 'ESRI Shapefile', schema) as c:
             ## If there are multiple geometries, put the "for" loop here
