@@ -70,7 +70,7 @@ class LoadSegmentationDatabase:
         cursor.execute(sql)
         self.conn.commit()
         # cursor.close()
-
+        
     def set_geom_srid_as_4674(self):
         """Clear table to load segmentation
 
@@ -81,14 +81,32 @@ class LoadSegmentationDatabase:
         """
         cursor = self._cur
         sql =   "ALTER TABLE {satellite_name}_{path_row}.{file_name} " \
-                "ALTER COLUMN geom  TYPE geometry(POLYGON) USING ST_SetSRID(geom, 4674);" \
+                "ALTER COLUMN geom  TYPE geometry(POLYGON, 4674) USING ST_SetSRID(geom, 4674);" \
                                                     .format(path_row=self.path_row,
                                                             satellite_name=self.satellite_name,
                                                             file_name=self.img_file_name_stored)
         cursor.execute(sql)
         self.conn.commit()
-        cursor.close()
+        # cursor.close()
 
+    def create_gist_index_geom_colum(self):
+        """Clear table to load segmentation
+
+        Arguments:
+            satellite_name {string} -- The initials from satelite name (Lansat 8 = lc8)
+            _path_row {string} -- The index where find scene from Lansat 8.
+            They have to be all together (i.e. 215068)
+        """
+        cursor = self._cur
+        sql =   "CREATE INDEX {file_name}_geom_idx ON {satellite_name}_{path_row}.{file_name}" \
+                " USING GIST (geom);".format(path_row=self.path_row,
+                                            satellite_name=self.satellite_name,
+                                            file_name=self.img_file_name_stored)
+        cursor.execute(sql)
+        self.conn.commit()
+        cursor.close()
+    
+    
     def load_segmentation_database(self):
 
         file = ogr.Open(self.segmentation_file_path)
@@ -127,6 +145,7 @@ class LoadSegmentationDatabase:
         self.del_table_scene_path_row_scene()
         self.load_segmentation_database()
         self.set_geom_srid_as_4674()
+        self.create_gist_index_geom_colum()
 
 # if __name__ == "__main__":
 

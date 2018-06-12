@@ -74,7 +74,7 @@ if __name__ == "__main__":
                 cloud = Cs.CloudShadow(dir_tmp_img=dir_tmp_img,
                                         image_output_path=img_output_path_stored,
                                         file_name=full_image_scene_name)
-                # cloud.run_cloud_shadow_fmask()
+                cloud.run_cloud_shadow_fmask()
 
                 # Segmentation
                 s = Seg.Segmentation(img_output_path_stored=img_output_path_stored,
