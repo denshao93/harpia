@@ -106,7 +106,7 @@ class LoadSegmentationDatabase:
                 count+=1
                 #Insert data into database, converting WKT geometry to a PostGIS geometry
                 # cursor.execute
-                if count < 1000:
+                if count < 5000:
                     query = "INSERT INTO {satellite_name}_{path_row}.{file_name} (geom)" \
                             " VALUES (ST_GeomFromText('{_wkt}'))".format(path_row=self.path_row,
                                                                         satellite_name=self.satellite_name,
@@ -119,6 +119,7 @@ class LoadSegmentationDatabase:
                     pool = multiprocessing.Pool(6)
                     for i in pool.imap_unordered(self.runQuery, queries):
                         continue
+                    pool.close()
                     queries = []
     def set_geom_srid_as_4674(self):
 
