@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import utils as u
 import Raster as R
 import CloudShadow as Cs
@@ -89,3 +90,5 @@ if __name__ == "__main__":
                                                             img_file_name_stored=img_file_name_stored,
                                                             dir_tmp_img=dir_tmp_img)
                 load_seg.run_load_segmentation()
+
+                shutil.rmtree(dir_tmp_img)
