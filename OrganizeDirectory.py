@@ -79,9 +79,9 @@ class OrganizeDirectory:
         dir_path = os.path.join(self.output_root_dir_image_processed,
                                 self.__class__.dir_name_processed,
                                 self.get_satellite(),
+                                self.get_path_row_from_targz(),
                                 self.get_image_year_aquisition_date(),
                                 self.get_mounth_folder_name(),
-                                self.get_path_row_from_targz(),
                                 self.get_file_name_targz())
 
         if not os.path.exists(dir_path):
