@@ -162,10 +162,10 @@ class LoadSegmentationDatabase:
         self.set_geom_srid_as_4674()
         self.create_gist_index_geom_colum()
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    load_seg = LoadSegmentationDatabase(segmentation_file_path="/home/diogocaribe/Public/E/PROCESSADA/LC08/2016/06_Junho/216069/LC08_L1TP_216069_20160616_20170323_01_T1/LC08_216069_20160616_SLIC.shp",
-                                        full_scene_name="LC08_L1TP_216069_20160616_20170323_01_T1",
-                                        img_file_name_stored="LC08_216069_20160616",
-                                        dir_tmp_img="/tmp/tmpi85pf078")
-    load_seg.run_load_segmentation()
+#     load_seg = LoadSegmentationDatabase(segmentation_file_path="/home/diogocaribe/Public/E/PROCESSADA/LC08/2016/06_Junho/216069/LC08_L1TP_216069_20160616_20170323_01_T1/LC08_216069_20160616_SLIC.shp",
+#                                         full_scene_name="LC08_L1TP_216069_20160616_20170323_01_T1",
+#                                         img_file_name_stored="LC08_216069_20160616",
+#                                         dir_tmp_img="/tmp/tmpi85pf078")
+#     load_seg.run_load_segmentation()
