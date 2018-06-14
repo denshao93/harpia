@@ -48,7 +48,7 @@ class LoadSegmentationDatabase:
             They have to be all together (i.e. 215068)
         """
         cursor = self._cur
-        sql =   "DROP TABLE {satellite_name}_{path_row}.{file_name};" \
+        sql =   "DROP TABLE IF EXISTS {satellite_name}_{path_row}.{file_name}; " \
                 "CREATE TABLE IF NOT EXISTS {satellite_name}_{path_row}.{file_name}" \
                 "(id SERIAL PRIMARY KEY, geom GEOMETRY(POLYGON));".format(path_row=self.path_row,
                                                                                 satellite_name=self.satellite_name,
@@ -164,8 +164,8 @@ class LoadSegmentationDatabase:
 
 if __name__ == "__main__":
 
-    load_seg = LoadSegmentationDatabase(segmentation_file_path="/home/diogocaribe/Public/E/PROCESSADA/LC08/2016/07_Julho/215072/LC08_L1TP_215072_20160711_20170323_01_T1/LC08_215072_20160711_SLIC.shp",
-                                        full_scene_name="LC08_L1TP_215072_20160711_20170323_01_T1",
-                                        img_file_name_stored="LC08_215072_20160711",
-                                        dir_tmp_img="/tmp/tmpu7zrdu5p")
+    load_seg = LoadSegmentationDatabase(segmentation_file_path="/home/diogocaribe/Public/E/PROCESSADA/LC08/2016/06_Junho/216069/LC08_L1TP_216069_20160616_20170323_01_T1/LC08_216069_20160616_SLIC.shp",
+                                        full_scene_name="LC08_L1TP_216069_20160616_20170323_01_T1",
+                                        img_file_name_stored="LC08_216069_20160616",
+                                        dir_tmp_img="/tmp/tmpi85pf078")
     load_seg.run_load_segmentation()
