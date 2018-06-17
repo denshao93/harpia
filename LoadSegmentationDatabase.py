@@ -14,9 +14,6 @@ class LoadSegmentationDatabase:
                  img_file_name_stored, dir_tmp_img):
         """Init."""
         self.dir_tmp_img = dir_tmp_img
-        self.conn = psycopg2.connect("""host=172.16.0.175 dbname='ta7_rascunho'
-                                        user='postgres' password='123456'""")
-        self._cur = self.conn.cursor()
         self.segmentation_file_path = segmentation_file_path
 
         self.img_file_name_stored = img_file_name_stored
@@ -29,7 +26,7 @@ class LoadSegmentationDatabase:
     def runQuery(query):
         """Run postgres query."""
         connect_text = """dbname= 'ta7_rascunho' user='postgres'
-                          host=172.16.0.175 port=5432 password='123456'"""
+                          host=localhost port=5432 password='postgres'"""
         con = psycopg2.connect(connect_text)
         cur = con.cursor()
         cur.execute(query)
@@ -67,11 +64,21 @@ class LoadSegmentationDatabase:
                             file_name=self.img_file_name_stored)
         self.runQuery(sql)
 
+    def create_insert_geom_query(self, wkt):
+        """Create string query to insert geom to table database."""
+        sql = """INSERT INTO
+                   {satellite_name}_{path_row}.{file_name} (geom)
+                   VALUES (ST_GeomFromText('{_wkt}'))""" \
+                   .format(path_row=self.path_row,
+                           satellite_name=self.satellite_name,
+                           file_name=self.img_file_name_stored,
+                           _wkt=wkt)
+        return sql
+
     def load_segmentation_database(self):
         """Load segmetation in draft database."""
         file = ogr.Open(self.segmentation_file_path)
         layer = file.GetLayer(0)
-
         intersect_pathrow_path = os.path.join(self.dir_tmp_img,
                                               "intersect_pathrow_ba.shp")
         geom2 = gu.read_shapefile_poly(intersect_pathrow_path)
@@ -80,7 +87,7 @@ class LoadSegmentationDatabase:
         end_list = layer.GetFeatureCount()
 
         for i in range(layer.GetFeatureCount()):
-            # print(i)
+            print(i)
             is_last_element = True if (i == end_list) else False
             feature = layer.GetFeature(i)
             # Get feature geometry
@@ -93,17 +100,8 @@ class LoadSegmentationDatabase:
 
             if intersetc:
                 count += 1
-                # Insert data into database,
-                # converting WKT geometry to a PostGIS geometry
-                # cursor.execute
                 if count < 5000:
-                    query = """INSERT INTO
-                               {satellite_name}_{path_row}.{file_name} (geom)
-                               VALUES (ST_GeomFromText('{_wkt}'))""" \
-                               .format(path_row=self.path_row,
-                                       satellite_name=self.satellite_name,
-                                       file_name=self.img_file_name_stored,
-                                       _wkt=wkt)
+                    query = self.create_insert_geom_query(wkt=wkt)
                     queries.append(query)
 
                 if count == 5000 or is_last_element:
@@ -144,12 +142,11 @@ class LoadSegmentationDatabase:
         self.set_geom_srid_as_4674()
         self.create_gist_index_geom_colum()
 
-# if __name__ == "__main__":
 
-#     load_seg = LoadSegmentationDatabase(segmentation_file_path="""
-# /home/diogocaribe/Public/E/PROCESSADA/LC08/2016/06_Junho/216069/
-# LC08_L1TP_216069_20160616_20170323_01_T1/LC08_216069_20160616_SLIC.shp""",
-#                                         full_scene_name="LC08_L1TP_216069_20160616_20170323_01_T1",
-#                                         img_file_name_stored="LC08_216069_20160616",
-#                                         dir_tmp_img="/tmp/tmpi85pf078")
-#     load_seg.run_load_segmentation()
+if __name__ == "__main__":
+
+    load_seg = LoadSegmentationDatabase(segmentation_file_path="/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/LC08/2017/12_Dezembro/215068/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_215068_20171205_SLIC.shp",
+                                        full_scene_name="LC08_L1TP_215068_20171205_20171222_01_T1",
+                                        img_file_name_stored="LC08_215068_20171205",
+                                        dir_tmp_img="/tmp/tmpn3k7znxi")
+    load_seg.run_load_segmentation()
