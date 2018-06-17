@@ -6,3 +6,4 @@ organizar
 *.pyc
 env
 __pycache__
+config/const.yaml
