@@ -25,63 +25,6 @@ class LoadSegmentationDatabase:
         self.path_row = "".join(self.lcinfo.get_path_row_from_file())
         self.satellite_name = self.lcinfo.get_satellite_name()
 
-    def create_scene_path_row_schema(self):
-        """Create the schema in draft database where segmentation will be save.
-
-           In Harpia project the draft database is called as ta7_rascunhoself.
-
-        Arguments:
-            satellite_name {str} -- The initials from
-            satelite name (Lansat 8 = lc08)
-            _path_row {str} -- The index where find scene from Lansat 8.
-            They have to be all together (i.e. 215068)
-        """
-        cursor = self._cur
-        sql = """CREATE SCHEMA IF NOT EXISTS
-                    {satellite_name}_{path_row}""".format(
-                    path_row=self.path_row, satellite_name=self.satellite_name)
-        cursor.execute(sql)
-        self.conn.commit()
-        # cursor.close()
-
-    def create_table_scene_path_row_scene(self):
-        """Clear table to load segmentation.
-
-        Arguments:
-            satellite_name {string} -- The initials from satelite
-                                       name (Lansat 8 = lc8)
-            _path_row {string} -- The index where find scene from Lansat 8.
-            They have to be all together (i.e. 215068)
-        """
-        cursor = self._cur
-        sql = """DROP TABLE IF EXISTS {satellite_name}_{path_row}.{file_name};
-                 CREATE TABLE IF NOT EXISTS
-                    {satellite_name}_{path_row}.{file_name}
-                    (id SERIAL PRIMARY KEY, geom GEOMETRY(POLYGON));""" \
-                    .format(path_row=self.path_row,
-                            satellite_name=self.satellite_name,
-                            file_name=self.img_file_name_stored)
-        cursor.execute(sql)
-        self.conn.commit()
-
-    def del_table_scene_path_row_scene(self):
-        """Clear table to load segmentation.
-
-        Arguments:
-            satellite_name {string} -- The initials from satelite
-                                       name (Lansat 8 = lc8)
-            _path_row {string} -- The index where find scene from Lansat 8.
-            They have to be all together (i.e. 215068)
-        """
-        cursor = self._cur
-        sql = """DELETE FROM
-                    {satellite_name}_{path_row}.{file_name};""" \
-                    .format(path_row=self.path_row,
-                            satellite_name=self.satellite_name,
-                            file_name=self.img_file_name_stored)
-        cursor.execute(sql)
-        self.conn.commit()
-
     @staticmethod
     def runQuery(query):
         """Run postgres query."""
@@ -97,12 +40,38 @@ class LoadSegmentationDatabase:
             print(query)
         return rowcount
 
+    def create_scene_path_row_schema(self):
+        """Create schema in draft database where segmentation will be save."""
+        sql = """CREATE SCHEMA IF NOT EXISTS
+                    {satellite_name}_{path_row}""".format(
+                    path_row=self.path_row, satellite_name=self.satellite_name)
+        self.runQuery(sql)
+
+    def create_table_scene_path_row_scene(self):
+        """Clear table to load segmentation."""
+        sql = """DROP TABLE IF EXISTS {satellite_name}_{path_row}.{file_name};
+                 CREATE TABLE IF NOT EXISTS
+                    {satellite_name}_{path_row}.{file_name}
+                    (id SERIAL PRIMARY KEY, geom GEOMETRY(POLYGON));""" \
+                    .format(path_row=self.path_row,
+                            satellite_name=self.satellite_name,
+                            file_name=self.img_file_name_stored)
+        self.runQuery(sql)
+
+    def del_table_scene_path_row_scene(self):
+        """Clear table to load segmentation."""
+        sql = """DELETE FROM
+                    {satellite_name}_{path_row}.{file_name};""" \
+                    .format(path_row=self.path_row,
+                            satellite_name=self.satellite_name,
+                            file_name=self.img_file_name_stored)
+        self.runQuery(sql)
+
     def load_segmentation_database(self):
         """Load segmetation in draft database."""
         file = ogr.Open(self.segmentation_file_path)
         layer = file.GetLayer(0)
 
-        # cursor = self._cur
         intersect_pathrow_path = os.path.join(self.dir_tmp_img,
                                               "intersect_pathrow_ba.shp")
         geom2 = gu.read_shapefile_poly(intersect_pathrow_path)
@@ -116,7 +85,6 @@ class LoadSegmentationDatabase:
             feature = layer.GetFeature(i)
             # Get feature geometry
             geometry = feature.GetGeometryRef()
-
             # Convert geometry to WKT format
             wkt = geometry.ExportToWkt()
             # Check intersect
