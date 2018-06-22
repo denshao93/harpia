@@ -51,20 +51,6 @@ class Segmentation:
         """
         Segmenting landsat image
         """
-        self.get_segmentation(region=8, inter=25, algorithm="SLIC")
-
-
-# if __name__ == "__main__":
-
-#     s = Segmentation(img_output_path_stored="/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/" \
-#                                             "LC08/2017/12/215068/LC08_L1TP_215068_20171205_20171222_01_T1/",
-#                      file_name="LC08_L1TP_215068_20171205_20171222_01_T1")
-#     s.run_segmentation()
-
-    # conn = Con.Connection("host=localhost dbname=ta7_rascunho user=postgres password=postgres")
-
-    # conn.create_scene_path_row_schema(satellite_name=,path_row="215068")
-    # conn.load_segmentation_database(shapefile_path="~/Downloads/",
-    #                                 shapefile_name="teste.shp")
+        self.get_segmentation(region=5, inter=10, algorithm="SLICO")
 
 
