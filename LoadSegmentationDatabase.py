@@ -25,7 +25,7 @@ class LoadSegmentationDatabase:
     @staticmethod
     def runQuery(query):
         """Run postgres query."""
-        connect_text = """dbname= 'ta7_rascunho' user='postgres'
+        connect_text = """dbname='ta7_rascunho' user='postgres'
                           host=localhost port=5432 password='postgres'"""
         con = psycopg2.connect(connect_text)
         cur = con.cursor()
@@ -100,11 +100,11 @@ class LoadSegmentationDatabase:
 
             if intersetc:
                 count += 1
-                if count < 5000:
+                if count < 10000:
                     query = self.create_insert_geom_query(wkt=wkt)
                     queries.append(query)
 
-                if count == 5000 or is_last_element:
+                if count == 10000 or is_last_element:
                     print("Load geometries")
                     count = 0
                     pool = multiprocessing.Pool(6)
@@ -143,10 +143,10 @@ class LoadSegmentationDatabase:
         self.create_gist_index_geom_colum()
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    load_seg = LoadSegmentationDatabase(segmentation_file_path="/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/LC08/2017/12_Dezembro/215068/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_215068_20171205_SLIC.shp",
-                                        full_scene_name="LC08_L1TP_215068_20171205_20171222_01_T1",
-                                        img_file_name_stored="LC08_215068_20171205",
-                                        dir_tmp_img="/tmp/tmpn3k7znxi")
-    load_seg.run_load_segmentation()
+#     load_seg = LoadSegmentationDatabase(segmentation_file_path="/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/LC08/2017/12_Dezembro/215068/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_215068_20171205_SLIC.shp",
+#                                         full_scene_name="LC08_L1TP_215068_20171205_20171222_01_T1",
+#                                         img_file_name_stored="LC08_215068_20171205",
+#                                         dir_tmp_img="/tmp/tmpn3k7znxi")
+#     load_seg.run_load_segmentation()
