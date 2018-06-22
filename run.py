@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
                 # Getting information from Landsat image file
                 segmentation_file_path = os.path.join(img_output_path_stored,
-                                                      img_file_name_stored+"_SLIC.shp" )
+                                                      img_file_name_stored+"_SLICO.shp" )
                 load_seg = LSegDB.LoadSegmentationDatabase(segmentation_file_path=segmentation_file_path,
                                                             full_scene_name=full_image_scene_name,
                                                             img_file_name_stored=img_file_name_stored,
