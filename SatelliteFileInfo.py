@@ -69,6 +69,18 @@ class LandsatFileInfo(SatelliteFileInfo):
     # Limiting the methods above to only landsat imagem files
     if check_file_is_landsat:
 
+        def get_landsat_collection(self):
+            """Get what collection landsat file belongs."""
+            if self.get_file_name[-2:] == 'T1':
+                # Collection 1
+                return 1
+            elif self.get_file_name[-2:] == 'T2':
+                # Collection 2
+                return 2
+            elif self.get_file_name[-2:] == 'RT':
+                # Collection Real time
+                return 3
+
         def get_path_row(self):
             """Know how path and row from landsat scene.
 
