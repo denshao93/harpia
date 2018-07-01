@@ -58,15 +58,12 @@ class LandsatFileInfo(SatelliteFileInfo):
             """Get aquisition data from landsat file.
 
             Return:
-                [str] -- Date when landsat capture the image from
-                                      land surface.
                 [dateandtime.date] -- Date when landsat capture the image from
                                       land surface.
             """
-            date_str = self.get_satellite_file_name()[17:25]
-            date_type = u.int2date(date_str)
+            date = u.int2date(int(self.get_satellite_file_name()[17:25]))
 
-            return [date_str, date_type]
+            return date
 
         def get_landsat_output_name_file(self):
             """Name that will be used to save every output file.
@@ -84,14 +81,14 @@ class LandsatFileInfo(SatelliteFileInfo):
             """
             view_date = '{year}' \
                         '{month}' \
-                        '{day}'.format(self.get_landsat_aquisition_date().year,
-                                       self.get_landsat_aquisition_date().month, #NOQA
-                                       self.get_landsat_aquisition_date().day)
+                        '{day}'.format(year=self.get_landsat_aquisition_date().year,
+                                       month=self.get_landsat_aquisition_date().month, #NOQA
+                                       day=self.get_landsat_aquisition_date().day)
 
             output_name = '{satellite}_' \
                           '{index}_' \
-                          '{view_date}'.format(satellite=self.get_satellite_name(),
-                                               index=self.get_landsat_index(),
+                          '{view_date}'.format(satellite=self.get_satellite_name().upper(),
+                                               index=''.join(self.get_landsat_index()),
                                                view_date=view_date)
 
             return output_name

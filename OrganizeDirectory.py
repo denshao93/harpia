@@ -64,11 +64,12 @@ class OrganizeDirectory:
             <file_name> = Full name of scene
         """
         dir_path = os.path.join(self.root_dir_path,
-                                self.satellite_name,
+                                self.processed_directory_name,
+                                self.satellite_name().upper(),
                                 self.satellite_index,
                                 self.year,
-                                self.get_mounth_folder_name,
-                                self.file_name)
+                                self.get_mounth_folder_name(),
+                                self.file_name())
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)

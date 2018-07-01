@@ -30,7 +30,7 @@ class SatelliteFileInfo:
         This name will be used to create folder name to where we save the
         outfile.
         """
-        file_name = self.get_satellite_base_name_file().split()[0]
+        file_name = self.get_satellite_base_name_file().split('.')[0]
 
         return file_name
 
