@@ -9,7 +9,7 @@ class OrganizeDirectory:
 
     def __init__(self,
                  root_dir_path=str,
-                 satellite_name=str,
+                 satellite_namestr,
                  satellite_index=str,
                  year=int,
                  month=int,
@@ -44,13 +44,13 @@ class OrganizeDirectory:
 
     def get_mounth_folder_name(self):
         """Do the name of month with cardinal and literal word of monthself."""
-        string_mounth = m.month[int(self.get_image_month_aquisition_date())]
+        string_mounth = m.month[int(self.month)]
 
         month_folder_name = '{}_{}'.format(self.month, string_mounth)
 
         return month_folder_name
 
-    def create_dir_satellite_index__year_month_file_name(self):
+    def create_dir_satellite_index_year_month_file_name(self):
         """Create directory where file processed will be saved.
 
         ..note::
