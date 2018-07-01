@@ -1,97 +1,76 @@
-import os
+import os #NOQA
 import MonthDictionary as m
 
 
 class OrganizeDirectory:
+    """Create tree of directory to save processed file organized."""
 
-    # The name of folder where all satellite processed output will be organized and stored
-    # WARMING: If this folder has been change the place incorrectly, all files will be processed again.
-    dir_name_processed = 'PROCESSADA'
+    processed_directory_name = 'PROCESSADA'
 
     def __init__(self,
-                 image_file_path_targz,
-                 output_root_dir_image_processed):
-        """
-        This class organizes folder in order to have structure directories to pre-processing landsast images
-        :param image_file_path_targz: Path of tar.gz file stored in directory
-        :param output_root_dir_image_processed: The root directory where image processed will be stored organized
-                                           by name of satellite, year and path row (ex.from landsat 8:
-                                           LC8/2017/215069).
-        """
-        # Input row file (landsat file compressed (tar.gz) downloaded from USGS).
-        self.raster_file_path_targz = image_file_path_targz
+                 root_dir_path=str,
+                 satellite_name=str,
+                 satellite_index=str,
+                 year=int,
+                 month=int,
+                 file_name=str):
+        """.
 
-        # Output image processed is a place where image processed output will be stored (ex. compositions, segmentation)
-        self.output_root_dir_image_processed = output_root_dir_image_processed
+        Args:
+            root_dir_path (str): Root directory given by user. It is where tree
+                    folder will be created to store files processed.
+            satellite_name (str): Value that represent scene from satellite.
+            satellite_index (str):
+            year (int): From aquisition date of satellite scene.
+            month (int): From aquisition date of satellite scene.
+            file_name (str): Full name of scene
 
-    def create_root_dir_processed(self, dir_name):
         """
-        Creating directory where files will be organized. This is the processed directory ooutput.
-        The sugestion is that set name as PROCESSADA
-        :param dir_name: Giving name for directory where all scene processed will be organized and stored
-        :return:
-        """
-        dir_path = os.path.join(self.output_root_dir_image_processed, dir_name)
+        self.root_dir_path = root_dir_path
+        self.satellite_name = satellite_name
+        self.satellite_index = satellite_index
+        self.year = year
+        self.month = month
+        self.file_name = file_name
+
+    def create_root_dir_path(self, processed_directory_name):
+        """Create directory where files will be organized."""
+        dir_path = os.path.join(self.root_dir_path, processed_directory_name)
 
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
 
         return dir_path
 
-    def get_file_name_targz(self):
-
-        head, tail = os.path.split(self.raster_file_path_targz)
-
-        return tail.split('.')[0]
-
-    def get_satellite(self):
-
-        if self.get_file_name_targz()[:4] == "LC08":
-            return "LC08"
-
-    def get_path_row_from_targz(self):
-        """
-        pathrow is the name of scene from landsat (ex. 215/068)
-        This values are in the title of file
-        :return:
-        """
-
-        return self.get_file_name_targz()[10:16]
-
-    def get_image_month_aquisition_date(self):
-
-        return self.get_file_name_targz()[21:23]
-
-    def get_image_year_aquisition_date(self):
-
-        return self.get_file_name_targz()[17:21]
-
     def get_mounth_folder_name(self):
-
+        """Do the name of month with cardinal and literal word of monthself."""
         string_mounth = m.month[int(self.get_image_month_aquisition_date())]
 
-        folder_name = '{}_{}'.format(self.get_image_month_aquisition_date(), string_mounth)
+        month_folder_name = '{}_{}'.format(self.month, string_mounth)
 
-        return folder_name
+        return month_folder_name
 
-    def create_dir_satellite_year_pathrow_image(self):
+    def create_dir_satellite_index__year_month_file_name(self):
+        """Create directory where file processed will be saved.
 
-        dir_path = os.path.join(self.output_root_dir_image_processed,
-                                self.__class__.dir_name_processed,
-                                self.get_satellite(),
-                                self.get_path_row_from_targz(),
-                                self.get_image_year_aquisition_date(),
-                                self.get_mounth_folder_name(),
-                                self.get_file_name_targz())
+        ..note::
+            <root_dir_path> = Root place given by parameters
+            <processed_directory_name> = Set in variable
+                                         processed_directory_name
+            <satellite_name> = Sigle words wchich represent satellite name
+            <index_of_satelite> = Value that represent scene from satellite.
+            <year> = From aquisition date.
+            <month> = From aquisition date.
+            <file_name> = Full name of scene
+        """
+        dir_path = os.path.join(self.root_dir_path,
+                                self.satellite_name,
+                                self.satellite_index,
+                                self.year,
+                                self.get_mounth_folder_name,
+                                self.file_name)
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
         return dir_path
-
-    def run_manage_directory(self):
-
-        # Making folder which will store files processed
-        self.get_mounth_folder_name
-        self.create_root_dir_processed(self.__class__.dir_name_processed)
-        self.create_dir_satellite_year_pathrow_image()
