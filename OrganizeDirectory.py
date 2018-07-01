@@ -9,7 +9,7 @@ class OrganizeDirectory:
 
     def __init__(self,
                  root_dir_path=str,
-                 satellite_namestr,
+                 satellite_name=str,
                  satellite_index=str,
                  year=int,
                  month=int,
