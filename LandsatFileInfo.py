@@ -1,6 +1,6 @@
 """This class collect information from satellite file."""
 import utils as u
-import SatelliteFileInfo
+from SatelliteFileInfo import SatelliteFileInfo
 
 
 class LandsatFileInfo(SatelliteFileInfo):
@@ -16,7 +16,7 @@ class LandsatFileInfo(SatelliteFileInfo):
         Return:
             [bool] -- True or False
         """
-        sat_name = self.get_satellite_base_name_file[0:4].lower()
+        sat_name = self.get_satellite_base_name_file()[0:4].lower()
         return sat_name in ("lc05", "lc07", "lc08")
 
     # Limiting the methods above to only landsat imagem files
@@ -30,13 +30,13 @@ class LandsatFileInfo(SatelliteFileInfo):
                 2 = Collection 2
                 3 = Real Time
             """
-            if self.get_satellite_file_name[-2:] == 'T1':
+            if self.get_satellite_file_name()[-2:] == 'T1':
                 # Collection 1
                 return 1
-            elif self.get_satellite_file_name[-2:] == 'T2':
+            elif self.get_satellite_file_name()[-2:] == 'T2':
                 # Collection 2
                 return 2
-            elif self.get_satellite_file_name[-2:] == 'RT':
+            elif self.get_satellite_file_name()[-2:] == 'RT':
                 # Collection Real time
                 return 3
 
@@ -49,21 +49,24 @@ class LandsatFileInfo(SatelliteFileInfo):
                 [list] -- List with two values. They represent index to find
                 scene of Landsat. They are called as path row.
             """
-            path, row = (self.get_satellite_file_name[10:13],
-                         self.get_satellite_file_name[13:16])
+            path, row = (self.get_satellite_file_name()[10:13],
+                         self.get_satellite_file_name()[13:16])
 
-            return path, row
+            return [path, row]
 
         def get_landsat_aquisition_date(self):
             """Get aquisition data from landsat file.
 
             Return:
+                [str] -- Date when landsat capture the image from
+                                      land surface.
                 [dateandtime.date] -- Date when landsat capture the image from
                                       land surface.
             """
-            date = u.int2date(self.get_satellite_file_name[17:25])
+            date_str = self.get_satellite_file_name()[17:25]
+            date_type = u.int2date(date_str)
 
-            return date
+            return [date_str, date_type]
 
         def get_landsat_output_name_file(self):
             """Name that will be used to save every output file.
@@ -87,8 +90,8 @@ class LandsatFileInfo(SatelliteFileInfo):
 
             output_name = '{satellite}_' \
                           '{index}_' \
-                          '{view_date}'.format(self.get_satellite_name(),
-                                               self.get_landsat_index(),
+                          '{view_date}'.format(satellite=self.get_satellite_name(),
+                                               index=self.get_landsat_index(),
                                                view_date=view_date)
 
             return output_name

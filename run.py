@@ -1,6 +1,6 @@
 import os
 import sys
-import LandsatFileInfo
+from LandsatFileInfo import LandsatFileInfo
 import OrganizeDirectory as Od
 
 
@@ -19,10 +19,10 @@ if __name__ == "__main__":
                 lc = LandsatFileInfo(file_path)
                 # Ordering directory to receive results
 
-                od = Od.OrganizeDirectory(root_dir_path=argv[2],
+                od = Od.OrganizeDirectory(root_dir_path=sys.argv[2],
                                           satellite_name=lc.get_satellite_name,
-                                          satellite_index=lc.get_landsat_index(),       #NOQA
-                                          year=lc.get_landsat_aquisition_date().year,   #NOQA
-                                          month=lc.get_landsat_aquisition_date().month, #NOQA
+                                          satellite_index=''.join(lc.get_landsat_index()),       #NOQA
+                                          year=lc.get_landsat_aquisition_date()[1].year,   #NOQA
+                                          month=lc.get_landsat_aquisition_date()[1].month, #NOQA
                                           file_name=lc.get_landsat_output_name_file)    #NOQA
                 od.create_dir_satellite_index_year_month_file_name()

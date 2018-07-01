@@ -11,6 +11,7 @@ def int2date(argdate=int):
         dateandtime.date: A date object which corresponds to the given value
                           `argdate`.
     """
+    argdate = int(argdate)
     year = int(argdate / 10000)
     month = int((argdate % 10000) / 100)
     day = int(argdate % 100)

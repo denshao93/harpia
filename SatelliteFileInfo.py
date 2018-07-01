@@ -41,11 +41,11 @@ class SatelliteFileInfo:
             [str] -- The initials letters from satellite name.
         """
         try:
-            if self.get_satellite_base_name_file[0:4] == "LC08":
+            if self.get_satellite_base_name_file()[0:4] == "LC08":
                 return "lc08"
-            elif self.get_satellite_base_name_file[0:4] == "LC07":
+            elif self.get_satellite_base_name_file()[0:4] == "LC07":
                 return "lc07"
-            elif self.get_satellite_base_name_file[0:4] == "LC05":
+            elif self.get_satellite_base_name_file()[0:4] == "LC05":
                 return "lc05"
         except Exception:
             print("Satellite type not found")

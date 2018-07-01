@@ -8,12 +8,12 @@ class OrganizeDirectory:
     processed_directory_name = 'PROCESSADA'
 
     def __init__(self,
-                 root_dir_path=str,
-                 satellite_name=str,
-                 satellite_index=str,
-                 year=int,
-                 month=int,
-                 file_name=str):
+                 root_dir_path,
+                 satellite_name,
+                 satellite_index,
+                 year,
+                 month,
+                 file_name):
         """.
 
         Args:
