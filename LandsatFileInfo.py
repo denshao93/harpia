@@ -1,4 +1,5 @@
 """This class collect information from satellite file."""
+import utils as u
 import SatelliteFileInfo
 
 
@@ -39,7 +40,7 @@ class LandsatFileInfo(SatelliteFileInfo):
                 # Collection Real time
                 return 3
 
-        def get_landsat_path_row(self):
+        def get_landsat_index(self):
             """Know how path and row from landsat scene.
 
             Path row is index where find scene of landsat files.
@@ -53,13 +54,16 @@ class LandsatFileInfo(SatelliteFileInfo):
 
             return path, row
 
-        def get_landsat_aquisition_data(self):
+        def get_landsat_aquisition_date(self):
             """Get aquisition data from landsat file.
 
             Return:
-                [str] -- Date when landsat capture the image from land surface.
+                [dateandtime.date] -- Date when landsat capture the image from
+                                      land surface.
             """
-            return self.get_satellite_file_name[17:25]
+            date = u.int2date(self.get_satellite_file_name[17:25])
+
+            return date
 
         def get_landsat_output_name_file(self):
             """Name that will be used to save every output file.
@@ -75,10 +79,16 @@ class LandsatFileInfo(SatelliteFileInfo):
                 [str] -- The format of string <satellite>_<pathrow>_<view_date>
 
             """
+            view_date = '{year}' \
+                        '{month}' \
+                        '{day}'.format(self.get_landsat_aquisition_date().year,
+                                       self.get_landsat_aquisition_date().month, #NOQA
+                                       self.get_landsat_aquisition_date().day)
+
             output_name = '{satellite}_' \
-                          '{pathrow}_' \
+                          '{index}_' \
                           '{view_date}'.format(self.get_satellite_name(),
-                                               self.get_landsat_path_row(),
-                                               self.view_date())
+                                               self.get_landsat_index(),
+                                               view_date=view_date)
 
             return output_name
