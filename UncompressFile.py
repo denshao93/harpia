@@ -28,8 +28,11 @@ class UncompressFile:
         try:
             with tarfile.open(self.file_path, "r:gz") as tar:
                 tar.extractall(self.tmp_dir)
+            if self.check_correct_uncompressed_targz():
+                raise Exception
         except Exception:
-            print("Error to uncompress targz file")
+            print("Wrong place where files where uncompressed.")
+            self.move_uncompressed_file_wrong_folder()
 
     def uncompress_zip(self):
         """Uncompress zip file donwloaded."""
@@ -46,7 +49,7 @@ class UncompressFile:
         elif zipfile.is_zipfile(self.file_path):
             self.uncompress_zip()
 
-    def check_uncompressed_file(self):
+    def check_correct_uncompressed_targz(self):
         """Check if there is .tif files into tmp folder.
 
         Return:
@@ -55,15 +58,10 @@ class UncompressFile:
         return len(glob('{}{}'.format(self.tmp_dir, "/*.TIF"))) > 0
 
     def move_uncompressed_file_wrong_folder(self):
-        """Check correct uncompressed."""
+        """Move files to folder named as scene file in tmp folder."""
         file_name = u.get_base_name(self.file_path).split('.')[0]
         files = os.listdir(self.tmp_dir)
         os.mkdir('{}/{}'.format(self.tmp_dir, file_name))
         dst_folder = '{}/{}'.format(self.tmp_dir, file_name)
         for f in files:
             shutil.move(self.tmp_dir+"/"+f, dst_folder)
-
-    @staticmethod
-    def close_tmp_dir(dir_path):
-        """."""
-        shutil.rmtree(dir_path)
