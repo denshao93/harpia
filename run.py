@@ -9,19 +9,20 @@ import OrganizeDirectory as Od
 
 
 if __name__ == "__main__":
-    # Run Landsat 8 for forest monitoring
     # argv[1] = directory where targz files are stored.
     # argv[2] = directory where folder tree will be created to sabe processed
     # files.
+
+    # Create list of zip and tar.gz files from folder where they are store.
     files = [f  for f_ in [glob.glob(e) \
                 for e in (sys.argv[1]+'/*/*.zip', \
                           sys.argv[1]+'/*/*.tar.gz')] \
                 for f in f_]
     for file_path in files:
-        print(file_path)
-        # File which will unconpress
+
         # Create tmp director to put all temp files
         # tmp_dir = tempfile.mkdtemp()
+
         # Create instance of landsat file where scene features are
         sat = s.SatelliteFileInfo(file_path)
         lc = land.LandsatFileInfo(file_path)
