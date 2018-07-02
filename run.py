@@ -1,12 +1,12 @@
 import os #NOQA
 import sys
-import tempfile #NOQA
 import glob
+import tempfile #NOQA
+import UncompressFile as Un
+import LandsatFileInfo as l
 import SatelliteFileInfo as s
 import SentinelFileInfo as sen
-import LandsatFileInfo as l
 import OrganizeDirectory as Od
-
 
 
 if __name__ == "__main__":
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     for file_path in files:
 
         # Create tmp director to put all temp files
-        # tmp_dir = tempfile.mkdtemp()
+        tmp_dir = tempfile.mkdtemp()
 
         # Create instance of landsat file where scene features are
         sat = s.SatelliteFileInfo(file_path)
@@ -49,3 +49,6 @@ if __name__ == "__main__":
                     file_name=sent.get_scene_file_name())
 
         od.create_dir_satellite_index_year_month_file_name()
+
+        # Uncompress file
+        Un.UncompressFile(file_path=file_path, tmp_dir=tmp_dir).uncompres_file()
