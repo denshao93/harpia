@@ -32,19 +32,19 @@ if __name__ == "__main__":
         if sat.is_file_from_landsat():
             od = Od.OrganizeDirectory(
                     root_dir_path=sys.argv[2],
-                    satellite_name=lc.get_satellite_alias_name().upper(),
+                    satellite_name=lc.get_satellite_initials_name().upper(),
                     satellite_index=''.join(lc.get_landsat_index()),
                     year=str(lc.get_landsat_aquisition_date().year),
                     month=str(lc.get_landsat_aquisition_date().month),
-                    file_name=lc.get_satellite_scene_file_name())
+                    file_name=lc.get_scene_file_name())
 
         elif sat.is_file_from_sentinel():
             od = Od.OrganizeDirectory(
                     root_dir_path=sys.argv[2],
-                    satellite_name=lc.get_satellite_alias_name().upper(),
+                    satellite_name=lc.get_satellite_initials_name().upper(),
                     satellite_index=''.join(sent.get_sentinel_index()),
                     year=str(sent.get_sentinel_aquisition_date().year),
                     month=str(sent.get_sentinel_aquisition_date().month),
-                    file_name=sent.get_satellite_scene_file_name())
+                    file_name=sent.get_scene_file_name())
 
         od.create_dir_satellite_index_year_month_file_name()

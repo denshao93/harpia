@@ -19,7 +19,7 @@ class SentinelFileInfo(SatelliteFileInfo):
             [list] -- List with two values. They represent index to find
             scene of Landsat. They are called as path row.
         """
-        index = self.get_satellite_scene_file_name()[39:44]
+        index = self.get_scene_file_name()[39:44]
 
         return index
 
@@ -30,7 +30,7 @@ class SentinelFileInfo(SatelliteFileInfo):
             [dateandtime.date] -- Date when landsat capture the image from
                                   land surface.
         """
-        date = u.int2date(int(self.get_satellite_scene_file_name()[11:19]))
+        date = u.int2date(int(self.get_scene_file_name()[11:19]))
 
         return date
 
@@ -51,15 +51,15 @@ class SentinelFileInfo(SatelliteFileInfo):
         view_date = '{year}' \
                     '{month}' \
                     '{day}'.format(
-                            year=self.get_landsat_aquisition_date().year,
-                            month=self.get_landsat_aquisition_date().month,
-                            day=self.get_landsat_aquisition_date().day)
+                            year=self.get_sentinel_aquisition_date().year,
+                            month=self.get_sentinel_aquisition_date().month,
+                            day=self.get_sentinel_aquisition_date().day)
 
         output_name = '{satellite}_' \
                       '{index}_' \
                       '{view_date}'.format(
-                          satellite=self.get_satellite_alias_name(),
-                          index=''.join(self.get_landsat_index()),
+                          satellite=self.get_satellite_initials_name(),
+                          index=''.join(self.get_sentinel_index()),
                           view_date=view_date)
 
         return output_name

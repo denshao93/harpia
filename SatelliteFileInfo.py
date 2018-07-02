@@ -16,7 +16,7 @@ class SatelliteFileInfo:
         # files.
         self.file_path = file_path
 
-    def get_satellite_scene_file_name(self):
+    def get_scene_file_name(self):
         """Get full file name without extensions.
 
         This name will be used to create folder name to where we save the
@@ -26,7 +26,7 @@ class SatelliteFileInfo:
 
         return file_name
 
-    def get_satellite_alias_name(self):
+    def get_satellite_initials_name(self):
         """Get initials letters from the satellite file to know who it is.
 
         Return:
@@ -35,17 +35,17 @@ class SatelliteFileInfo:
         try:
 
             if self.is_file_from_landsat():
-                return self.get_satellite_scene_file_name()[:4]
+                return self.get_scene_file_name()[:4]
             elif self.is_file_from_sentinel:
-                return self.get_satellite_scene_file_name()[:3]
+                return self.get_scene_file_name()[:3]
 
         except Exception:
             print("Satellite type not found")
 
     def is_file_from_landsat(self):
         """Check if file is from landsat satellite."""
-        return self.get_satellite_scene_file_name().startswith("L")
+        return self.get_scene_file_name().startswith("L")
 
     def is_file_from_sentinel(self):
         """Check if file is from sentinel satellite."""
-        return self.get_satellite_scene_file_name().startswith("S")
+        return self.get_scene_file_name().startswith("S")

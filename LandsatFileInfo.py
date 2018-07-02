@@ -20,13 +20,13 @@ class LandsatFileInfo(SatelliteFileInfo):
             2 = Collection 2
             3 = Real Time
         """
-        if self.get_satellite_scene_file_name().endwith('T1'):
+        if self.get_scene_file_name().endwith('T1'):
             # Collection 1
             return 1
-        elif self.get_satellite_scene_file_name().endwith('T2'):
+        elif self.get_scene_file_name().endwith('T2'):
             # Collection 2
             return 2
-        elif self.get_satellite_scene_file_name().endwith('RT'):
+        elif self.get_scene_file_name().endwith('RT'):
             # Collection Real time
             return 3
 
@@ -39,8 +39,8 @@ class LandsatFileInfo(SatelliteFileInfo):
             [list] -- List with two values. They represent index to find
             scene of Landsat. They are called as path row.
         """
-        path, row = (self.get_satellite_scene_file_name()[10:13],
-                     self.get_satellite_scene_file_name()[13:16])
+        path, row = (self.get_scene_file_name()[10:13],
+                     self.get_scene_file_name()[13:16])
 
         return [path, row]
 
@@ -51,7 +51,7 @@ class LandsatFileInfo(SatelliteFileInfo):
             [dateandtime.date] -- Date when landsat capture the image from
                                   land surface.
         """
-        date = u.int2date(int(self.get_satellite_scene_file_name()[17:25]))
+        date = u.int2date(int(self.get_scene_file_name()[17:25]))
 
         return date
 
@@ -79,7 +79,7 @@ class LandsatFileInfo(SatelliteFileInfo):
         output_name = '{satellite}_' \
                       '{index}_' \
                       '{view_date}'.format(
-                          satellite=self.get_satellite_alias_name(),
+                          satellite=self.get_satellite_initials_name(),
                           index=''.join(self.get_landsat_index()),
                           view_date=view_date)
 
