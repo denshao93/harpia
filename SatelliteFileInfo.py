@@ -1,7 +1,8 @@
 
 """This class collect information from satellite file."""
 
-import os
+import os #NOQA
+import utils as u
 
 
 class SatelliteFileInfo:
@@ -15,37 +16,36 @@ class SatelliteFileInfo:
         # files.
         self.file_path = file_path
 
-    def get_satellite_base_name_file(self):
-        """Get basename from targz file path.
-
-        Base name is file name with extension.
-        """
-        base_name = os.path.basename(self.file_path)
-
-        return base_name
-
-    def get_satellite_file_name(self):
+    def get_satellite_scene_file_name(self):
         """Get full file name without extensions.
 
         This name will be used to create folder name to where we save the
         outfile.
         """
-        file_name = self.get_satellite_base_name_file().split('.')[0]
+        file_name = u.get_base_name(self.file_path).split('.')[0]
 
         return file_name
 
-    def get_satellite_name(self):
+    def get_satellite_alias_name(self):
         """Get initials letters from the satellite file to know who it is.
 
         Return:
             [str] -- The initials letters from satellite name.
         """
         try:
-            if self.get_satellite_base_name_file()[0:4] == "LC08":
-                return "lc08"
-            elif self.get_satellite_base_name_file()[0:4] == "LE07":
-                return "lc07"
-            elif self.get_satellite_base_name_file()[0:4] == "LT05":
-                return "lc05"
+
+            if self.is_file_from_landsat():
+                return self.get_satellite_scene_file_name()[:4]
+            elif self.is_file_from_sentinel:
+                return self.get_satellite_scene_file_name()[:3]
+
         except Exception:
             print("Satellite type not found")
+
+    def is_file_from_landsat(self):
+        """Check if file is from landsat satellite."""
+        return self.get_satellite_scene_file_name().startswith("L")
+
+    def is_file_from_sentinel(self):
+        """Check if file is from sentinel satellite."""
+        return self.get_satellite_scene_file_name().startswith("S")

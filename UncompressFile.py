@@ -1,41 +1,52 @@
 import os
 import shutil
+import zipfile
 import tarfile
 import tempfile
 from glob import glob
 
 
 class UncompressFile:
-    """Uncompress tar.gz file"""
+    """Uncompress file."""
 
-    def __init__(self, image_file_path_targz, file_name):
+    def __init__(self, file_path, tmp_dir):
+        """Uncompress file.
+
+        Arg:
+            file_path (str): Compressed file path.
+            tmp_dir (str): Temporary folder where files will be uncompressed.
+
+        Raise:
+            Exception: description
+
         """
-        Arguments:
-            image_file_path_targz {str} -- [description]
-            file_name {str} -- [description]
-        """
-        # Input row file (landsat file compressed like dowloaded from USGS)
-        self.image_file_path_targz = image_file_path_targz
+        self.file_path = file_path
+        self.tmp_dir = tmp_dir
 
-        # Temporary folder to put files to process and remove after that
-        self.tmp = tempfile.gettempdir()
-
-        # Tmp directory to put landsat imagens
-        self.dir_tmp_img = tempfile.mkdtemp()
-
-        # File name
-        self.file_name = file_name
-
-    def uncompress_img(self):
-        """This function uncompress tar.gz files donwloaded from USGS"""
+    def uncompress_targz(self):
+        """Uncompress targz file donwloaded."""
         try:
             with tarfile.open(self.image_file_path_targz, "r:gz") as tar:
                 tar.extractall(self.dir_tmp_img)
-        except:
-            print("Error to uncompress image files")
+        except Exception:
+            print("Error to uncompress targz file")
+
+    def uncompress_zip(self):
+        """Uncompress zip file donwloaded."""
+        try:
+            with zipfile.ZipFile(self.file_path, "r") as zip:
+                zip.extractall(self.tmp_dir)
+        except Exception:
+            print("Error to uncompress zip files")
+
+    def uncompres_file(self, arg):
+        """See what extension the file has."""
+        if condition:
+            pass
 
     def check_uncompressed_file(self):
         """Check if there is .tif files into tmp folder.
+
         Returns:
             [boolean] -- If False the uncompresstion was done corretly
         """
@@ -57,17 +68,6 @@ class UncompressFile:
         shutil.rmtree(dir_path)
 
     def run(self):
-        self.uncompress_img()
+        self.uncompress_targz()
         if self.check_uncompressed_file():
             self.move_uncompressed_file_wrong_folder()
-
-# Exemple
-# if __name__ == '__main__':
-
-#     file = UncompressFile("/media/diogocaribe/56A22ED6A22EBA7F/BRUTA/LC8/215068/LC08_L1TP_215068_20171205_20171222_01_T1.tar.gz",
-#     "LC08_L1TP_215068_20171205_20171222_01_T1")
-#     file.run()
-    # file = UncompressFile("/media/diogocaribe/56A22ED6A22EBA7F/BRUTA/LC8/215068/LC08_L1TP_215068_20160913_20170321_01_T1.tar.gz")
-    # file.run()
-
-

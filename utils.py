@@ -1,3 +1,4 @@
+import os #NOQA
 from datetime import date
 
 
@@ -17,3 +18,15 @@ def int2date(argdate=int):
     day = int(argdate % 100)
 
     return date(year, month, day)
+
+
+def get_base_name(file_path):
+    """Get base name (with extesion).
+
+    Arg:
+        file_path (str): File name with extesion.
+
+    Return:
+        (str): File name without extension.
+    """
+    return os.path.basename(file_path)

@@ -10,85 +10,77 @@ class LandsatFileInfo(SatelliteFileInfo):
         """."""
         super().__init__(file_path)
 
-    def check_file_is_landsat(self):
-        """Check if the file comes from landsat satellite.
+    # Limiting the methods above to only landsat imagem files
+
+    def get_landsat_collection(self):
+        """Get what collection landsat file belongs.
 
         Return:
-            [bool] -- True or False
+            1 = Collection 1
+            2 = Collection 2
+            3 = Real Time
         """
-        sat_name = self.get_satellite_base_name_file()[0:4].lower()
-        return sat_name in ("lc05", "lc07", "lc08")
+        if self.get_satellite_scene_file_name().endwith('T1'):
+            # Collection 1
+            return 1
+        elif self.get_satellite_scene_file_name().endwith('T2'):
+            # Collection 2
+            return 2
+        elif self.get_satellite_scene_file_name().endwith('RT'):
+            # Collection Real time
+            return 3
 
-    # Limiting the methods above to only landsat imagem files
-    if check_file_is_landsat:
+    def get_landsat_index(self):
+        """Know how path and row from landsat scene.
 
-        def get_landsat_collection(self):
-            """Get what collection landsat file belongs.
+        Path row is index where find scene of landsat files.
 
-            Return:
-                1 = Collection 1
-                2 = Collection 2
-                3 = Real Time
-            """
-            if self.get_satellite_file_name()[-2:] == 'T1':
-                # Collection 1
-                return 1
-            elif self.get_satellite_file_name()[-2:] == 'T2':
-                # Collection 2
-                return 2
-            elif self.get_satellite_file_name()[-2:] == 'RT':
-                # Collection Real time
-                return 3
+        Return:
+            [list] -- List with two values. They represent index to find
+            scene of Landsat. They are called as path row.
+        """
+        path, row = (self.get_satellite_scene_file_name()[10:13],
+                     self.get_satellite_scene_file_name()[13:16])
 
-        def get_landsat_index(self):
-            """Know how path and row from landsat scene.
+        return [path, row]
 
-            Path row is index where find scene of landsat files.
+    def get_landsat_aquisition_date(self):
+        """Get aquisition data from landsat file.
 
-            Return:
-                [list] -- List with two values. They represent index to find
-                scene of Landsat. They are called as path row.
-            """
-            path, row = (self.get_satellite_file_name()[10:13],
-                         self.get_satellite_file_name()[13:16])
+        Return:
+            [dateandtime.date] -- Date when landsat capture the image from
+                                  land surface.
+        """
+        date = u.int2date(int(self.get_satellite_scene_file_name()[17:25]))
 
-            return [path, row]
+        return date
 
-        def get_landsat_aquisition_date(self):
-            """Get aquisition data from landsat file.
+    def get_landsat_output_name_file(self):
+        """Name that will be used to save every output file.
 
-            Return:
-                [dateandtime.date] -- Date when landsat capture the image from
-                                      land surface.
-            """
-            date = u.int2date(int(self.get_satellite_file_name()[17:25]))
+        ..note::
+            Folder where file will be saved not use this format. It will
+            use full name of file.
 
-            return date
+        ..note::
+        <view_date> is when satellite capture imagem (dd/mm/yyyy)
 
-        def get_landsat_output_name_file(self):
-            """Name that will be used to save every output file.
+        Return:
+            [str] -- The format of string <satellite>_<pathrow>_<view_date>
 
-            ..note::
-                Folder where file will be saved not use this format. It will
-                use full name of file.
+        """
+        view_date = '{year}' \
+                    '{month}' \
+                    '{day}'.format(
+                            year=self.get_landsat_aquisition_date().year,
+                            month=self.get_landsat_aquisition_date().month,
+                            day=self.get_landsat_aquisition_date().day)
 
-            ..note::
-            <view_date> is when satellite capture imagem (dd/mm/yyyy)
+        output_name = '{satellite}_' \
+                      '{index}_' \
+                      '{view_date}'.format(
+                          satellite=self.get_satellite_alias_name(),
+                          index=''.join(self.get_landsat_index()),
+                          view_date=view_date)
 
-            Return:
-                [str] -- The format of string <satellite>_<pathrow>_<view_date>
-
-            """
-            view_date = '{year}' \
-                        '{month}' \
-                        '{day}'.format(year=self.get_landsat_aquisition_date().year,
-                                       month=self.get_landsat_aquisition_date().month, #NOQA
-                                       day=self.get_landsat_aquisition_date().day)
-
-            output_name = '{satellite}_' \
-                          '{index}_' \
-                          '{view_date}'.format(satellite=self.get_satellite_name().upper(),
-                                               index=''.join(self.get_landsat_index()),
-                                               view_date=view_date)
-
-            return output_name
+        return output_name
