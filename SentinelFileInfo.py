@@ -10,7 +10,7 @@ class SentinelFileInfo(SatelliteFileInfo):
         """."""
         super().__init__(file_path)
 
-    def get_sentinel_index(self):
+    def get_index(self):
         """Know how path and row from sentinel scene.
 
         Path row is index where find scene of landsat files.
@@ -23,7 +23,7 @@ class SentinelFileInfo(SatelliteFileInfo):
 
         return index
 
-    def get_sentinel_aquisition_date(self):
+    def get_aquisition_date(self):
         """Get aquisition data from landsat file.
 
         Return:
@@ -34,7 +34,7 @@ class SentinelFileInfo(SatelliteFileInfo):
 
         return date
 
-    def get_sentinel_output_name_file(self):
+    def get_output_name_file(self):
         """Name that will be used to save every output file.
 
         ..note::
@@ -51,15 +51,15 @@ class SentinelFileInfo(SatelliteFileInfo):
         view_date = '{year}' \
                     '{month}' \
                     '{day}'.format(
-                            year=self.get_sentinel_aquisition_date().year,
-                            month=self.get_sentinel_aquisition_date().month,
-                            day=self.get_sentinel_aquisition_date().day)
+                            year=self.get_aquisition_date().year,
+                            month=self.get_aquisition_date().month,
+                            day=self.get_aquisition_date().day)
 
         output_name = '{satellite}_' \
                       '{index}_' \
                       '{view_date}'.format(
-                          satellite=self.get_satellite_initials_name(),
-                          index=''.join(self.get_sentinel_index()),
+                          satellite=self.get_initials_name(),
+                          index=''.join(self.get_index()),
                           view_date=view_date)
 
         return output_name

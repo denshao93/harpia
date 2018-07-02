@@ -6,7 +6,7 @@ import utils as u
 
 
 class SatelliteFileInfo:
-    """Class to read info from targz file name."""
+    """Class to read info from file name that come from satellite."""
 
     def __init__(self, file_path):
         """."""
@@ -26,7 +26,7 @@ class SatelliteFileInfo:
 
         return file_name
 
-    def get_satellite_initials_name(self):
+    def get_initials_name(self):
         """Get initials letters from the satellite file to know who it is.
 
         Return:
