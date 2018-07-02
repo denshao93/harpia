@@ -4,8 +4,9 @@ import tempfile #NOQA
 import glob
 import SatelliteFileInfo as s
 import SentinelFileInfo as sen
-import LandsatFileInfo as land
+import LandsatFileInfo as l
 import OrganizeDirectory as Od
+
 
 
 if __name__ == "__main__":
@@ -25,23 +26,23 @@ if __name__ == "__main__":
 
         # Create instance of landsat file where scene features are
         sat = s.SatelliteFileInfo(file_path)
-        lc = land.LandsatFileInfo(file_path)
+        land = l.LandsatFileInfo(file_path)
         sent = sen.SentinelFileInfo(file_path)
 
         # Create director where files will be saved
         if sat.is_file_from_landsat():
             od = Od.OrganizeDirectory(
                     root_dir_path=sys.argv[2],
-                    satellite_name=lc.get_initials_name().upper(),
-                    satellite_index=''.join(lc.get_index()),
-                    year=str(lc.get_aquisition_date().year),
-                    month=str(lc.get_aquisition_date().month),
-                    file_name=lc.get_scene_file_name())
+                    satellite_name=land.get_initials_name().upper(),
+                    satellite_index=''.join(land.get_index()),
+                    year=str(land.get_aquisition_date().year),
+                    month=str(land.get_aquisition_date().month),
+                    file_name=land.get_scene_file_name())
 
         elif sat.is_file_from_sentinel():
             od = Od.OrganizeDirectory(
                     root_dir_path=sys.argv[2],
-                    satellite_name=lc.get_initials_name().upper(),
+                    satellite_name=land.get_initials_name().upper(),
                     satellite_index=''.join(sent.get_index()),
                     year=str(sent.get_aquisition_date().year),
                     month=str(sent.get_aquisition_date().month),
