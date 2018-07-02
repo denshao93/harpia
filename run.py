@@ -14,10 +14,10 @@ if __name__ == "__main__":
     # files.
 
     # Create list of zip and tar.gz files from folder where they are store.
-    files = [f  for f_ in [glob.glob(e) \
-                for e in (sys.argv[1]+'/*/*.zip', \
-                          sys.argv[1]+'/*/*.tar.gz')] \
-                for f in f_]
+    files = [f for f_ in [glob.glob(e)
+             for e in (sys.argv[1]+'/*/*.zip', sys.argv[1]+'/*/*.tar.gz')]
+             for f in f_]
+
     for file_path in files:
 
         # Create tmp director to put all temp files
