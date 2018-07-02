@@ -2,7 +2,7 @@ import os
 import shutil
 import zipfile
 import tarfile
-import tempfile
+import utils as u
 from glob import glob
 
 
@@ -26,8 +26,8 @@ class UncompressFile:
     def uncompress_targz(self):
         """Uncompress targz file donwloaded."""
         try:
-            with tarfile.open(self.image_file_path_targz, "r:gz") as tar:
-                tar.extractall(self.dir_tmp_img)
+            with tarfile.open(self.file_path, "r:gz") as tar:
+                tar.extractall(self.tmp_dir)
         except Exception:
             print("Error to uncompress targz file")
 
@@ -39,35 +39,31 @@ class UncompressFile:
         except Exception:
             print("Error to uncompress zip files")
 
-    def uncompres_file(self, arg):
+    def uncompres_file(self):
         """See what extension the file has."""
-        if condition:
-            pass
+        if tarfile.is_tarfile(self.file_path):
+            self.uncompress_targz()
+        elif zipfile.is_zipfile(self.file_path):
+            self.uncompress_zip()
 
     def check_uncompressed_file(self):
         """Check if there is .tif files into tmp folder.
 
-        Returns:
+        Return:
             [boolean] -- If False the uncompresstion was done corretly
         """
-        return len(glob('{}{}'.format(self.dir_tmp_img, "/*.TIF"))) > 0
+        return len(glob('{}{}'.format(self.tmp_dir, "/*.TIF"))) > 0
 
     def move_uncompressed_file_wrong_folder(self):
-        """If image files were uncompressed in wrong place, this method will put it
-        in place where all of code recognized
-        """
-        files = os.listdir(self.dir_tmp_img)
-        os.mkdir('{}/{}'.format(self.dir_tmp_img, self.file_name))
-        dst_folder = '{}/{}'.format(self.dir_tmp_img, self.file_name)
-
+        """Check correct uncompressed."""
+        file_name = u.get_base_name(self.file_path).split('.')[0]
+        files = os.listdir(self.tmp_dir)
+        os.mkdir('{}/{}'.format(self.tmp_dir, file_name))
+        dst_folder = '{}/{}'.format(self.tmp_dir, file_name)
         for f in files:
-            shutil.move(self.dir_tmp_img+"/"+f, dst_folder)
+            shutil.move(self.tmp_dir+"/"+f, dst_folder)
 
     @staticmethod
     def close_tmp_dir(dir_path):
+        """."""
         shutil.rmtree(dir_path)
-
-    def run(self):
-        self.uncompress_targz()
-        if self.check_uncompressed_file():
-            self.move_uncompressed_file_wrong_folder()
