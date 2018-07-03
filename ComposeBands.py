@@ -3,49 +3,47 @@ import os
 
 class ComposeBands:
 
-    def __init__(self, image_output_path_stored, scene_image_name, dir_tmp_img):
-        # The folder where output processed will be saved
-        self.image_output_path_stored = image_output_path_stored
+    def __init__(self, input_dir, output_dir, output_file_name):
+        """Init.
 
-        # Temporary folder to put files to process and remove after that
-        self.dir_tmp_img = dir_tmp_img
+        Argument:
+            input_dir [str] -- The path where all images are.
+            output_dir [str] -- The path where compose image will be saved.
+            output_file_name [str] -- Name of file without extension.
+        """
+        self.input_dir = input_dir
 
-        self.file_name = scene_image_name
+        self.output_dir = output_dir
 
-        # Path where band files can be find.
-        self.tmp_raw_img_path = os.path.join(self.dir_tmp_img, self.file_name)
+        self.output_file_name = output_file_name
 
-    def stack_img(self, output_image_path, output_image_name, expression):
+    def stack_img(self, expression):
         """Stacking bands from landsat in tmp folder.
-           The expression is the bands which will be stacked.
 
-        Arguments:
-            output_image_path {str} -- The path where image will be save.
-            output_image_name {str} -- The name of image output with extention (ie. ref.img).
+        Argument:
             expression {str} -- Regular expression which select files who will be put in output.
         """
 
         # Path where band files can be find.
         # Here, it is the input for gdal_merge.
-        tmp_raw_img = os.path.join(self.tmp_raw_img_path, expression)
+        input_img_dir = os.path.join(self.input_dir, expression)
 
         # Output image
-        output_image_path = os.path.join(output_image_path, output_image_name)
+        output_image_path = os.path.join(self.output_dir, self.output_file_name)
 
-        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {output_image} " \
-                  "{tmp_raw_img}".format(output_image=output_image_path,
-                                         tmp_raw_img=tmp_raw_img)
-        print(command)
+        command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {output_image_path} " \
+                  "{input_img_dir}".format(output_image_path=output_image_path,
+                                           input_img_dir=input_img_dir)
         os.system(command)
 
-    def run_image_composition(self):
+    # def run_image_composition(self):
 
-        # Stacking image to cloud/shadow
-        self.stack_img(output_image_path=self.dir_tmp_img,
-                       output_image_name="ref.img",
-                       expression="LC08*_B[1-7,9].TIF")
-        self.stack_img(self.dir_tmp_img, "thermal.img", "LC08*_B1[0,1].TIF")
+    #     # Stacking image to cloud/shadow
+    #     self.stack_img(output_image_path=self.dir_tmp_img,
+    #                    output_image_name="ref.img",
+    #                    expression="LC08*_B[1-7,9].TIF")
+    #     self.stack_img(self.dir_tmp_img, "thermal.img", "LC08*_B1[0,1].TIF")
 
-        # Stacking imagem to clip
-        self.stack_img(self.dir_tmp_img, self.file_name + ".TIF", expression="LC08*_B[3-6].TIF")
+    #     # Stacking imagem to clip
+    #     self.stack_img(self.dir_tmp_img, self.file_name + ".TIF", expression="LC08*_B[3-6].TIF")
 
