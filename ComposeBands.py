@@ -1,4 +1,5 @@
 import os
+import sys
 
 
 class ComposeBands:
@@ -17,7 +18,7 @@ class ComposeBands:
 
         self.output_file_name = output_file_name
 
-    def stack_img(self, expression):
+    def stack_img(self, expression, extension):
         """Stacking bands from landsat in tmp folder.
 
         Argument:
@@ -29,11 +30,30 @@ class ComposeBands:
         input_img_dir = os.path.join(self.input_dir, expression)
 
         # Output image
-        output_image_path = os.path.join(self.output_dir, self.output_file_name)
+        output_image_path = os.path.join(self.output_dir, self.output_file_name+extension)
 
         command = "gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o {output_image_path} " \
                   "{input_img_dir}".format(output_image_path=output_image_path,
                                            input_img_dir=input_img_dir)
+        os.system(command)
+
+    def stack_sentinel(self, scene_file_name, utm_zone):
+
+        """gdal_translate 
+        SENTINEL2_L1C:S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.SAFE/
+        MTD_MSIL1C.xml:10m:EPSG_32724 10m.tif -co TILED=YES --config 
+        GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS 2"""
+
+        path = self.input_dir
+        os.chdir(path)
+        command = 'gdal_translate SENTINEL2_L1C:{scene_file_name}.SAFE/' \
+                  'MTD_MSIL1C.xml:10m:EPSG_327{utm_zone} ' \
+                  '{output_file_name}.tif -co TILED=YES --config ' \
+                  'GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS 2' \
+                  .format(scene_file_name=scene_file_name,
+                          utm_zone=utm_zone,
+                          output_file_name=self.output_file_name)
+        print(command)
         os.system(command)
 
     # def run_image_composition(self):
@@ -46,4 +66,4 @@ class ComposeBands:
 
     #     # Stacking imagem to clip
     #     self.stack_img(self.dir_tmp_img, self.file_name + ".TIF", expression="LC08*_B[3-6].TIF")
-
+    
