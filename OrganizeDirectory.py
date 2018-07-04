@@ -50,7 +50,7 @@ class OrganizeDirectory:
 
         return month_folder_name
 
-    def create_dir_satellite_index_year_month_file_name(self):
+    def create_output_dir(self):
         """Create directory where file processed will be saved.
 
         ..note::
