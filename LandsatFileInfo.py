@@ -55,7 +55,7 @@ class LandsatFileInfo(SatelliteFileInfo):
 
         return date
 
-    def get_output_name_file(self):
+    def get_output_file_name(self):
         """Name that will be used to save every output file.
 
         ..note::
