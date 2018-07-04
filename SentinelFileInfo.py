@@ -40,8 +40,6 @@ class SentinelFileInfo(SatelliteFileInfo):
         Returns:
             [str] -- Utm zone of scene.
         """
-
-
         return self.get_index()[0:2]
 
     def get_output_file_name(self):
