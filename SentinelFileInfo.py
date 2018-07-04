@@ -34,7 +34,17 @@ class SentinelFileInfo(SatelliteFileInfo):
 
         return date
 
-    def get_output_name_file(self):
+    def get_utm_zone(self):
+        """Get utm zone where scene is located.
+
+        Returns:
+            [str] -- Utm zone of scene.
+        """
+
+
+        return self.get_index()[0:2]
+
+    def get_output_file_name(self):
         """Name that will be used to save every output file.
 
         ..note::
