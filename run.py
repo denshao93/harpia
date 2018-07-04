@@ -16,7 +16,8 @@ if __name__ == "__main__":
     # files.
 
     # Important variables:
-        # output_file_name = name of file without extension
+        # output_file_name = name of file without extension less than original
+        # Only <satellite>_<index>_<view_date>
         # It is in sublass of satellite (ex. LandsatFileInfo.py)
 
         # output_dir = directory where results will be stored.
@@ -63,6 +64,9 @@ if __name__ == "__main__":
         UF.UncompressFile(file_path=file_path, tmp_dir=tmp_dir).uncompres_file()
 
         # Stacking imagem to clip
-        
-        # expression="LC08*_B[3-6].TIF")
-
+        if sat.is_file_from_sentinel():
+            CB.ComposeBands(input_dir=tmp_dir,
+                            output_dir=od.create_output_dir(),
+                            output_file_name=sent.get_output_file_name()) \
+            .stack_sentinel(scene_file_name=sent.get_scene_file_name(),
+                            utm_zone=sent.get_utm_zone())
