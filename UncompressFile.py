@@ -28,11 +28,8 @@ class UncompressFile:
         try:
             with tarfile.open(self.file_path, "r:gz") as tar:
                 tar.extractall(self.tmp_dir)
-            if self.check_correct_uncompressed_targz():
-                raise Exception
         except Exception:
             print("Wrong place where files where uncompressed.")
-            self.move_uncompressed_file_wrong_folder()
 
     def uncompress_zip(self):
         """Uncompress zip file donwloaded."""
