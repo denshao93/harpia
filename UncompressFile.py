@@ -54,7 +54,7 @@ class UncompressFile:
         """
         return len(glob('{}{}'.format(self.tmp_dir, "/*.TIF"))) > 0
 
-    def move_uncompressed_file_wrong_folder(self):
+    def move_file_2_right_folder(self):
         """Move files to folder named as scene file in tmp folder."""
         file_name = u.get_base_name(self.file_path).split('.')[0]
         files = os.listdir(self.tmp_dir)
