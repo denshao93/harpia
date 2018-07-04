@@ -39,11 +39,6 @@ class ComposeBands:
 
     def stack_sentinel(self, scene_file_name, utm_zone):
 
-        """gdal_translate 
-        SENTINEL2_L1C:S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.SAFE/
-        MTD_MSIL1C.xml:10m:EPSG_32724 10m.tif -co TILED=YES --config 
-        GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS 2"""
-
         path = self.input_dir
         os.chdir(path)
         command = 'gdal_translate SENTINEL2_L1C:{scene_file_name}.SAFE/' \
