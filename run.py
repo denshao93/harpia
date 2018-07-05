@@ -3,7 +3,7 @@ import sys
 import glob
 import tempfile #NOQA
 import ComposeBands as CB
-import UncompressFile as UF
+import UnpackFile as UF
 import LandsatFileInfo as LFI
 import SatelliteFileInfo as SFI
 import SentinelFileInfo as SFI
@@ -61,7 +61,14 @@ if __name__ == "__main__":
         od.create_output_dir()
 
         # Uncompress file
-        UF.UncompressFile(file_path=file_path, tmp_dir=tmp_dir).uncompres_file()
+        up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
+
+        if sat.is_file_from_landsat and sat.get_initials_name == 'lc08':
+            up.uncompres_file(bands=[1,2,3,4,5,6,7,9,10,11])
+        elif sat.is_file_from_landsat:
+            up.uncompres_file(bands=[2,3,4,5])
+        elif sat.is_file_from_sentinel:
+            up.uncompress_zip()
 
         # Stacking imagem to clip
         if sat.is_file_from_sentinel():
