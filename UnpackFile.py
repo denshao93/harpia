@@ -69,9 +69,7 @@ class UnpackFile:
         elements = []
         blist = ''.join(str(i) for i in bands)
         patternStr =    '.*_B[' + blist + ']\.TIF|' + \
-                        '.*_band[' + blist +']\.tif|' + \
-                        '.*_B1[' + blist + ']\.TIF|' + \
-                        '.*_band1[' + blist +']\.tif|.*_MTL*\.txt'
+                        '.*_B1[' + blist + ']\.TIF|.*_MTL*\.txt'
 
         pattern = re.compile(patternStr)
         for i, name in enumerate(names):
