@@ -66,9 +66,9 @@ if __name__ == "__main__":
         if sat.is_file_from_landsat() and sat.get_initials_name() == 'LC08':
             print("landsat8")
             up.uncompres_file(bands=[1,2,3,4,5,6,7,9,10,11])
-        elif sat.is_file_from_landsat:
+        elif sat.is_file_from_landsat():
             up.uncompres_file(bands=[2,3,4,5])
-        elif sat.is_file_from_sentinel:
+        elif sat.is_file_from_sentinel():
             up.uncompress_zip()
 
         # Stacking imagem to clip
