@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     # Create list of zip and tar.gz files from folder where they are store.
     files = [f for f_ in [glob.glob(e)
-             for e in (sys.argv[1]+'/*.zip', sys.argv[1]+'/*.tar.gz')]
+             for e in (sys.argv[1]+'/*/*.zip', sys.argv[1]+'/*/*.tar.gz')]
              for f in f_]
 
     for file_path in files:
@@ -58,47 +58,14 @@ if __name__ == "__main__":
                     month=str(sent.get_aquisition_date().month),
                     file_name=sent.get_scene_file_name())
 
+        # Create directory to save results
         od.create_output_dir()
 
-        # Uncompress file
+        # Create objet to unpack files
         up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
 
-        # Work with Landsat 8
-        if sat.get_initials_name() == 'LC08':
-            # Unpak bands from landsat 8 
-
-            up.uncompres_file(bands=[1,2,3,4,5,6,7,9,10,11])
-
-            # Stack with band [3, 4, 5, 6]
-            # Bands
-            # 3 = Green | 4 = Red | 5 = Nir | 6 = Swir1 |
-            CB.ComposeBands(input_dir=tmp_dir,
-                            output_dir=tmp_dir,
-                            output_file_name=land.get_scene_file_name()) \
-                            .stack_img(expression="LC08*_B[3-6].TIF",
-                                      extension = '.TIF')
-            # Clip
-            # Segmentation
-            # Cloud/Shadow
-                # Thinking about compose image in fuction for fmask
-
-        # Work with Landsat 5 and 7
-        elif sat.is_file_from_landsat():
-            # Unpak bands from landsat 5 and 7
-            up.uncompres_file(bands=[2,3,4,5])
-
-            # Stack images
-            # Bands
-            # 2 = Green | 3 = Red | 4 = Nir | 5 = Swir |
-            CB.ComposeBands(input_dir=tmp_dir,
-                            output_dir=tmp_dir,
-                            output_file_name=land.get_scene_file_name()) \
-                            .stack_img(expression="L[T,E]0[5,7]*_B[2-5].TIF",
-                                      extension = '.TIF')
-            # Clip
-
         # Work with Sentinel2
-        elif sat.is_file_from_sentinel():
+        if sat.is_file_from_sentinel():
             # Unzip setinel file
             up.uncompress_zip()
 
@@ -111,5 +78,37 @@ if __name__ == "__main__":
             # Clip
             # Segmentation
             # Cloud/Shadow
+            continue
 
+        # Work with Landsat 8
+        elif sat.get_initials_name() == 'LC08':
+            # Set bands to unpack from landsat 8
+            bands=[1,2,3,4,5,6,7,9,10,11]
+            # Stack images
+            # Bands: 3 = Green | 4 = Red | 5 = Nir | 6 = Swir1 |
+            bands_expression = '3-6'
+            # Clip
+            # Segmentation
+            # Cloud/Shadow
+                # Thinking about compose image in fuction for fmask
 
+        # Work with Landsat 5 and 7
+        elif sat.is_file_from_landsat():
+            # Set bands to unpack from landsat 5 and 7
+            bands=[2,3,4,5]
+            # Stack images
+            # Bands: 2 = Green | 3 = Red | 4 = Nir | 5 = Swir |
+            bands_expression = '2-5'
+            # Clip
+
+        # Unpack files from landsat
+        up.uncompres_file(bands)
+
+        # Stack bands from landsat
+        expression = "L[C,T,E]0[5,7,8]*_B[{bands_expression}].TIF" \
+                    .format(bands_expression=bands_expression)
+        CB.ComposeBands(input_dir=tmp_dir,
+                        output_dir=tmp_dir,
+                        output_file_name=land.get_scene_file_name()) \
+                        .stack_img(expression=expression,
+                                extension = '.TIF')
