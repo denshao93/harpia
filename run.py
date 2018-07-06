@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     # Create list of zip and tar.gz files from folder where they are store.
     files = [f for f_ in [glob.glob(e)
-             for e in (sys.argv[1]+'/*/*.zip', sys.argv[1]+'/*/*.tar.gz')]
+             for e in (sys.argv[1]+'/*.zip', sys.argv[1]+'/*.tar.gz')]
              for f in f_]
 
     for file_path in files:
@@ -63,18 +63,53 @@ if __name__ == "__main__":
         # Uncompress file
         up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
 
-        if sat.is_file_from_landsat() and sat.get_initials_name() == 'LC08':
-            print("landsat8")
+        # Work with Landsat 8
+        if sat.get_initials_name() == 'LC08':
+            # Unpak bands from landsat 8 
+
             up.uncompres_file(bands=[1,2,3,4,5,6,7,9,10,11])
+
+            # Stack with band [3, 4, 5, 6]
+            # Bands
+            # 3 = Green | 4 = Red | 5 = Nir | 6 = Swir1 |
+            CB.ComposeBands(input_dir=tmp_dir,
+                            output_dir=tmp_dir,
+                            output_file_name=land.get_scene_file_name()) \
+                            .stack_img(expression="LC08*_B[3-6].TIF",
+                                      extension = '.TIF')
+            # Clip
+            # Segmentation
+            # Cloud/Shadow
+                # Thinking about compose image in fuction for fmask
+
+        # Work with Landsat 5 and 7
         elif sat.is_file_from_landsat():
+            # Unpak bands from landsat 5 and 7
             up.uncompres_file(bands=[2,3,4,5])
+
+            # Stack images
+            # Bands
+            # 2 = Green | 3 = Red | 4 = Nir | 5 = Swir |
+            CB.ComposeBands(input_dir=tmp_dir,
+                            output_dir=tmp_dir,
+                            output_file_name=land.get_scene_file_name()) \
+                            .stack_img(expression="L[T,E]0[5,7]*_B[2-5].TIF",
+                                      extension = '.TIF')
+            # Clip
+
+        # Work with Sentinel2
         elif sat.is_file_from_sentinel():
+            # Unzip setinel file
             up.uncompress_zip()
 
-        # Stacking imagem to clip
-        if sat.is_file_from_sentinel():
+            # Compose bands with 10m spatial resolution
             CB.ComposeBands(input_dir=tmp_dir,
                             output_dir=od.create_output_dir(),
                             output_file_name=sent.get_output_file_name()) \
             .stack_sentinel(scene_file_name=sent.get_scene_file_name(),
                             utm_zone=sent.get_utm_zone())
+            # Clip
+            # Segmentation
+            # Cloud/Shadow
+
+
