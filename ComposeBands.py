@@ -23,8 +23,9 @@ class ComposeBands:
         """Stacking bands from landsat in tmp folder.
 
         Argument:
-            expression {str} -- Regular expression which select files who will
+            expression (str) -- Regular expression which select files who will
                                 be put in output.
+            extension (str) -- Types of extensions output file ['.TIF', '.img']
         """
         # Path where band files can be find.
         # Here, it is the input for gdal_merge.
@@ -34,7 +35,7 @@ class ComposeBands:
         output_image_path = os.path.join(self.output_dir,
                                          self.output_file_name + extension)
 
-        command = 'gdal_merge.py -separate -of HFA -co COMPRESSED=YES -o' \
+        command = 'gdal_merge.py -separate -co PHOTOMETRIC=RGB -o ' \
                   ' {output_image_path} {input_img_dir}' \
                   .format(output_image_path=output_image_path,
                           input_img_dir=input_img_dir)
