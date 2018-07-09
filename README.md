@@ -1,7 +1,7 @@
-## Rotine to preprocess satellite image to forest monitoring
+## Routine to preprocess satellite image to forest monitoring
 _______________________________________________________________________________________________
 
-The aim of this rotine is automate stepts for forest monotoring used with TerraAmazon 7 program.
+The aim of this routine is automate stepts for forest monotoring used with TerraAmazon 7 program.
 
 The main steps that it will do are:
 
@@ -11,5 +11,5 @@ The main steps that it will do are:
     4) Create pyramid of the raster.
     5) Classify cloud and shadow from raster with fmask algorithm.
     6) Segment satellite image.
-    7) Loand segmentation to draft database.
+    7) Load segmentation to draft database.
     8) Create image server
