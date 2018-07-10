@@ -1,28 +1,20 @@
 import os
-import Raster as r
 
 
 class ClipRaster(object):
 
-    def __init__(self, scene_image_name, dir_tmp_img, img_output_path_stored, img_file_name_stored):
-        # Temporary folder to put files to process and remove after that
-        self.dir_tmp_img = dir_tmp_img
+    def __init__(self):
 
-        self.file_name = scene_image_name
 
-        self.img_output_path_stored = img_output_path_stored
+    def check_if_clip(self, satellite_index, aoi_project):
+        """Verify if image have to be cliped.
 
-        # Path where band files can be find.
-        self.tmp_raw_img_path = os.path.join(self.dir_tmp_img, self.file_name)
+        Argument:
+            satellite_index (geom) -- [description]
+            aoi_project (geom) -- [description]
+        """
 
-        self.ref_img = os.path.join(self.dir_tmp_img, self.file_name+".TIF")
-        self.cut_img_vrt = os.path.join(self.dir_tmp_img, "cut_"+self.file_name)
-
-        self.file_name_stored = '{}{}'.format(img_file_name_stored, ".TIF")
-
-        self.cut_img_tif_path = os.path.join(self.img_output_path_stored,
-                                             self.file_name_stored)
-
+        pass
     def clip_raster_by_mask(self):
 
         print("........Clip raster........")
