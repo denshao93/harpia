@@ -3,12 +3,10 @@ from geomet import wkt
 import shapefile
 from osgeo import gdal
 import rasterio
-import rasterio.features
-import shapely
-import pprint
 import numpy as np
 import geo_utils as gu
-
+import rasterio.features as features
+from shapely.geometry import shape
 
 class Raster:
 
@@ -23,96 +21,29 @@ class Raster:
 
         return image
 
-    def _bounds_raster_polygon(self):
+    def bounds_raster_polygon_geom(self):
 
         # Read the input raster into a Numpy array
         infile = self.image_path
         data   = gdal.Open(infile)
         arr1    = data.ReadAsArray()
 
-        # Do some processing....
+        # Select only useless area
         arr = arr1 > 0
 
+        # Convert to 8 bits
         arr = arr.astype('uint8')
-        # Save out to a GeoTiff
-
-        # First of all, gather some information from the original file
-        [cols,rows] = arr.shape
-        trans       = data.GetGeoTransform()
-        proj        = data.GetProjection()
-        # nodatav     = data.GetNoDataValue()
-        outfile     = os.path.join("../../Documents/", "outputfile.tif")
-
-
-        shapes = rasterio.features.shapes(arr)
-        polygons = [shapely.geometry.Polygon(shape[0]["coordinates"][0]) for shape in shapes if shape[1] == 1]
-
-        # Create the file, using the information from the original file
-        outdriver = gdal.GetDriverByName("GTiff")
-        outdata   = outdriver.Create(str(outfile), rows, cols, 1, gdal.GDT_Byte)
-
-        # Write the array to the file, which is the original array in this example
-        outdata.GetRasterBand(1).WriteArray(arr)
-
-        # Set a no data value if required
-        # outdata.GetRasterBand(1).SetNoDataValue(nodatav)
-
-        # Georeference the image
-        outdata.SetGeoTransform(trans)
-
-        # Write projection information
-        outdata.SetProjection(proj)
-
-    def _bounds_raster_polygon_geom(self):
-
-        # Read the input raster into a Numpy array
-        infile = self.image_path
-        data   = gdal.Open(infile)
-        arr1    = data.ReadAsArray()
-
-        # Do some processing....
-        arr = arr1 > 0
-
-        arr = arr.astype('uint8')
-        import matplotlib.pyplot as plt
-        # plt.imshow(arr)
-        # plt.show()
 
         # Read the dataset's valid data mask as a ndarray.
         # First of all, gather some information from the original file
-        trans       = data.GetGeoTransform()
-        proj        = data.GetProjection()
-        print(proj)
+
         # Extract feature shapes and values from the array.
-        import rasterio.features as features
-        import pandas as pd
-        from geopandas import GeoDataFrame
-        from shapely.geometry import shape
-        d = {}
-        d['val']=list()
-        geometry = list()
-
-        for shp, val in features.shapes(arr):
+        for shp, val in features.shapes(arr, transform=self.read_image().affine):
             if val == 1:
-                d['val'].append(val)
-                print(shape(shp).to_wkt())
-                geometry.append(shape(shp))
-                print(val)
-            # print('%s: %s' % (val, shape(shp)))
-        df = pd.DataFrame(data=d)
-        geo_df = GeoDataFrame(df,crs={'init': 'EPSG:32624'},geometry = geometry)
-        geo_df['area'] =  geo_df.area
-        geo_df.plot()
-        plt.show()
-        print(trans)
+                trace_outline = shape(shp).to_wkt()
 
+        return trace_outline
 
-
-        # shapes = rasterio.features.shapes(arr, connectivity=8)
-        # polygons = [shapely.geometry.Polygon(shape[0]["coordinates"][0]) for shape in shapes if shape[1] == 1]
-
-        # print(wkt.dumps(shape,decimals=2))
-        # return polygons
 
     # def trace_outline_from_raster_shapefile(self):
 
@@ -139,4 +70,4 @@ if __name__ == "__main__":
 
     Raster(img_path="/media/diogocaribe/56A22ED6A22EBA7F/BRUTA/LANDSAT/" \
     "LC08_L1TP_215068_20171205_20171222_01_T1/" \
-    "LC08_L1TP_215068_20171205_20171222_01_T1_B1.TIF")._bounds_raster_polygon_geom()
+    "LC08_L1TP_215068_20171205_20171222_01_T1_B1.TIF").bounds_raster_polygon_geom()
