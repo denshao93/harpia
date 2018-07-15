@@ -45,29 +45,28 @@ class Raster:
         return trace_outline
 
 
-    # def trace_outline_from_raster_shapefile(self):
+    def trace_outline_from_raster_shapefile(self):
 
-    #     try:
-    #         vct_output = os.path.join(self.dir_img_path, "trace_outline.shp")
-    #         if os.path.isfile(vct_output) is not True:
+        try:
+            vct_output = os.path.join(self.image_path, "trace_outline.shp")
+            if os.path.isfile(vct_output) is not True:
 
-    #             command = "gdal_trace_outline {img_input} -ndv 0 -out-cs en -dp-toler 10 " \
-    #             "-ogr-out {vct_output}".format(img_input=self.image_path, vct_output=vct_output)
+                command = "gdal_trace_outline {img_input} -ndv 0 -out-cs en -dp-toler 10 " \
+                "-ogr-out {vct_output}".format(img_input=self.image_path, vct_output=vct_output)
 
-    #             os.system(command)
-    #     except Exception:
-    #         print("Problem to run gdal_trace_outline")
+                os.system(command)
+        except Exception:
+            print("Problem to run gdal_trace_outline")
 
-    # def trace_outline_raster_poly_geom(self):
+    def trace_outline_raster_poly_geom(self):
 
-    #     vector = os.path.join(self.dir_img_path, "trace_outline.shp")
+        vector = os.path.join(self.image_path, "trace_outline.shp")
 
-    #     shp_geom = gu.read_shapefile_poly(vector)
+        shp_geom = gu.read_shapefile_poly(vector)
 
-    #     return shp_geom
+        return shp_geom
 
 if __name__ == "__main__":
 
-    Raster(img_path="/media/diogocaribe/56A22ED6A22EBA7F/BRUTA/LANDSAT/" \
-    "LC08_L1TP_215068_20171205_20171222_01_T1/" \
-    "LC08_L1TP_215068_20171205_20171222_01_T1_B1.TIF").bounds_raster_polygon_geom()
+    Raster(img_path="/tmp/tmp7cqgaz25/" \
+    "LT05_L1TP_220069_20110903_20161008_01_T1.TIF").bounds_raster_polygon_geom()
