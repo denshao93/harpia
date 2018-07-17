@@ -38,19 +38,16 @@ $ bash
 mkvirtualenv -a ~/workspace/harpia harpia
 ```
 
-## Install gdal
+## Install gdal in VirtualEnvironment
 
-Gdal needs to support hdf5 format file
+Gdal needs to support hdf5 format file to gdal-segment
 
-```sudo add-apt-repository -y ppa:ubuntugis/ppa
-sudo apt update
-sudo apt upgrade
-sudo apt install gdal-bin python-gdal python3-gdal
-Suporte para o formato hdf5
-sudo apt-get install libhdf5-dev libhdf5-serial-dev
-
-sudo apt-get install dans-gdal-scripts
 ```
+sudo apt-get install libgdal-dev
+workon harpia
+pip install pygdal==2.2.3
+```
+*Obs: Pay attention to pygdal version. It need to be the same as system installed*
 
 ___________________________________________________
 
