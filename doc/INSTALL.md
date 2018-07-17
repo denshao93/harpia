@@ -17,8 +17,10 @@ mkdir ~/workspace
 
 export PATH="~/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+export WORKON_HOME=~/.ve
+export PROJECT_HOME=~/workspace
 #pyenv virtualenvwrapper_lazy
+
 
 # Open terminal
 $ source ~/.bashrc
