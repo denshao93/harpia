@@ -2,6 +2,40 @@
 
 ___________________________________________________
 
+## Install python
+```
+brew install pyenv
+brew install pyenv-virtualenv
+brew install pyenv-virtualenvwrapper
+```
+
+#Virtuaenv are in:
+```
+mkdir ~/.ve
+Project code is in:
+mkdir ~/workspace
+
+export PATH="~/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+#pyenv virtualenvwrapper_lazy
+
+# Open terminal
+$ source ~/.bashrc
+$ bash
+
+pyenv install 3.6.6
+
+pyenv global 3.6.6
+
+Remove # from pyenv virtualenvwrapper_lazy
+# Open terminal
+$ source ~/.bashrc
+$ bash
+
+mkvirtualenv -a ~/workspace/harpia harpia
+```
+
 ## Install gdal
 
 Gdal needs to support hdf5 format file
