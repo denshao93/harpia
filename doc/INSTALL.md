@@ -1,10 +1,48 @@
 # Setting enviroment
 ___________________________________________________
 
-## Install pyenv and pyenv-virtualenv
-```console
-curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+## Install dependecies
+```c
+sudo apt install curl git-core gcc make zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libssl-dev
 ```
+## Install pyenv and pyenv
+```c
+git clone https://github.com/pyenv/pyenv.git $HOME/.pyenv
+```
+## pyenv configs
+```c
+nano $HOME/.bashrc 
+```
+*Copy and paste at the end of bashrc*
+
+```c
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv 1>/dev/null 2>&1; then
+eval "$(pyenv init -)"
+fi
+```
+*Save file*
+
+```c
+source $HOME/.bashrc
+```
+
+# Install python with pyenv
+```c
+pyenv install 3.6.6
+```
+
+```c
+pyenv global 3.6.6
+```
+
+
+
+
+
+
+
 
 ## Install pyenv-virtualenvwrapper
 ```console
@@ -29,10 +67,7 @@ bash
 ```
 *Obs: With you use Linux Mint or Ubuntu you should change ~/.zshrc*
 
-## Install dependecies
-```console
-sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev
-```
+
 
 ## Install python set aside of system
 ```console
@@ -60,9 +95,9 @@ mkvirtualenv -a ~/workspace/harpia harpia
 *Gdal needs to support hdf5 format file to gdal-segment*
 
 ```
-sudo apt-get install libgdal-dev
+sudo apt-get install libgdal-dev g++ gdal-bin   
 workon harpia
-pip install pygdal==2.2.3
+pip install pygdal==2.2.3.
 
 ```
 *Obs: Pay attention to pygdal version. It need to be the same as system installed*
