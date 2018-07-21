@@ -1,11 +1,11 @@
 # Setting enviroment
 ___________________________________________________
 
-## Install dependecies
+## Install dependecies to pyenv
 ```c
 sudo apt install curl git-core gcc make zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libssl-dev
 ```
-## Install pyenv and pyenv
+## Install pyenv
 ```c
 git clone https://github.com/pyenv/pyenv.git $HOME/.pyenv
 ```
@@ -28,6 +28,11 @@ fi
 source $HOME/.bashrc
 ```
 
+## Install pyenv-virtualenv
+```c
+git clone https://github.com/yyuu/pyenv-virtualenv.git   $HOME/.pyenv/plugins/pyenv-virtualenv
+```
+
 # Install python with pyenv
 ```c
 pyenv install 3.6.6
@@ -37,53 +42,28 @@ pyenv install 3.6.6
 pyenv global 3.6.6
 ```
 
-
-
-
-
-
-
-
-## Install pyenv-virtualenvwrapper
-```console
-git clone https://github.com/yyuu/pyenv-virtualenvwrapper.git ~/.pyenv/plugins/pyenv-virtualenvwrapper
-```
-
 # Directory architecture:
-```console
+```c
 mkdir ~/.ve
-Project code is in:
+"Project code is in:"
 mkdir ~/workspace
 
 export WORKON_HOME=~/.ve
 export PROJECT_HOME=~/workspace
-eval "$(pyenv init -)"
-#pyenv virtualenvwrapper_lazy
 
 # Open terminal
-```console
+```c
 source ~/.bashrc
 bash
 ```
-*Obs: With you use Linux Mint or Ubuntu you should change ~/.zshrc*
 
+# 
+```c
+git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper
 
-
-## Install python set aside of system
-```console
-pyenv install 3.6.7
-
-# Set python env as global 
-pyenv global 3.6.7
+"Is necessary to do it?"
+pyenv virtualenvwrapper
 ```
-
-# Remove # from pyenv virtualenvwrapper_lazy
-*Open terminal*
-```console
-source ~/.
-bash
-```
-*Obs: With you use Linux Mint or Ubuntu you should change ~/.zshrc*
 
 # Connect workspace to virtual environment
 ```
@@ -95,15 +75,12 @@ mkvirtualenv -a ~/workspace/harpia harpia
 *Gdal needs to support hdf5 format file to gdal-segment*
 
 ```
-sudo apt-get install libgdal-dev g++ gdal-bin   
+sudo apt-get install libgdal-dev g++ gdal-bin python-gdal python3-gdal
 workon harpia
 pip install pygdal==2.2.3.
-
 ```
 *Obs: Pay attention to pygdal version. It need to be the same as system installed*
-
 ___________________________________________________
-
 ## Install OpenCV
 
 ```sudo apt-get install build-essential
