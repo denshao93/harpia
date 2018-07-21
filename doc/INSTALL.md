@@ -57,7 +57,7 @@ source ~/.bashrc
 bash
 ```
 
-# 
+# Install virtualenvwrapper
 ```c
 git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper
 
