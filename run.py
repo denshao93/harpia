@@ -2,13 +2,14 @@ import os #NOQA
 import sys
 import glob
 import tempfile #NOQA
-import ComposeBands as CB
+import ClipRaster as CR
 import UnpackFile as UF
-import LandsatFileInfo as LFI
-import SatelliteFileInfo as SFI
-import SentinelFileInfo as SFI
+import ComposeBands as CB
 import CbersFileInfo as CFI
+import LandsatFileInfo as LFI
+import SentinelFileInfo as SEI
 import OrganizeDirectory as OD
+import SatelliteFileInfo as SFI
 
 
 if __name__ == "__main__":
@@ -33,14 +34,16 @@ if __name__ == "__main__":
             for f in f_]
 
     for file_path in files:
+        
+        print(file_path)
 
         # Create tmp director to put all temp files
         tmp_dir = tempfile.mkdtemp()
-
+        
         # Create instance of landsat file where scene features are
         sat = SFI.SatelliteFileInfo(file_path)
         land = LFI.LandsatFileInfo(file_path)
-        sent = SFI.SentinelFileInfo(file_path)
+        sent = SEI.SentinelFileInfo(file_path)
         cbers = CFI.CbersFileInfo(file_path)
 
         # Create director where files will be saved
@@ -72,8 +75,8 @@ if __name__ == "__main__":
                     file_name=cbers.get_scene_file_name()[:-6])
 
         # Create directory to save results
-        od.create_output_dir()
-        
+        output_dir = od.create_output_dir()
+
         # Cbers4
         if sat.is_file_from_cbers4():
             exp = f"{sys.argv[1]}/*/{cbers.get_scene_file_name()[:-6]}*.zip"
@@ -86,11 +89,15 @@ if __name__ == "__main__":
             expression = f"CBERS*BAND[{bands_expression}].tif"
             CB.ComposeBands(input_dir=tmp_dir,
                             output_dir=tmp_dir,
-                            output_file_name=cbers.get_scene_file_name()[:-6]) \
+                            output_file_name=cbers.get_output_file_name())\
                             .stack_img(expression=expression,
                                        extension = '.TIF')
             # Clip
-
+            img_path = f"{tmp_dir}/r{cbers.get_output_file_name()}.TIF"
+            CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
+                          scene_file_name=cbers.get_scene_file_name()[:-6],
+                          output_dir = output_dir, 
+                          output_file_name = cbers.get_output_file_name()).run_clip()
             # Segmentation
             # Cloud/Shadow
             continue
@@ -109,6 +116,11 @@ if __name__ == "__main__":
             .stack_sentinel(scene_file_name=sent.get_scene_file_name(),
                             utm_zone=sent.get_utm_zone())
             # Clip
+            img_path = f"{tmp_dir}/r{sent.get_output_file_name()}.TIF"
+            CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
+                          scene_file_name=sent.get_scene_file_name(),
+                          output_dir = output_dir, 
+                          output_file_name = sent.get_output_file_name()).run_clip()
             # Segmentation
             # Cloud/Shadow
             continue
@@ -120,10 +132,6 @@ if __name__ == "__main__":
             # Stack images
             # Bands: 3 = Green | 4 = Red | 5 = Nir | 6 = Swir1 |
             bands_expression = '3-6'
-            # Clip
-            # Segmentation
-            # Cloud/Shadow
-                # Thinking about compose image in fuction for fmask
 
         # Work with Landsat 5 and 7
         elif sat.is_file_from_landsat():
@@ -145,3 +153,12 @@ if __name__ == "__main__":
                         output_file_name=land.get_scene_file_name()) \
                         .stack_img(expression=expression,
                                 extension = '.TIF')
+        # Clip
+        # Segmentation
+        # Cloud/Shadow
+            # Thinking about compose image in fuction for fmask
+        img_path = f"{tmp_dir}/{land.get_scene_file_name()}.TIF"
+        CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
+                        scene_file_name=land.get_scene_file_name(),
+                        output_dir = output_dir, 
+                        output_file_name = land.get_scene_file_name()).run_clip()
