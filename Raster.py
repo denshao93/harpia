@@ -21,7 +21,7 @@ class Raster:
 
         return image
 
-    def teste(self):
+    def trace_outline_from_raster_wkt(self):
 
         with rasterio.open(self.image_path) as dataset:
 
@@ -33,39 +33,15 @@ class Raster:
                     mask, transform=dataset.transform):
 
                 # Transform shapes from the dataset's own coordinate
-                # reference system to CRS84 (EPSG:4326).
+                # reference system to SIRGAS 2000 (EPSG:4674).
                 geom = rasterio.warp.transform_geom(
                     dataset.crs, 'EPSG:4674', geom, precision=6)
 
-                    # Print GeoJSON shapes to stdout.
+                # Print Polygon Wkt shapes to stdout.
                 trace_outline = shape(geom).to_wkt()
 
                 return trace_outline
                 
-    def bounds_raster_polygon_geom(self):
-
-        # Read the input raster into a Numpy array
-        infile = self.image_path
-        data   = gdal.Open(infile)
-        arr1    = data.ReadAsArray()
-
-        # Select only useless area
-        arr = arr1 > 0
-
-        # Convert to 8 bits
-        arr = arr.astype('uint8')
-
-        # Read the dataset's valid data mask as a ndarray.
-        # First of all, gather some information from the original file
-
-        # Extract feature shapes and values from the array.
-        for shp, val in features.shapes(arr, transform=self.read_image().affine):
-            if val == 1:
-                trace_outline = shape(shp).to_wkt()
-
-        return trace_outline
-
-
     def trace_outline_from_raster_shapefile(self):
 
         try:
@@ -89,4 +65,6 @@ class Raster:
 
 if __name__ == "__main__":
 
-    Raster(img_path="/tmp/tmp2qtqk6i6/LC08_L1TP_215068_20171205_20171222_01_T1.TIF").teste()
+    Raster(img_path=f"/tmp/tmp2qtqk6i6/" \
+                    f"LC08_L1TP_215068_20171205_20171222_01_T1.TIF")\
+                    .trace_outline_from_raster_wkt()
