@@ -1,6 +1,7 @@
 import os
 import Raster as R
 import geo_utils as gu
+from shapely import wkt
 
 
 class ClipRaster:
@@ -18,12 +19,13 @@ class ClipRaster:
             satellite_index (geom) -- [description]
             aoi_project (geom) -- [description]
         """
-        ba_line = gu.read_shapefile_poly("/home/diogocaribe/Projetos/Harpia/vector/ba_4674_buffer.shp")
-        trace_outline = R.Raster(self.image_path)
+        ba_line = gu.read_shapefile_poly("/home/diogocaribe/workspace/harpia/vector/ba_4674_line.shp")
+        trace_outline = R.Raster(self.image_path).trace_outline_from_raster_wkt()
+        trace_outline = wkt.loads(trace_outline)
 
-        print(ba_line)
-        print(trace_outline)
-        return 'oi'
+        check_intersects = trace_outline.intersects(ba_line)
+
+        return check_intersects
 
     # def clip_raster_by_mask(self):
 
@@ -54,5 +56,6 @@ class ClipRaster:
 
 if __name__ == "__main__":
 
-    ClipRaster(img_path="/tmp/tmp7cqgaz25/" \
-    "LT05_L1TP_220069_20110903_20161008_01_T1.TIF").check_img_will_be_cliped()
+    ClipRaster(img_path=f"/tmp/tmp2qtqk6i6/" \
+                        f"LC08_L1TP_215068_20171205_20171222_01_T1.TIF")\
+                        .check_img_will_be_cliped()
