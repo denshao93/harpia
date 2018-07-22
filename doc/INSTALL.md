@@ -17,10 +17,10 @@ git clone https://github.com/pyenv/pyenv.git $HOME/.pyenv
 ## pyenv configs
 
 ```c
-nano $HOME/.bashrc 
+nano $HOME/.bashrc
 ```
 
-*Copy and paste at the end of bashrc*
+Copy and paste at the end of bashrc
 
 ```c
 export PYENV_ROOT="$HOME/.pyenv"
@@ -30,7 +30,7 @@ eval "$(pyenv init -)"
 fi
 ```
 
-*Save file*
+Save file
 
 ```c
 source $HOME/.bashrc
@@ -52,7 +52,7 @@ pyenv install 3.6.6
 pyenv global 3.6.6
 ```
 
-## Directory architecture:
+## Directory architecture
 
 ```c
 mkdir ~/.ve
@@ -92,7 +92,7 @@ mkvirtualenv -a ~/workspace/harpia harpia
 
 ## Install gdal in VirtualEnvironment
 
-*Gdal needs to support hdf5 format file to gdal-segment*
+Gdal needs to support hdf5 format file to gdal-segment
 
 ```c
 
@@ -102,7 +102,7 @@ pip install pygdal==2.2.3.
 
 ```
 
-*Obs: Pay attention to pygdal version. It need to be the same as system installed*
+Obs: Pay attention to pygdal version. It need to be the same as system installed
 ___________________________________________________
 
 ## Install OpenCV
