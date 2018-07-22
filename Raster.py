@@ -1,8 +1,8 @@
 import os
-from geomet import wkt
 import shapefile
 from osgeo import gdal
 import rasterio
+import rasterio.warp
 import numpy as np
 import geo_utils as gu
 import rasterio.features as features
@@ -21,6 +21,33 @@ class Raster:
 
         return image
 
+    def teste(self):
+
+        with rasterio.open(self.image_path) as dataset:
+
+            # Read the dataset's valid data mask as a ndarray.
+            mask = dataset.dataset_mask()
+            
+            # Extract feature shapes and values from the array.
+            for geom, val in rasterio.features.shapes(
+                    mask, transform=dataset.transform):
+
+                # Transform shapes from the dataset's own coordinate
+                # reference system to CRS84 (EPSG:4326).
+                geom = rasterio.warp.transform_geom(
+                    dataset.crs, 'EPSG:4674', geom, precision=6)
+
+                    # Print GeoJSON shapes to stdout.
+                trace_outline = shape(geom).to_wkt()
+                from shapely.wkt import loads
+                from geopandas import GeoSeries
+                gs = GeoSeries([loads(trace_outline)])
+                gs.plot()
+                import matplotlib.pyplot as plt
+                plt.show()
+
+                return trace_outline
+                
     def bounds_raster_polygon_geom(self):
 
         # Read the input raster into a Numpy array
@@ -68,5 +95,4 @@ class Raster:
 
 if __name__ == "__main__":
 
-    Raster(img_path="/tmp/tmp7cqgaz25/" \
-    "LT05_L1TP_220069_20110903_20161008_01_T1.TIF").bounds_raster_polygon_geom()
+    Raster(img_path="/tmp/tmp2qtqk6i6/LC08_L1TP_215068_20171205_20171222_01_T1.TIF").teste()
