@@ -78,7 +78,6 @@ if __name__ == "__main__":
             for i in glob.glob(exp):
                 up = UF.UnpackFile(file_path=i, tmp_dir=tmp_dir)
                 up.uncompress_zip()
-            
             # Stack images
             # Bands: 6 = Blue | 6 = Green | 7 = Red | 8 = Nir |
             bands_expression = '5-8'
