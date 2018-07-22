@@ -48,6 +48,7 @@ mkdir ~/.ve
 "Project code is in:"
 mkdir ~/workspace
 
+pyenv virtualenvwrapper_lazy
 export WORKON_HOME=~/.ve
 export PROJECT_HOME=~/workspace
 
