@@ -29,7 +29,7 @@ class Raster:
             mask = dataset.dataset_mask()
             
             # Extract feature shapes and values from the array.
-            for geom, val in rasterio.features.shapes( #NOQA
+            for geom, val in rasterio.features.shapes(
                     mask, transform=dataset.transform):
 
                 # Transform shapes from the dataset's own coordinate
