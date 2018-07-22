@@ -27,8 +27,10 @@ if __name__ == "__main__":
 
     # Create list of zip and tar.gz files from folder where they are store.
     files = [f for f_ in [glob.glob(e)
-             for e in (sys.argv[1]+'/*/*.zip', sys.argv[1]+'/*/*.tar.gz')]
-             for f in f_]
+            for e in (sys.argv[1]+'/*/S2A*.zip',
+                      sys.argv[1]+'/*/CBERS*BAND5.zip', 
+                      sys.argv[1]+'/*/L*.tar.gz')]
+            for f in f_]
 
     for file_path in files:
 
@@ -88,6 +90,7 @@ if __name__ == "__main__":
                             .stack_img(expression=expression,
                                        extension = '.TIF')
             # Clip
+
             # Segmentation
             # Cloud/Shadow
             continue
