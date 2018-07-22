@@ -78,12 +78,20 @@ if __name__ == "__main__":
             for i in glob.glob(exp):
                 up = UF.UnpackFile(file_path=i, tmp_dir=tmp_dir)
                 up.uncompress_zip()
-            continue
-            # Compose bands
+            
+            # Stack images
+            # Bands: 6 = Blue | 6 = Green | 7 = Red | 8 = Nir |
+            bands_expression = '5-8'
+            expression = f"CBERS*BAND[{bands_expression}].tif"
+            CB.ComposeBands(input_dir=tmp_dir,
+                            output_dir=tmp_dir,
+                            output_file_name=cbers.get_scene_file_name()[:-6]) \
+                            .stack_img(expression=expression,
+                                       extension = '.TIF')
             # Clip
             # Segmentation
             # Cloud/Shadow
-        
+            continue
         # Create objet to unpack files
         up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
 
