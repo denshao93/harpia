@@ -7,6 +7,7 @@ import UnpackFile as UF
 import LandsatFileInfo as LFI
 import SatelliteFileInfo as SFI
 import SentinelFileInfo as SFI
+import CbersFileInfo as CFI
 import OrganizeDirectory as OD
 
 
@@ -38,6 +39,7 @@ if __name__ == "__main__":
         sat = SFI.SatelliteFileInfo(file_path)
         land = LFI.LandsatFileInfo(file_path)
         sent = SFI.SentinelFileInfo(file_path)
+        cbers = CFI.CbersFileInfo(file_path)
 
         # Create director where files will be saved
         if sat.is_file_from_landsat():
@@ -58,9 +60,30 @@ if __name__ == "__main__":
                     month=str(sent.get_aquisition_date().month),
                     file_name=sent.get_scene_file_name())
 
+        elif sat.is_file_from_cbers4():
+            od = OD.OrganizeDirectory(
+                    root_dir_path=sys.argv[2],
+                    satellite_name=sat.get_initials_name().upper(),
+                    satellite_index=''.join(cbers.get_index()),
+                    year=str(cbers.get_aquisition_date().year),
+                    month=str(cbers.get_aquisition_date().month),
+                    file_name=cbers.get_scene_file_name()[:-6])
+
         # Create directory to save results
         od.create_output_dir()
-
+        
+        # Cbers4
+        if sat.is_file_from_cbers4():
+            exp = f"{sys.argv[1]}/*/{cbers.get_scene_file_name()[:-6]}*.zip"
+            for i in glob.glob(exp):
+                up = UF.UnpackFile(file_path=i, tmp_dir=tmp_dir)
+                up.uncompress_zip()
+            continue
+            # Compose bands
+            # Clip
+            # Segmentation
+            # Cloud/Shadow
+        
         # Create objet to unpack files
         up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
 
@@ -79,7 +102,7 @@ if __name__ == "__main__":
             # Segmentation
             # Cloud/Shadow
             continue
-
+        
         # Work with Landsat 8
         elif sat.get_initials_name() == 'LC08':
             # Set bands to unpack from landsat 8

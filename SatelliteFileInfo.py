@@ -36,9 +36,11 @@ class SatelliteFileInfo:
 
             if self.is_file_from_landsat():
                 return self.get_scene_file_name()[:4]
-            elif self.is_file_from_sentinel:
+            elif self.is_file_from_sentinel():
                 return self.get_scene_file_name()[:3]
-
+            elif self.is_file_from_cbers4():
+                return self.get_scene_file_name()[:5]
+                
         except Exception:
             print("Satellite type not found")
 
@@ -48,4 +50,8 @@ class SatelliteFileInfo:
 
     def is_file_from_sentinel(self):
         """Check if file is from sentinel satellite."""
-        return self.get_scene_file_name().startswith("S")
+        return self.get_scene_file_name().startswith("S2")
+    
+    def is_file_from_cbers4(self):
+        """Check if file is from sentinel satellite."""
+        return self.get_scene_file_name().startswith("CB")
