@@ -39,12 +39,6 @@ class Raster:
 
                     # Print GeoJSON shapes to stdout.
                 trace_outline = shape(geom).to_wkt()
-                from shapely.wkt import loads
-                from geopandas import GeoSeries
-                gs = GeoSeries([loads(trace_outline)])
-                gs.plot()
-                import matplotlib.pyplot as plt
-                plt.show()
 
                 return trace_outline
                 
