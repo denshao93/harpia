@@ -54,7 +54,9 @@ class ClipRaster:
                 "COMPRESS": 'LZW',
                 "PHOTOMETRIC": 'RGB'})
         with rasterio.open(f"{self.output_dir}/{self.output_file_name}.TIF", "w", **out_meta) as dest:
-            dest.write(out_image)
+            # Set order bands to save (NIR/GREEN/RED/BLUE)
+            # This bands not the same in LC08
+            dest.write(out_image, [4,3,2,1]) 
 
    
     def reproject_raster_to_epsg4674(self):
