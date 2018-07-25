@@ -85,7 +85,7 @@ if __name__ == "__main__":
                 up = UF.UnpackFile(file_path=i, tmp_dir=tmp_dir)
                 up.uncompress_zip()
             # Stack images
-            # Bands: 6 = Blue | 6 = Green | 7 = Red | 8 = Nir |
+            # Bands: 5 = Blue | 6 = Green | 7 = Red | 8 = Nir |
             bands_expression = '5-8'
             expression = f"CBERS*BAND[{bands_expression}].tif"
             CB.ComposeBands(input_dir=tmp_dir,
@@ -98,7 +98,8 @@ if __name__ == "__main__":
             CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
                           scene_file_name=cbers.get_scene_file_name()[:-6],
                           output_dir = output_dir, 
-                          output_file_name = cbers.get_output_file_name()).run_clip()
+                          output_file_name = cbers.get_output_file_name())\
+                          .run_clip(band_order=[4,3,2,1])
             # Segmentation
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
@@ -107,6 +108,7 @@ if __name__ == "__main__":
         up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
 
         # Work with Sentinel2
+        # Bands: 2 = Blue | 3 = Green | 4 = Red | 8 = Nir |
         if sat.is_file_from_sentinel():
             # Unzip setinel file
             up.uncompress_zip()
@@ -122,7 +124,8 @@ if __name__ == "__main__":
             CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
                           scene_file_name=sent.get_scene_file_name(),
                           output_dir = output_dir, 
-                          output_file_name = sent.get_output_file_name()).run_clip()
+                          output_file_name = sent.get_output_file_name())\
+                          .run_clip(band_order=[4,3,2,1])
             # Segmentation
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
@@ -135,6 +138,8 @@ if __name__ == "__main__":
             # Stack images
             # Bands: 3 = Green | 4 = Red | 5 = Nir | 6 = Swir1 |
             bands_expression = '3-6'
+            # Clip 
+            band_order = [3,2,1,4]
 
         # Work with Landsat 5 and 7
         elif sat.is_file_from_landsat():
@@ -144,6 +149,7 @@ if __name__ == "__main__":
             # Bands: 2 = Green | 3 = Red | 4 = Nir | 5 = Swir |
             bands_expression = '2-5'
             # Clip
+            band_order = [3,2,1,4]
 
         # Unpack files from landsat
         up.uncompres_file(bands)
@@ -164,5 +170,6 @@ if __name__ == "__main__":
         CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
                         scene_file_name=land.get_scene_file_name(),
                         output_dir = output_dir, 
-                        output_file_name = land.get_output_file_name()).run_clip()
+                        output_file_name = land.get_output_file_name())\
+                        .run_clip(band_order=band_order)
         shutil.rmtree(tmp_dir)
