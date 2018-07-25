@@ -54,8 +54,8 @@ class CbersFileInfo(SatelliteFileInfo):
                     '{month}' \
                     '{day}'.format(
                             year=self.get_aquisition_date().year,
-                            month=self.get_aquisition_date().month,
-                            day=self.get_aquisition_date().day)
+                            month=f"{self.get_aquisition_date():%m}",
+                            day=f"{self.get_aquisition_date():%d}")
 
         output_name = '{satellite}_' \
                       '{index}_' \
