@@ -35,7 +35,7 @@ class ComposeBands:
         output_image_path = os.path.join(self.output_dir,
                                          self.output_file_name + extension)
 
-        command = 'gdal_merge.py -separate -co -a_nodata 0 -o ' \
+        command = 'gdal_merge.py -separate -a_nodata 0 -o ' \
                   ' {output_image_path} {input_img_dir}' \
                   .format(output_image_path=output_image_path,
                           input_img_dir=input_img_dir)
@@ -58,7 +58,7 @@ class ComposeBands:
         os.chdir(path)
         command = 'gdal_translate SENTINEL2_L1C:{scene_file_name}.SAFE/' \
                   'MTD_MSIL1C.xml:10m:EPSG_327{utm_zone} -ot Byte -scale -co PHOTOMETRIC=RGB ' \
-                  '{output_file_name}.TIF -a_nodata 0 --config ' \
+                  '{output_file_name}.TIF -a_nodata 0 -co "ALPHA=NO" --config ' \
                   'GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS 6 ' \
                   '-b 4 -b 3 -b 2 -b 1 -co COMPRESS=DEFLATE' \
                   .format(scene_file_name=scene_file_name,
@@ -66,15 +66,3 @@ class ComposeBands:
                           output_file_name = self.output_file_name)
 
         os.system(command)
-
-    # def run_image_composition(self):
-
-    #     # Stacking image to cloud/shadow
-    #     self.stack_img(output_image_path=self.dir_tmp_img,
-    #                    output_image_name="ref.img",
-    #                    expression="LC08*_B[1-7,9].TIF")
-    #     self.stack_img(self.dir_tmp_img, "thermal.img", "LC08*_B1[0,1].TIF")
-
-    #     # Stacking imagem to clip
-    #     self.stack_img(self.dir_tmp_img, self.file_name + ".TIF",
-    #                    expression="LC08*_B[3-6].TIF")
