@@ -150,7 +150,7 @@ if __name__ == "__main__":
                     .format(bands_expression=bands_expression)
         CB.ComposeBands(input_dir=tmp_dir,
                         output_dir=tmp_dir,
-                        output_file_name=land.get_scene_file_name()) \
+                        output_file_name=land.get_output_file_name()) \
                         .stack_img(expression=expression,
                                 extension = '.TIF')
         # Clip
