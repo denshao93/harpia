@@ -38,10 +38,7 @@ class ClipRaster:
 
         return check_intersects
 
-    def clip_raster_by_mask(self, band_order):
-        """
-        band_order = ex. [4,3,2,1]
-        """
+    def clip_raster_by_mask(self):
         
         with fiona.open("/home/diogocaribe/workspace/harpia/vector/ba_4674_buffer.shp", "r") as shapefile:
             features = [feature["geometry"] for feature in shapefile]
@@ -72,6 +69,9 @@ class ClipRaster:
         os.system(command)
 
 
-    def run_clip(self):
+    def run_clip(self, band_order):
+        """
+        band_order = ex. [4,3,2,1]
+        """
         self.reproject_raster_to_epsg4674()
-        self.clip_raster_by_mask()
+        self.clip_raster_by_mask(band_order)
