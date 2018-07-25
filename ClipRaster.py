@@ -49,7 +49,10 @@ class ClipRaster:
         out_meta.update({"driver": "GTiff",
                 "height": out_image.shape[1],
                 "width": out_image.shape[2],
-                "transform": out_transform})
+                "transform": out_transform,
+                "alpha": 'NO',
+                "COMPRESS": 'LZW',
+                "PHOTOMETRIC": 'RGB'})
         with rasterio.open(f"{self.output_dir}/{self.output_file_name}.TIF", "w", **out_meta) as dest:
             dest.write(out_image)
 
@@ -57,34 +60,13 @@ class ClipRaster:
     def reproject_raster_to_epsg4674(self):
 
         command =   f"gdalwarp -t_srs EPSG:4674 -multi -dstnodata 0 "\
+                    f" --config GDAL_CACHEMAX 500 -wm 500 "\
                     f"{self.tmp_dir}/{self.output_file_name}.TIF "\
                     f"{self.tmp_dir}/r{self.output_file_name}.TIF"
 
         os.system(command)
 
-    def cut_gdal(self):
-        
-        vector = "/home/diogocaribe/workspace/harpia/vector/ba_4674_buffer.shp"
-
-        command = f"gdalwarp -cutline {vector} -crop_to_cutline -multi " \
-                  f"-dstnodata 0 {self.tmp_dir}/r{self.output_file_name}.TIF "\
-                  f"{self.tmp_dir}/c{self.output_file_name}.TIF"
-        
-        os.system(command)
-
-    def compress_save_output_raster(self):
-        
-        command = f"gdal_translate -ot Byte -scale -co compress=DEFLATE -b 4 -b 3 -b 2 -b 1"\
-                  f"-multi -a_nodata 0 {self.tmp_dir}/c{self.output_file_name}.TIF "\
-                  f"{self.output_dir}/{self.output_file_name}.TIF"
-        
-        os.system(command)
-
-    def run_clip_(self):
-        self.reproject_raster_to_epsg4674()
-        self.clip_raster_by_mask()
 
     def run_clip(self):
         self.reproject_raster_to_epsg4674()
-        self.cut_gdal()
-        self.compress_save_output_raster()
+        self.clip_raster_by_mask()
