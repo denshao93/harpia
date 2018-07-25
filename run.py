@@ -1,6 +1,7 @@
 import os #NOQA
 import sys
 import glob
+import shutil
 import tempfile #NOQA
 import ClipRaster as CR
 import UnpackFile as UF
@@ -100,6 +101,7 @@ if __name__ == "__main__":
                           output_file_name = cbers.get_output_file_name()).run_clip()
             # Segmentation
             # Cloud/Shadow
+            shutil.rmtree(tmp_dir)
             continue
         # Create objet to unpack files
         up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
@@ -123,6 +125,7 @@ if __name__ == "__main__":
                           output_file_name = sent.get_output_file_name()).run_clip()
             # Segmentation
             # Cloud/Shadow
+            shutil.rmtree(tmp_dir)
             continue
         
         # Work with Landsat 8
@@ -162,3 +165,4 @@ if __name__ == "__main__":
                         scene_file_name=land.get_scene_file_name(),
                         output_dir = output_dir, 
                         output_file_name = land.get_output_file_name()).run_clip()
+        shutil.rmtree(tmp_dir)
