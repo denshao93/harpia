@@ -161,4 +161,4 @@ if __name__ == "__main__":
         CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
                         scene_file_name=land.get_scene_file_name(),
                         output_dir = output_dir, 
-                        output_file_name = land.get_scene_file_name()).run_clip()
+                        output_file_name = land.get_output_file_name()).run_clip()
