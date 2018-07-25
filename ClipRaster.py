@@ -38,7 +38,10 @@ class ClipRaster:
 
         return check_intersects
 
-    def clip_raster_by_mask(self):
+    def clip_raster_by_mask(self, band_order):
+        """
+        band_order = ex. [4,3,2,1]
+        """
         
         with fiona.open("/home/diogocaribe/workspace/harpia/vector/ba_4674_buffer.shp", "r") as shapefile:
             features = [feature["geometry"] for feature in shapefile]
@@ -56,7 +59,7 @@ class ClipRaster:
         with rasterio.open(f"{self.output_dir}/{self.output_file_name}.TIF", "w", **out_meta) as dest:
             # Set order bands to save (NIR/GREEN/RED/BLUE)
             # This bands not the same in LC08
-            dest.write(out_image, [4,3,2,1]) 
+            dest.write(out_image, band_order) 
 
    
     def reproject_raster_to_epsg4674(self):
