@@ -1,11 +1,12 @@
 import os
 import fiona
 import rasterio
+import numpy as np
 import Raster as R
 import rasterio.mask
 import geo_utils as gu
 from shapely import wkt
-
+from rasterio.warp import calculate_default_transform, reproject, Resampling
 
 class ClipRaster:
 
@@ -68,7 +69,7 @@ class ClipRaster:
 
         os.system(command)
 
-
+    
     def run_clip(self, band_order):
         """
         band_order = ex. [4,3,2,1]
