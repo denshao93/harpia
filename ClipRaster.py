@@ -38,7 +38,7 @@ class ClipRaster:
 
         return check_intersects
 
-    def clip_raster_by_mask(self):
+    def clip_raster_by_mask(self, band_order):
         
         with fiona.open("/home/diogocaribe/workspace/harpia/vector/ba_4674_buffer.shp", "r") as shapefile:
             features = [feature["geometry"] for feature in shapefile]
