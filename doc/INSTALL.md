@@ -66,8 +66,7 @@ mkdir ~/workspace
 
 git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper
 
-"Is necessary to do it?"
-pyenv virtualenvwrapper
+pip install virtualenv virtualenvwrapper
 
 ```
 
@@ -76,9 +75,13 @@ pyenv virtualenvwrapper
 ```c
 nano $HOME/.bashrc
 
-pyenv virtualenvwrapper_lazy
 export WORKON_HOME=~/.ve
 export PROJECT_HOME=~/workspace
+pyenv virtualenvwrapper_lazy
+
+
+Save file
+
 source ~/.bashrc
 bash
 
@@ -102,7 +105,7 @@ Gdal needs to support hdf5 format file to gdal-segment
 
 sudo apt-get install libgdal-dev g++ gdal-bin python-gdal python3-gdal
 workon harpia
-pip install pygdal==2.2.3.
+pip install pygdal==2.2.3
 
 ```
 
