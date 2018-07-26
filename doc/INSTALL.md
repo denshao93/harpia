@@ -58,17 +58,6 @@ pyenv global 3.6.6
 mkdir ~/.ve
 "Project code is in:"
 mkdir ~/workspace
-
-pyenv virtualenvwrapper_lazy
-export WORKON_HOME=~/.ve
-export PROJECT_HOME=~/workspace
-
-# Open terminal
-```c
-
-source ~/.bashrc
-bash
-
 ```
 
 ## Install virtualenvwrapper
@@ -81,6 +70,21 @@ git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plu
 pyenv virtualenvwrapper
 
 ```
+
+
+# Open terminal
+```c
+nano $HOME/.bashrc
+
+pyenv virtualenvwrapper_lazy
+export WORKON_HOME=~/.ve
+export PROJECT_HOME=~/workspace
+source ~/.bashrc
+bash
+
+```
+
+
 
 ## Connect workspace to virtual environment
 
