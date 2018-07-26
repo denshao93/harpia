@@ -4,6 +4,7 @@ import glob
 import shutil
 import tempfile #NOQA
 import ClipRaster as CR
+import PyramidRaster as PR
 import UnpackFile as UF
 import ComposeBands as CB
 import CbersFileInfo as CFI
@@ -100,6 +101,9 @@ if __name__ == "__main__":
                           output_dir = output_dir, 
                           output_file_name = cbers.get_output_file_name())\
                           .run_clip(band_order=[4,3,2,1])
+            # Make pyramid
+            img_path = os.path.join(output_dir, f"{cbers.get_output_file_name()}.TIF")
+            PR.PyramidRaster(img_path=img_path).create_img_pyramid()
             # Segmentation
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
@@ -126,6 +130,9 @@ if __name__ == "__main__":
                           output_dir = output_dir, 
                           output_file_name = sent.get_output_file_name())\
                           .run_clip(band_order=[4,3,2,1])
+            # Make pyramid
+            img_path = os.path.join(output_dir, f"{sent.get_output_file_name()}.TIF")
+            PR.PyramidRaster(img_path=img_path).create_img_pyramid()
             # Segmentation
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
@@ -163,13 +170,16 @@ if __name__ == "__main__":
                         .stack_img(expression=expression,
                                 extension = '.TIF')
         # Clip
-        # Segmentation
-        # Cloud/Shadow
-            # Thinking about compose image in fuction for fmask
         img_path = f"{tmp_dir}/{land.get_scene_file_name()}.TIF"
         CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
                         scene_file_name=land.get_scene_file_name(),
                         output_dir = output_dir, 
                         output_file_name = land.get_output_file_name())\
                         .run_clip(band_order=band_order)
+        # Make pyramid
+        img_path = os.path.join(output_dir, f"{land.get_output_file_name()}.TIF")
+        PR.PyramidRaster(img_path=img_path).create_img_pyramid()
+        # Segmentation
+        # Cloud/Shadow
+            # Thinking about compose image in fuction for fmask
         shutil.rmtree(tmp_dir)
