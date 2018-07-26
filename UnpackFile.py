@@ -84,20 +84,3 @@ class UnpackFile:
             self.unpack_landsat(bands)
         elif zipfile.is_zipfile(self.file_path):
             self.uncompress_zip()
-
-    def check_correct_uncompressed_targz(self):
-        """Check if there is .tif files into tmp folder.
-
-        Return:
-            [boolean] -- If False the uncompresstion was done corretly
-        """
-        return len(glob('{}{}'.format(self.tmp_dir, "/*.TIF"))) > 0
-
-    def move_file_2_right_folder(self):
-        """Move files to folder named as scene file in tmp folder."""
-        file_name = u.get_base_name(self.file_path).split('.')[0]
-        files = os.listdir(self.tmp_dir)
-        os.mkdir('{}/{}'.format(self.tmp_dir, file_name))
-        dst_folder = '{}/{}'.format(self.tmp_dir, file_name)
-        for f in files:
-            shutil.move(self.tmp_dir+"/"+f, dst_folder)
