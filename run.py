@@ -162,8 +162,7 @@ if __name__ == "__main__":
         up.uncompres_file(bands)
 
         # Stack bands from landsat
-        expression = "L[C,T,E]0[5,7,8]*_B[{bands_expression}].TIF" \
-                    .format(bands_expression=bands_expression)
+        expression = f"L[C,T,E]0[5,7,8]*_B[{bands_expression}].TIF"
         CB.ComposeBands(input_dir=tmp_dir,
                         output_dir=tmp_dir,
                         output_file_name=land.get_output_file_name()) \
