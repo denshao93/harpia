@@ -62,8 +62,10 @@ class ClipRaster:
    
     def reproject_raster_to_epsg4674(self):
 
-        command =   f"gdalwarp -t_srs EPSG:4674 -multi -dstnodata 0 "\
-                    f" --config GDAL_CACHEMAX 500 -wm 500 "\
+        print("......Repojecting......")
+
+        command =   f"gdalwarp -t_srs EPSG:4674 -wo NUM_THREADS=ALL_CPUS -dstnodata 0 "\
+                    f"-wo SOURCE_EXTRA=1000 --config GDAL_CACHEMAX 500 -wm 500 "\
                     f"{self.tmp_dir}/{self.output_file_name}.TIF "\
                     f"{self.tmp_dir}/r{self.output_file_name}.TIF"
 
