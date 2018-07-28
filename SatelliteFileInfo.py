@@ -16,7 +16,6 @@ class SatelliteFileInfo:
         The file used to being processed comes from Landsat satellite,
         CBERS4 and Sentinel2.
         """
-        
         self.file_path = file_path
 
     def get_scene_file_name(self):
@@ -61,15 +60,12 @@ class SatelliteFileInfo:
         except Exception:
             print("Satellite not found.")
 
-
     def get_parameter_from_satellite(self):
         """Dictionary to cadastrete satellite features.
         
         This method return dictionary where basic parameters of file 
         can be capture.
-
         """
-
         dict = {
                 # Landsat
                 "landsat": 
