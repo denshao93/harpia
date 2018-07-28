@@ -44,18 +44,18 @@ if __name__ == "__main__":
 
         # Create director where files will be saved
         od = OD.OrganizeDirectory(root_dir_path=sys.argv[2],
-                satellite_name=sat.get_parameter_from_satellite()["initials_name"],
-                satellite_index=sat.get_parameter_from_satellite()["index"],
-                year=sat.get_parameter_from_satellite()["aquisition_year"],
-                month=sat.get_parameter_from_satellite()["aquisition_month"],
-                file_name=sat.get_parameter_from_satellite()["scene_file_name"])
+                satellite_name=sat.get_parameter_satellite()["initials_name"],
+                satellite_index=sat.get_parameter_satellite()["index"],
+                year=sat.get_parameter_satellite()["aquisition_year"],
+                month=sat.get_parameter_satellite()["aquisition_month"],
+                file_name=sat.get_parameter_satellite()["scene_file_name"])
 
         # Create directory to save results
         output_dir = od.create_output_dir()
-        continue
+
         # Cbers4
         if sat.is_file_from_cbers4():
-            exp = f"{sys.argv[1]}/*/{cbers.get_scene_file_name()[:-6]}*.zip"
+            exp = f"{sys.argv[1]}/*/{sat.get_parameter_satellite()['scene_file_name']}*.zip"
             for i in glob.glob(exp):
                 up = UF.UnpackFile(file_path=i, tmp_dir=tmp_dir)
                 up.uncompress_zip()
@@ -65,18 +65,18 @@ if __name__ == "__main__":
             expression = f"CBERS*BAND[{bands_expression}].tif"
             CB.ComposeBands(input_dir=tmp_dir,
                             output_dir=tmp_dir,
-                            output_file_name=cbers.get_output_file_name())\
+                            output_file_name=sat.get_output_file_name())\
                             .stack_img(expression=expression,
                                        extension = '.TIF')
             # Clip
-            img_path = f"{tmp_dir}/r{cbers.get_output_file_name()}.TIF"
+            img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
             CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
-                          scene_file_name=cbers.get_scene_file_name()[:-6],
+                          scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
                           output_dir = output_dir, 
-                          output_file_name = cbers.get_output_file_name())\
+                          output_file_name = sat.get_output_file_name())\
                           .run_clip(band_order=[4,3,2,1])
             # Make pyramid
-            img_path = os.path.join(output_dir, f"{cbers.get_output_file_name()}.TIF")
+            img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
             # Segmentation
             # Cloud/Shadow
@@ -93,19 +93,19 @@ if __name__ == "__main__":
 
             # Compose bands with 10m spatial resolution
             CB.ComposeBands(input_dir=tmp_dir,
-                            output_dir=od.create_output_dir(),
-                            output_file_name=sent.get_output_file_name()) \
-            .stack_sentinel(scene_file_name=sent.get_scene_file_name(),
-                            utm_zone=sent.get_utm_zone())
+                            output_dir=tmp_dir,
+                            output_file_name=sat.get_output_file_name()) \
+            .stack_sentinel(scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
+                            utm_zone=sat.get_parameter_satellite()["utm_zone"])
             # Clip
-            img_path = f"{tmp_dir}/r{sent.get_output_file_name()}.TIF"
+            img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
             CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
-                          scene_file_name=sent.get_scene_file_name(),
+                          scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
                           output_dir = output_dir, 
-                          output_file_name = sent.get_output_file_name())\
+                          output_file_name = sat.get_output_file_name())\
                           .run_clip(band_order=[4,3,2,1])
             # Make pyramid
-            img_path = os.path.join(output_dir, f"{sent.get_output_file_name()}.TIF")
+            img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
             # Segmentation
             # Cloud/Shadow
@@ -113,7 +113,7 @@ if __name__ == "__main__":
             continue
         
         # Work with Landsat 8
-        elif sat.get_initials_name() == 'LC08':
+        elif sat.get_parameter_satellite()['initials_name'] == 'LC08':
             # Set bands to unpack from landsat 8
             bands=[1,2,3,4,5,6,7,9,10,11]
             # Stack images
@@ -139,18 +139,18 @@ if __name__ == "__main__":
         expression = f"L[C,T,E]0[5,7,8]*_B[{bands_expression}].TIF"
         CB.ComposeBands(input_dir=tmp_dir,
                         output_dir=tmp_dir,
-                        output_file_name=land.get_output_file_name()) \
+                        output_file_name=sat.get_output_file_name()) \
                         .stack_img(expression=expression,
                                 extension = '.TIF')
         # Clip
-        img_path = f"{tmp_dir}/{land.get_scene_file_name()}.TIF"
+        img_path = f"{tmp_dir}/{sat.get_parameter_satellite()['scene_file_name']}.TIF"
         CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
-                        scene_file_name=land.get_scene_file_name(),
+                        scene_file_name=sat.get_scene_file_name(),
                         output_dir = output_dir, 
-                        output_file_name = land.get_output_file_name())\
+                        output_file_name = sat.get_output_file_name())\
                         .run_clip(band_order=band_order)
         # Make pyramid
-        img_path = os.path.join(output_dir, f"{land.get_output_file_name()}.TIF")
+        img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
         PR.PyramidRaster(img_path=img_path).create_img_pyramid()
         # Segmentation
         # Cloud/Shadow
