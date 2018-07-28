@@ -7,9 +7,6 @@ import ClipRaster as CR
 import PyramidRaster as PR
 import UnpackFile as UF
 import ComposeBands as CB
-import CbersFileInfo as CFI
-import LandsatFileInfo as LFI
-import SentinelFileInfo as SEI
 import OrganizeDirectory as OD
 import SatelliteFileInfo as SFI
 
@@ -44,41 +41,18 @@ if __name__ == "__main__":
         
         # Create instance of landsat file where scene features are
         sat = SFI.SatelliteFileInfo(file_path)
-        land = LFI.LandsatFileInfo(file_path)
-        sent = SEI.SentinelFileInfo(file_path)
-        cbers = CFI.CbersFileInfo(file_path)
 
         # Create director where files will be saved
-        if sat.is_file_from_landsat():
-            od = OD.OrganizeDirectory(
-                    root_dir_path=sys.argv[2],
-                    satellite_name=land.get_initials_name().upper(),
-                    satellite_index=''.join(land.get_index()),
-                    year=str(land.get_aquisition_date().year),
-                    month=str(land.get_aquisition_date().month),
-                    file_name=land.get_scene_file_name())
-
-        elif sat.is_file_from_sentinel():
-            od = OD.OrganizeDirectory(
-                    root_dir_path=sys.argv[2],
-                    satellite_name=land.get_initials_name().upper(),
-                    satellite_index=''.join(sent.get_index()),
-                    year=str(sent.get_aquisition_date().year),
-                    month=str(sent.get_aquisition_date().month),
-                    file_name=sent.get_scene_file_name())
-
-        elif sat.is_file_from_cbers4():
-            od = OD.OrganizeDirectory(
-                    root_dir_path=sys.argv[2],
-                    satellite_name=sat.get_initials_name().upper(),
-                    satellite_index=''.join(cbers.get_index()),
-                    year=str(cbers.get_aquisition_date().year),
-                    month=str(cbers.get_aquisition_date().month),
-                    file_name=cbers.get_scene_file_name()[:-6])
+        od = OD.OrganizeDirectory(root_dir_path=sys.argv[2],
+                satellite_name=sat.get_parameter_from_satellite()["initials_name"],
+                satellite_index=sat.get_parameter_from_satellite()["index"],
+                year=sat.get_parameter_from_satellite()["aquisition_year"],
+                month=sat.get_parameter_from_satellite()["aquisition_month"],
+                file_name=sat.get_parameter_from_satellite()["scene_file_name"])
 
         # Create directory to save results
         output_dir = od.create_output_dir()
-
+        continue
         # Cbers4
         if sat.is_file_from_cbers4():
             exp = f"{sys.argv[1]}/*/{cbers.get_scene_file_name()[:-6]}*.zip"
