@@ -65,9 +65,11 @@ if __name__ == "__main__":
             if sat.is_cbers4_file():
                 bands_expression = '5-8'
                 expression = f"CBERS*BAND[{bands_expression}].tif"
+                band_order = [4,3,2,1]
             elif sat.is_resourcesat2_file():
                 bands_expression = '2-5'
                 expression = f"R2LS3*BAND[{bands_expression}]*.tif"
+                band_order = [3,2,1,4]
             CB.ComposeBands(input_dir=tmp_dir,
                             output_dir=tmp_dir,
                             output_file_name=sat.get_output_file_name())\
@@ -79,7 +81,7 @@ if __name__ == "__main__":
                           scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
                           output_dir = output_dir, 
                           output_file_name = sat.get_output_file_name())\
-                          .run_clip(band_order=[4,3,2,1])
+                          .run_clip(band_order=band_order)
             # Make pyramid
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
