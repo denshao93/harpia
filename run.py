@@ -54,7 +54,7 @@ if __name__ == "__main__":
         output_dir = od.create_output_dir()
 
         # Cbers4
-        if sat.is_file_from_cbers4():
+        if sat.is_cbers4_file():
             exp = f"{sys.argv[1]}/*/{sat.get_parameter_satellite()['scene_file_name']}*.zip"
             for i in glob.glob(exp):
                 up = UF.UnpackFile(file_path=i, tmp_dir=tmp_dir)
@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
         # Work with Sentinel2
         # Bands: 2 = Blue | 3 = Green | 4 = Red | 8 = Nir |
-        if sat.is_file_from_sentinel():
+        if sat.is_sentinel_file():
             # Unzip setinel file
             up.uncompress_zip()
 
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             band_order = [3,2,1,4]
 
         # Work with Landsat 5 and 7
-        elif sat.is_file_from_landsat():
+        elif sat.is_landsat_file():
             # Set bands to unpack from landsat 5 and 7
             bands=[2,3,4,5]
             # Stack images
