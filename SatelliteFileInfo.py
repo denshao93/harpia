@@ -25,7 +25,7 @@ class SatelliteFileInfo:
         outfile.
         """
         file_name = u.get_base_name(self.file_path).split('.')[0]
-
+        
         return file_name
 
     def is_file_from_landsat(self):
@@ -71,7 +71,11 @@ class SatelliteFileInfo:
                 "landsat": 
                     {
                     "initials_name":self.get_scene_file_name()[:4],
+                    "scene_file_name": self.get_scene_file_name(),
                     "aquisition_date": self.get_scene_file_name()[17:25],
+                    "aquisition_year": self.get_scene_file_name()[17:21],
+                    "aquisition_month": self.get_scene_file_name()[21:23],
+                    "aquisition_day": self.get_scene_file_name()[23:25],
                     "julian_day": self.get_julian_day,
                     "index":f"{self.get_scene_file_name()[10:13]}"
                             f"{self.get_scene_file_name()[13:16]}"
@@ -80,7 +84,11 @@ class SatelliteFileInfo:
                 "sentinel": 
                     {
                     "initials_name": self.get_scene_file_name()[:3],
+                    "scene_file_name": self.get_scene_file_name(),
                     "aquisition_date": self.get_scene_file_name()[11:19],
+                    "aquisition_year": self.get_scene_file_name()[11:15],
+                    "aquisition_month": self.get_scene_file_name()[15:17],
+                    "aquisition_day": self.get_scene_file_name()[17:19],
                     "utm_zone": self.get_scene_file_name()[39:41],
                     "julian_day": self.get_julian_day,
                     "index": self.get_scene_file_name()[39:44]
@@ -89,7 +97,11 @@ class SatelliteFileInfo:
                 "cbers4": 
                     {
                     "initials_name": self.get_scene_file_name()[:5],
+                    "scene_file_name": self.get_scene_file_name()[:-6],
                     "aquisition_date": self.get_scene_file_name()[12:20],
+                    "aquisition_year": self.get_scene_file_name()[12:16],
+                    "aquisition_month": self.get_scene_file_name()[16:18],
+                    "aquisition_day": self.get_scene_file_name()[18:20],
                     "julian_day": self.get_julian_day,
                     "index":f"{self.get_scene_file_name()[21:24]}"
                             f"{self.get_scene_file_name()[25:28]}"
@@ -124,6 +136,8 @@ class SatelliteFileInfo:
         """Get julian day from gregorian day."""
 
         # TODO: Study this function to see the logial of this convertion and if it is right
+        # TODO: See if there is solved to loop when get this information from dict and try
+        # to save it there.
         
         aquisition_date = self.get_parameter_from_satellite()["aquisition_date"]
         fmt = '%Y%m%d'
