@@ -41,7 +41,7 @@ class SatelliteFileInfo:
         """Check if file is from sentinel satellite."""
         return self.get_scene_file_name().startswith("CB")
     
-    def get_dictionary_key_of_satellite_dict(self):
+    def get_dictionary_key_satellite_dict(self):
         """Get short name of satellite."""
         try:
 
@@ -60,7 +60,7 @@ class SatelliteFileInfo:
         except Exception:
             print("Satellite not found.")
 
-    def get_parameter_from_satellite(self):
+    def get_parameter_satellite(self):
         """Dictionary to cadastrete satellite features.
         
         This method return dictionary where basic parameters of file 
@@ -76,7 +76,8 @@ class SatelliteFileInfo:
                     "aquisition_year": self.get_scene_file_name()[17:21],
                     "aquisition_month": self.get_scene_file_name()[21:23],
                     "aquisition_day": self.get_scene_file_name()[23:25],
-                    "julian_day": self.get_julian_day,
+                    "julian_day": "",
+                    "days_from_today": "",
                     "index":f"{self.get_scene_file_name()[10:13]}"
                             f"{self.get_scene_file_name()[13:16]}"
                     },
@@ -90,7 +91,8 @@ class SatelliteFileInfo:
                     "aquisition_month": self.get_scene_file_name()[15:17],
                     "aquisition_day": self.get_scene_file_name()[17:19],
                     "utm_zone": self.get_scene_file_name()[39:41],
-                    "julian_day": self.get_julian_day,
+                    "julian_day": "",
+                    "days_from_today": "",
                     "index": self.get_scene_file_name()[39:44]
                     },
                 # Cbers4
@@ -102,13 +104,21 @@ class SatelliteFileInfo:
                     "aquisition_year": self.get_scene_file_name()[12:16],
                     "aquisition_month": self.get_scene_file_name()[16:18],
                     "aquisition_day": self.get_scene_file_name()[18:20],
-                    "julian_day": self.get_julian_day,
+                    "julian_day": "",
+                    "days_from_today": "",
                     "index":f"{self.get_scene_file_name()[21:24]}"
                             f"{self.get_scene_file_name()[25:28]}"
                     }
                 }
+        
+        dict = dict[self.get_dictionary_key_satellite_dict()]
+        
+        # Add julian day and how many days image will be processed.
+        dict["julian_day"] = self.get_julian_day_aquisition_date(dict)
+        
+        # dict["days_from_today"] = self.get_days_from_today(dict)
 
-        return dict[self.get_dictionary_key_of_satellite_dict()]
+        return dict
     
     def get_output_file_name(self):
         """Name that will be used to save every output file.
@@ -124,35 +134,49 @@ class SatelliteFileInfo:
             [str] -- The format of string <satellite>_<index>_<view_date>
 
         """
-        satellite = self.get_parameter_from_satellite()["initials_name"]
-        index = self.get_parameter_from_satellite()["index"]
-        aquisition_date = self.get_parameter_from_satellite()["aquisition_date"]
+        satellite = self.get_parameter_satellite()["initials_name"]
+        index = self.get_parameter_satellite()["index"]
+        aquisition_date = self.get_parameter_satellite()["aquisition_date"]
     
         output_name = f"{satellite}_{index}_{aquisition_date}"
                           
         return output_name
     
-    def get_julian_day(self):
+    def get_julian_day_aquisition_date(self, dict):
         """Get julian day from gregorian day."""
-
         # TODO: Study this function to see the logial of this convertion and if it is right
-        # TODO: See if there is solved to loop when get this information from dict and try
-        # to save it there.
-        
-        aquisition_date = self.get_parameter_from_satellite()["aquisition_date"]
+       
+        aquisition_date = dict["aquisition_date"]
         fmt = '%Y%m%d'
         dt = datetime.datetime.strptime(aquisition_date, fmt)
         tt = dt.timetuple()
         
-        return int(tt.tm_yday)
+        return tt.tm_yday
+    
+    def get_days_from_today(self, dict):
+        """Calc howm many days from processing days.
+        
+        It is calc to decide if image will passed in monitoring forest process
+        """ 
+        date_today = datetime.date.today().strftime('%Y%m%d')
+        fmt = '%Y%m%d'
+        dt = datetime.datetime.strptime(date_today, fmt)
+        tt = dt.timetuple()
+        
+        # TODO: Result is wrong. See it again.
+        day_from_today = tt.tm_yday - dict["julian_day"]
+
+        return day_from_today
 
 if __name__ == '__main__':
 
     s = SatelliteFileInfo(file_path="/test/files/S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.zip")
-    print(s.get_parameter_from_satellite())
+    print(s.get_parameter_satellite())
     s = SatelliteFileInfo(file_path="/test/files/CBERS_4_MUX_20170718_151_116_L4_BAND5.zip")
-    print(s.get_parameter_from_satellite())
+    print(s.get_parameter_satellite())
     s = SatelliteFileInfo(file_path="/test/files/LC08_L1GT_037035_20160314_20160314_01_RT.tar.gz")
-    print(s.get_parameter_from_satellite())
+    print(s.get_parameter_satellite())
     s = SatelliteFileInfo(file_path="/test/files/LE07_L1TP_215068_20171205_20171222_01_T1.tar.gz")
-    print(s.get_parameter_from_satellite())
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/LC08_L1TP_215068_20180726_20171222_01_T1.tar.gz")
+    print(s.get_parameter_satellite())
