@@ -10,3 +10,16 @@ month = {1: "Janeiro",
          10: "Outubro",
          11: "Novembro",
          12: "Dezembro"}
+
+month_R2LS3 = { "JAN": "01",
+                "FEB": "02",
+                "MAR": "03",
+                "APR": "04",
+                "MAY": "05",
+                "JUN": "06",
+                "JUL": "07",
+                "AGU": "08",
+                "SEP": "09",
+                "OCT": "10",
+                "NOV": "11",
+                "DEC": "12"}
