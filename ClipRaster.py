@@ -61,7 +61,6 @@ class ClipRaster:
                 "COMPRESS": 'LZW',
                 "PHOTOMETRIC": 'RGB',
                 "dtype": "uint8"})
-            src.update_tags(a='NIR', b='BLUE', c='RED', d='GREEN')
             out_image = self.scale8bit(out_image)
         
         with rasterio.open(f"{self.output_dir}/{self.output_file_name}.TIF", "w", **out_meta) as dest:
