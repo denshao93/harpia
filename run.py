@@ -29,7 +29,7 @@ if __name__ == "__main__":
     files = [f for f_ in [glob.glob(e)
             for e in (sys.argv[1]+'/*/S2A*.zip',
                       sys.argv[1]+'/*/CBERS*BAND5.zip', 
-                      sys.argv[1]+'/*/R2LS3*BAND5*.zip',
+                      sys.argv[1]+'/*/R2*BAND5*.zip',
                       sys.argv[1]+'/*/L*.tar.gz')]
             for f in f_]
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
                 band_order = [4,3,2,1]
             elif sat.is_resourcesat2_file():
                 bands_expression = '2-5'
-                expression = f"R2LS3*BAND[{bands_expression}]*.tif"
+                expression = f"R2*BAND[{bands_expression}]*.tif"
                 band_order = [3,2,1,4]
             CB.ComposeBands(input_dir=tmp_dir,
                             output_dir=tmp_dir,
