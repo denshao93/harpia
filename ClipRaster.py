@@ -38,6 +38,12 @@ class ClipRaster:
         check_intersects = trace_outline.intersects(ba_line)
 
         return check_intersects
+    
+    #Transform to uint8
+    @staticmethod
+    def scale8bit(image):
+        scale = float(256) / (image.max() - image.min())
+        return np.clip(np.round(np.multiply(image, scale)), 0, 255).astype(np.uint8)
 
     def clip_raster_by_mask(self, band_order):
         
@@ -47,13 +53,17 @@ class ClipRaster:
         with rasterio.open(f"{self.tmp_dir}/r{self.output_file_name}.TIF") as src:
             out_image, out_transform = rasterio.mask.mask(src, features, crop=True)
             out_meta = src.meta.copy()
-        out_meta.update({"driver": "GTiff",
+            out_meta.update({"driver": "GTiff",
                 "height": out_image.shape[1],
                 "width": out_image.shape[2],
                 "transform": out_transform,
                 "alpha": 'NO',
                 "COMPRESS": 'LZW',
-                "PHOTOMETRIC": 'RGB'})
+                "PHOTOMETRIC": 'RGB',
+                "dtype": "uint8"})
+            src.update_tags(a='NIR', b='BLUE', c='RED', d='GREEN')
+            out_image = self.scale8bit(out_image)
+        
         with rasterio.open(f"{self.output_dir}/{self.output_file_name}.TIF", "w", **out_meta) as dest:
             # Set order bands to save (NIR/GREEN/RED/BLUE)
             # This bands not the same in LC08
