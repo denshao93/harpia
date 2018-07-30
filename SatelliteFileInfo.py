@@ -42,7 +42,7 @@ class SatelliteFileInfo:
     
     def is_resourcesat2_file(self):
         """Check if file is from sentinel satellite."""
-        return self.get_scene_file_name().startswith("R2L")
+        return self.get_scene_file_name().startswith("R2")
     
     def get_dictionary_key_satellite_dict(self):
         """Get short name of satellite."""
@@ -60,7 +60,7 @@ class SatelliteFileInfo:
             if re.match(expression, self.get_scene_file_name()):
                 return "sentinel"
             
-            expression = "R2LS3*"
+            expression = "R2*"
             if re.match(expression, self.get_scene_file_name()):
                 return "resourcesat2"
         
