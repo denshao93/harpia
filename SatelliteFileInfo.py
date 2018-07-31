@@ -66,82 +66,6 @@ class SatelliteFileInfo:
         
         except Exception:
             print("Satellite not found.")
-
-    def get_parameter_satellite(self):
-        """Dictionary to cadastrete satellite features.
-        
-        This method return dictionary where basic parameters of file 
-        can be capture.
-        """
-        scene_file_name = self.get_scene_file_name()
-        dict = {
-                # Landsat
-                "landsat": 
-                    {
-                    "initials_name": scene_file_name[:4],
-                    "scene_file_name": scene_file_name,
-                    "aquisition_date": scene_file_name[17:25],
-                    "aquisition_year": scene_file_name[17:21],
-                    "aquisition_month": scene_file_name[21:23],
-                    "aquisition_day": scene_file_name[23:25],
-                    "julian_day": "",
-                    "days_from_today": "",
-                    "index":f"{scene_file_name[10:13]}"
-                            f"{scene_file_name[13:16]}"
-                    },
-                # Sentinel
-                "sentinel": 
-                    {
-                    "initials_name": scene_file_name[:3],
-                    "scene_file_name": scene_file_name,
-                    "aquisition_date": scene_file_name[11:19],
-                    "aquisition_year": scene_file_name[11:15],
-                    "aquisition_month": scene_file_name[15:17],
-                    "aquisition_day": scene_file_name[17:19],
-                    "utm_zone": scene_file_name[39:41],
-                    "julian_day": "",
-                    "days_from_today": "",
-                    "index": scene_file_name[39:44]
-                    },
-                # Cbers4
-                "cbers4": 
-                    {
-                    "initials_name": scene_file_name[:5],
-                    "scene_file_name": scene_file_name[:-6],
-                    "aquisition_date": scene_file_name[12:20],
-                    "aquisition_year": scene_file_name[12:16],
-                    "aquisition_month": scene_file_name[16:18],
-                    "aquisition_day": scene_file_name[18:20],
-                    "julian_day": "",
-                    "days_from_today": "",
-                    "index":f"{scene_file_name[21:24]}"
-                            f"{scene_file_name[25:28]}"
-                    },
-                    # Resoucesat2
-                "resourcesat2": 
-                    {
-                    "initials_name": scene_file_name[:5],
-                    "scene_file_name": scene_file_name[:-10],
-                    "aquisition_date":  f"{scene_file_name[10:14]}"
-                                        f"{self.__get_month_resourcesat2()}"
-                                        f"{scene_file_name[5:7]}",
-                    "aquisition_year": scene_file_name[10:14],
-                    "aquisition_month": self.__get_month_resourcesat2(),
-                    "aquisition_day": scene_file_name[5:7],
-                    "julian_day": "",
-                    "days_from_today": "",
-                    "index":scene_file_name[14:20]                            
-                    }
-                }
-        
-        dict = dict[self.get_dictionary_key_satellite_dict()]
-        
-        # Add julian day and how many days image will be processed.
-        dict["julian_day"] = self.get_julian_day_aquisition_date(dict)
-        
-        # dict["days_from_today"] = self.get_days_from_today(dict)
-
-        return dict
     
     def get_output_file_name(self):
         """Name that will be used to save every output file.
@@ -196,16 +120,127 @@ class SatelliteFileInfo:
             month = self.get_scene_file_name()[7:10]
             return MD.month_R2LS3[month]
 
+    def get_parameter_satellite(self):
+        """Dictionary to cadastrete satellite features.
+        
+        This method return dictionary where basic parameters of file 
+        can be capture.
+        """
+        scene_file_name = self.get_scene_file_name()
+        try:
+            dict = {
+                    # Landsat
+                    "landsat": 
+                        {
+                        "initials_name": scene_file_name[:4],
+                        "sensor": scene_file_name[1:2],
+                        "scene_file_name": scene_file_name,
+                        "aquisition_date": scene_file_name[17:25],
+                        "aquisition_year": scene_file_name[17:21],
+                        "aquisition_month": scene_file_name[21:23],
+                        "aquisition_day": scene_file_name[23:25],
+                        "julian_day": "",
+                        "days_from_today": "",
+                        "index":f"{scene_file_name[10:13]}"
+                                f"{scene_file_name[13:16]}"
+                        },
+                    # Sentinel
+                    "sentinel": 
+                        {
+                        "initials_name": scene_file_name[:3],
+                        "sensor": scene_file_name[4:7],
+                        "scene_file_name": scene_file_name,
+                        "aquisition_date": scene_file_name[11:19],
+                        "aquisition_year": scene_file_name[11:15],
+                        "aquisition_month": scene_file_name[15:17],
+                        "aquisition_day": scene_file_name[17:19],
+                        "utm_zone": scene_file_name[39:41],
+                        "julian_day": "",
+                        "days_from_today": "",
+                        "index": scene_file_name[39:44]
+                        },
+                    # Cbers4
+                    "cbers4": 
+                        {
+                        "initials_name": scene_file_name[:5],
+                        "sensor": scene_file_name[8:11],
+                        "scene_file_name": scene_file_name[:-6],
+                        "aquisition_date": scene_file_name[12:20],
+                        "aquisition_year": scene_file_name[12:16],
+                        "aquisition_month": scene_file_name[16:18],
+                        "aquisition_day": scene_file_name[18:20],
+                        "julian_day": "",
+                        "days_from_today": "",
+                        "index":f"{scene_file_name[21:24]}"
+                                f"{scene_file_name[25:28]}"
+                        },
+                        # Resoucesat2
+                    "resourcesat2": 
+                        {
+                        "initials_name": scene_file_name[:5],
+                        "sensor": scene_file_name[2:5],
+                        "scene_file_name": scene_file_name[:-10],
+                        "aquisition_date":  f"{scene_file_name[10:14]}"
+                                            f"{self.__get_month_resourcesat2()}"
+                                            f"{scene_file_name[5:7]}",
+                        "aquisition_year": scene_file_name[10:14],
+                        "aquisition_month": self.__get_month_resourcesat2(),
+                        "aquisition_day": scene_file_name[5:7],
+                        "julian_day": "",
+                        "days_from_today": "",
+                        "index":scene_file_name[14:20]                            
+                        }
+                    }
+            
+            dict = dict[self.get_dictionary_key_satellite_dict()]
+            
+            # Add julian day and how many days image will be processed.
+            dict["julian_day"] = self.get_julian_day_aquisition_date(dict)
+            
+            # dict["days_from_today"] = self.get_days_from_today(dict)
+
+            return dict
+
+        except Exception:
+
+            if self.is_cbers4_file and self.get_scene_file_name()[9:12] == 'WFI':
+                dict = {
+                # Cbers4
+                    "initials_name": scene_file_name[:5],
+                    "sensor": scene_file_name[9:12],
+                    "scene_file_name": scene_file_name[:-6],
+                    "aquisition_date": scene_file_name[13:21],
+                    "aquisition_year": scene_file_name[13:17],
+                    "aquisition_month": scene_file_name[17:19],
+                    "aquisition_day": scene_file_name[19:21],
+                    "julian_day": "",
+                    "days_from_today": "",
+                    "index":f"{scene_file_name[22:25]}"
+                            f"{scene_file_name[26:29]}"
+                    }
+        
+            # Add julian day and how many days image will be processed.
+            dict["julian_day"] = self.get_julian_day_aquisition_date(dict)
+            
+            # dict["days_from_today"] = self.get_days_from_today(dict)
+
+            return dict
+            
+
 
 if __name__ == '__main__':
 
-    # s = SatelliteFileInfo(file_path="/test/files/S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.zip")
-    # print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.zip")
+    print(s.get_parameter_satellite())
     s = SatelliteFileInfo(file_path="/test/files/CBERS_4_MUX_20170718_151_116_L4_BAND5.zip")
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/CBERS_4_AWFI_20180729_173_135_L4_BAND13.zip")
     print(s.get_parameter_satellite())
     s = SatelliteFileInfo(file_path="/test/files/LC08_L1GT_037035_20160314_20160314_01_RT.tar.gz")
     print(s.get_parameter_satellite())
     s = SatelliteFileInfo(file_path="/test/files/LE07_L1TP_215068_20171205_20171222_01_T1.tar.gz")
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/LT05_L1TP_220069_20110903_20161008_01_T1.tar.gz")
     print(s.get_parameter_satellite())
     s = SatelliteFileInfo(file_path="/test/files/R2LS326JUL2018336087STUC00GODP_BAND2_RPC.tif.zip")
     print(s.get_parameter_satellite())
