@@ -20,7 +20,7 @@ class IntersectionTraceOutlineBa:
         trace_outline_path = os.path.join(self.dir_tmp_img, "trace_outline.shp")
 
         read_trace_outline = gu.read_shapefile_poly(trace_outline_path)
-        ba_buffer = gu.read_shapefile_poly("vector/ba_4674_buffer.shp").to_wkt()
+        ba_buffer = gu.read_shapefile_poly("/data/vector/ba_4674_buffer.shp").to_wkt()
         ba_buffer = ogr.CreateGeometryFromWkt(ba_buffer)
 
         trace_outline = gu.project_geometry(vector_layer=read_trace_outline.to_wkt(),
