@@ -11,6 +11,7 @@ import OrganizeDirectory as OD
 import SatelliteFileInfo as SFI
 
 
+
 if __name__ == "__main__":
     # argv[1] = directory where targz files are stored.
     # argv[2] = directory where folder tree will be created to sabe processed
@@ -44,12 +45,13 @@ if __name__ == "__main__":
         sat = SFI.SatelliteFileInfo(file_path)
 
         # Create director where files will be saved
+        parameter_satellite = sat.get_parameter_satellite()
         od = OD.OrganizeDirectory(root_dir_path=sys.argv[2],
-                satellite_name=sat.get_parameter_satellite()["initials_name"],
-                satellite_index=sat.get_parameter_satellite()["index"],
-                year=sat.get_parameter_satellite()["aquisition_year"],
-                month=sat.get_parameter_satellite()["aquisition_month"],
-                file_name=sat.get_parameter_satellite()["scene_file_name"])
+                satellite_name=parameter_satellite["initials_name"],
+                satellite_index=parameter_satellite["index"],
+                year=parameter_satellite["aquisition_year"],
+                month=parameter_satellite["aquisition_month"],
+                file_name=parameter_satellite["scene_file_name"])
 
         # Create directory to save results
         output_dir = od.create_output_dir()
