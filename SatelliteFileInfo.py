@@ -203,7 +203,7 @@ class SatelliteFileInfo:
 
         except Exception:
 
-            if self.is_cbers4_file and self.get_scene_file_name()[9:12] == 'WFI':
+            if self.is_cbers4_file and self.get_scene_file_name()[9:1] == 'WFI':
                 dict = {
                 # Cbers4
                     "initials_name": scene_file_name[:5],
