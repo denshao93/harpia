@@ -29,7 +29,8 @@ if __name__ == "__main__":
     # Create list of zip and tar.gz files from folder where they are store.
     files = [f for f_ in [glob.glob(e)
             for e in (sys.argv[1]+'/*/S2A*.zip',
-                      sys.argv[1]+'/*/CBERS*BAND5.zip', 
+                      sys.argv[1]+'/*/CBERS*BAND5.zip',
+                      sys.argv[1]+'/*/CBERS*BAND13.zip', 
                       sys.argv[1]+'/*/R2*BAND5*.zip',
                       sys.argv[1]+'/*/L*.tar.gz')]
             for f in f_]
@@ -66,12 +67,18 @@ if __name__ == "__main__":
             # Bands: 5 = Blue | 6 = Green | 7 = Red | 8 = Nir |
             if sat.is_cbers4_file():
                 bands_expression = '5-8'
-                expression = f"CBERS*BAND[{bands_expression}].tif"
                 band_order = [4,3,2,1]
+                expression = f"CBERS*BAND[{bands_expression}].tif"
+
+                if parameter_satellite['sensor'] == 'WFI':
+                    bands_expression = f"1[3-6]"
+                    expression = f"CBERS*BAND{bands_expression}.tif"
+
             elif sat.is_resourcesat2_file():
                 bands_expression = '2-5'
                 expression = f"R2*BAND[{bands_expression}]*.tif"
                 band_order = [3,2,1,4]
+            
             CB.ComposeBands(input_dir=tmp_dir,
                             output_dir=tmp_dir,
                             output_file_name=sat.get_output_file_name())\
