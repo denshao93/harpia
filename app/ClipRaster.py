@@ -47,7 +47,7 @@ class ClipRaster:
 
     def clip_raster_by_mask(self, band_order):
         
-        with fiona.open("data/vector/ba_4674_buffer.shp", "r") as shapefile:
+        with fiona.open("/home/diogocaribe/workspace/harpia/data/vector/ba_4674_buffer.shp", "r") as shapefile:
             features = [feature["geometry"] for feature in shapefile]
         
         with rasterio.open(f"{self.tmp_dir}/r{self.output_file_name}.TIF") as src:
