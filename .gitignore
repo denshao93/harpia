@@ -4,5 +4,4 @@
 .vscode
 *.pyc
 __pycache__
-config/const.yaml
-
+app/config/const.yaml
