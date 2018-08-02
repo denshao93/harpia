@@ -1,5 +1,6 @@
 import psycopg2
-
+import datetime
+import yaml
 
 class Connection:
 
@@ -37,3 +38,21 @@ class Connection:
             if conn is not None:
                 conn.close()
                 print('Database connection closed.')
+            
+    def save_db_composition_done(self, dict, scene_path):
+        """."""
+        cursor = self.conn.cursor()
+        
+        sqlQuery =  f"INSERT INTO public.harpia_img_processed ("\
+                    f"save_composition, processing_date, "\
+                    f"scene_file_name, satellite, sensor, satellite_index, "\
+                    f"aquisition_date, scene_path)"\
+                    f"VALUES ("\
+                    f"1, {datetime.date.today},"\
+                    f"{dict['scene_file_name']},{dict['initials_name']},"\
+                    f"{dict['sensor']}, {dict['index']},"\
+                    f"{dict['aquisition_date']}, {scene_path});"
+        
+        cursor.execute(sqlQuery)
+        cursor.close()
+        
