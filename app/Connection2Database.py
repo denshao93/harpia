@@ -1,6 +1,6 @@
 import psycopg2
 import datetime
-import yaml
+
 
 class Connection:
 
