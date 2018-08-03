@@ -42,18 +42,31 @@ class Connection:
             
     def save_db_composition_done(self, dict, scene_path):
         """."""
-        cursor = self.conn.cursor()
+        try:
+            cursor = self.open_connect().cursor()
         
-        sqlQuery =  f"INSERT INTO public.harpia_img_processed ("\
-                    f"save_composition, processing_date, "\
-                    f"scene_file_name, satellite, sensor, satellite_index, "\
-                    f"aquisition_date, scene_path)"\
-                    f"VALUES ("\
-                    f"1, {datetime.date.today},"\
-                    f"{dict['scene_file_name']},{dict['initials_name']},"\
-                    f"{dict['sensor']}, {dict['index']},"\
-                    f"{dict['aquisition_date']}, {scene_path});"
+            sqlQuery =  f"INSERT INTO public.harpia_img_processed ("\
+                        f"save_composition, processing_date, "\
+                        f"scene_file_name, satellite, sensor, satellite_index, "\
+                        f"aquisition_date, scene_path)"\
+                        f"VALUES ("\
+                        f"1, {datetime.date.today},"\
+                        f"{dict['scene_file_name']},{dict['initials_name']},"\
+                        f"{dict['sensor']}, {dict['index']},"\
+                        f"{dict['aquisition_date']}, {scene_path});"
         
-        cursor.execute(sqlQuery)
-        cursor.close()
+            cursor.execute(sqlQuery)
+            cursor.close()
+        except Exception:
+            print("Exception")
         
+
+if __name__ == '__main__':
+    
+    import yaml
+    c = open("/home/diogocaribe/workspace/harpia/app/config/const.yaml", 'r')
+    string = "host=localhost dbname=harpia user='postgres' password='postgres'"
+    # harpia_db = yaml.load(f)
+    # print(harpia_db["host"])
+    a = Connection(str_connection=string)
+    print(a)
