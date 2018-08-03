@@ -1,15 +1,16 @@
 import os #NOQA
 import sys
+import yaml
 import glob
 import shutil
 import tempfile #NOQA
-import ClipRaster as CR
-import PyramidRaster as PR
 import UnpackFile as UF
+import ClipRaster as CR
 import ComposeBands as CB
+import PyramidRaster as PR
 import OrganizeDirectory as OD
 import SatelliteFileInfo as SFI
-
+import Connection2Database as CDB
 
 
 if __name__ == "__main__":
@@ -45,6 +46,10 @@ if __name__ == "__main__":
         # Create instance of landsat file where scene features are
         sat = SFI.SatelliteFileInfo(file_path)
 
+        # Instanciate conection to database log
+        with open("/home/diogocaribe/workspace/harpia/app/config/const.yaml", 'r') as f:
+            harpia_db = yaml.load(f)
+        
         # Create director where files will be saved
         parameter_satellite = sat.get_parameter_satellite()
         od = OD.OrganizeDirectory(root_dir_path=sys.argv[2],
@@ -84,6 +89,7 @@ if __name__ == "__main__":
                             output_file_name=sat.get_output_file_name())\
                             .stack_img(expression=expression,
                                        extension = '.TIF')
+                        
             # Clip
             img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
             CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
@@ -94,6 +100,11 @@ if __name__ == "__main__":
             # Make pyramid
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
+
+            string = "host=localhost dbname=harpia user='postgres' password='postgres'"
+            dict = sat.get_parameter_satellite()
+            CDB.Connection(string).save_db_composition_done(dict=dict, scene_path=output_dir)
+
             # Segmentation
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
