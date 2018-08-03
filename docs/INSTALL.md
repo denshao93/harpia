@@ -93,7 +93,7 @@ bash
 
 ```c
 
-mkvirtualenv -a ~/workspace/harpia harpia
+mkvirtualenv -a ~/workspace/harpia/app harpia
 
 ```
 
