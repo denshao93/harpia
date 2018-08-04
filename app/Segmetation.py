@@ -1,25 +1,16 @@
+"""Class to segment satellite image."""
 import os
-import Connection2Database as Con
 
 
 class Segmentation:
 
-    def __init__(self,
-                 img_output_path_stored,
-                 file_name):
+    def __init__(self, output_dir, output_file_name):
 
-        # The folder where output processed will be saved
-        self.image_output_path = img_output_path_stored
+        # The folder where output processed is stored.
+        self.output_dir = output_dir
 
-        self.file_name = file_name
-
-        # Image name
-        self.img_file_name_stored = '{}{}'.format(self.file_name[:5],
-                                                  self.file_name[10:25]+".TIF")
-
-        # Vector name (without extention)
-        self.vector_file_name_stored = '{}{}'.format(self.file_name[:5],
-                                                self.file_name[10:25])
+        # Name of image file save the will be segmented.
+        self.output_file_name = output_file_name
 
     def get_segmentation(self, region, inter, algorithm):
         """Segmentation function by gdal-segment
@@ -32,19 +23,14 @@ class Segmentation:
         """
 
         print("........Segmentanção.........")
-        input_img = os.path.join(self.image_output_path, self.img_file_name_stored)
-        output_segmentation = os.path.join(self.image_output_path,
-                                  self.vector_file_name_stored + "_" + algorithm + ".shp")
-        command = "/home/diogocaribe/gdal-segment/bin/gdal-segment " \
-                    "-region {r} " \
-                    "-niter {i} " \
-                    "-algo {algo} " \
-                    "{input_img} " \
-                    "-out {seg_output}".format(r=region,
-                                                             i=inter,
-                                                             algo=algorithm,
-                                                             input_img=input_img,
-                                                             seg_output=output_segmentation)
+        
+        input_img = os.path.join(self.output_dir, f"{self.output_file_name}.TIF")
+        output_segmentation =   os.path.join(self.output_dir,
+                                f"{self.output_file_name}_{algorithm}.shp")
+        
+        command = f"{$HOME}gdal-segment/bin/gdal-segment -region {r} -niter {i} "\
+                  f"-algo {algo} {input_img} -out {output_segmentation}"
+        
         os.system(command)
 
     def run_segmentation(self):
@@ -52,5 +38,3 @@ class Segmentation:
         Segmenting landsat image
         """
         self.get_segmentation(region=5, inter=10, algorithm="SLICO")
-
-
