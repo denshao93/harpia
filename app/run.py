@@ -7,6 +7,7 @@ import tempfile #NOQA
 import UnpackFile as UF
 import ClipRaster as CR
 import ComposeBands as CB
+import Segmetation as SEG
 import PyramidRaster as PR
 import OrganizeDirectory as OD
 import SatelliteFileInfo as SFI
@@ -179,7 +180,12 @@ if __name__ == "__main__":
         # Make pyramid
         img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
         PR.PyramidRaster(img_path=img_path).create_img_pyramid()
+        
         # Segmentation
+        if sat.get_parameter_satellite()['initials_name'] == 'LC08':
+            SEG.Segmentation(output_dir=output_dir, 
+                            output_file_name=sat.get_output_file_name())\
+                            .run_segmentation()
         # Cloud/Shadow
             # Thinking about compose image in fuction for fmask
         shutil.rmtree(tmp_dir)
