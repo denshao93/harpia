@@ -67,11 +67,10 @@ mkdir ~/workspace
 git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper
 
 pip install virtualenv virtualenvwrapper
-
 ```
 
+## Open terminal
 
-# Open terminal
 ```c
 nano $HOME/.bashrc
 
