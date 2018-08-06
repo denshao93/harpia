@@ -4,7 +4,7 @@ from osgeo import ogr
 import multiprocessing
 import geo_utils as gu
 from shapely.wkt import loads
-from SatelliteFileInfo import LandsatFileInfo as LCinfo
+import Raster as R
 
 
 class LoadSegmentationDatabase:
@@ -81,37 +81,27 @@ class LoadSegmentationDatabase:
         layer = file.GetLayer(0)
         intersect_pathrow_path = os.path.join(self.dir_tmp_img,
                                               "intersect_pathrow_ba.shp")
-        geom2 = gu.read_shapefile_poly(intersect_pathrow_path)
-        queries = []
-        count = 0
-        end_list = layer.GetFeatureCount()
+        aoi = gu.read_shapefile_poly(intersect_pathrow_path)
+
+        values = []
 
         for i in range(layer.GetFeatureCount()):
             print(i)
-            is_last_element = True if (i == end_list) else False
             feature = layer.GetFeature(i)
             # Get feature geometry
             geometry = feature.GetGeometryRef()
             # Convert geometry to WKT format
             wkt = geometry.ExportToWkt()
             # Check intersect
-            geom1 = loads(wkt)
-            intersetc = geom1.intersects(geom2)
+            geom = loads(wkt)
+            intersetc = geom.intersects(aoi)
 
             if intersetc:
-                count += 1
-                if count < 10000:
-                    query = self.create_insert_geom_query(wkt=wkt)
-                    queries.append(query)
 
-                if count == 10000 or is_last_element:
-                    print("Load geometries")
-                    count = 0
-                    pool = multiprocessing.Pool(6)
-                    for i in pool.imap_unordered(self.runQuery, queries):
-                        continue
-                    pool.close()
-                    queries = []
+                values = values.append(geom)
+        
+        return values
+
 
     def set_geom_srid_as_4674(self):
         """Set SRID as 4674 to geom column."""
