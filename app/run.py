@@ -102,11 +102,12 @@ if __name__ == "__main__":
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
-            string = "host=localhost dbname=harpia user='postgres' password='postgres'"
-            dict = sat.get_parameter_satellite()
-            CDB.Connection(string).save_db_composition_done(dict=dict, scene_path=output_dir)
+            # string = "host=localhost dbname=harpia user='postgres' password='postgres'"
+            # dict = sat.get_parameter_satellite()
+            # CDB.Connection(string).save_db_composition_done(dict=dict, scene_path=output_dir)
 
             # Segmentation
+            SEG.Segmentation(output_dir=output_dir,output_file_name=sat.get_output_file_name()).run_segmentation()
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
             continue
@@ -183,9 +184,10 @@ if __name__ == "__main__":
         
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
-            SEG.Segmentation(output_dir=output_dir, 
-                            output_file_name=sat.get_output_file_name())\
-                            .run_segmentation()
+            # SEG.Segmentation(output_dir=output_dir, 
+            #                 output_file_name=sat.get_output_file_name())\
+            #                 .run_segmentation()
+            pass
         # Cloud/Shadow
             # Thinking about compose image in fuction for fmask
         shutil.rmtree(tmp_dir)
