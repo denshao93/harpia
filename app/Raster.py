@@ -42,7 +42,7 @@ class Raster:
 
                 return trace_outline
                 
-    def intersetion_pathrow_ba_(self):
+    def intersetion_img_useless_ba(self):
         """Verify if image have to be cliped.
 
         If img overlap boundery of area of interested project (aoi),
@@ -84,4 +84,4 @@ if __name__ == "__main__":
 
     r = Raster(img_path=f"/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/LC08/215068/2017/"
                     f"12_Dezembro/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_215068_20171205.TIF")
-    r.intersetion_pathrow_ba_()
+    r.intersetion_img_useless_ba()

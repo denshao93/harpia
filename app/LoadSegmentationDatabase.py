@@ -86,6 +86,8 @@ class LoadSegmentationDatabase:
         file = ogr.Open(self.segmentation_file_path)
         layer = file.GetLayer(0)
 
+        img_path = os.path.join(self.tmp_dir, f"{self.output_file_name}.TIF")
+        intersection = R.Raster(img_path=img_path).intersetion_img_useless_ba()
         values = []
 
         for i in range(layer.GetFeatureCount()):
@@ -97,28 +99,23 @@ class LoadSegmentationDatabase:
             wkt = geometry.ExportToWkt()
             # Check intersect
             geom = loads(wkt)
-            img_path = os.path.join(self.tmp_dir, f"{self.output_file_name}.TIF")
-            intersection = R.Raster(img_path=img_path).intersetion_pathrow_ba_()
-
+            
             intersect = geom.intersects(intersection)
 
-            
-            intersection = gpd.GeoDataFrame(intersect)
-            intersection.plot()
-            plt.show()
-
             if intersect:
-                print(i)
-                values = values.append(wkt)
-        
-        return values
+                # print(i)
+                values.append(wkt)
+                if len(values) == 10:
+                    
+                    sql = f"INSERT INTO  {self.satellite_initials_name}_{self.satellite_index}_{self.date} (geom)"\
+                        f" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    self.runQuery(sql)
+        # return values
 
 
     def insert_geom(self):
+        pass
         
-        sql = f"INSERT INTO  {self.satellite_initials_name}_{self.satellite_index}_{self.date} (geom)"\
-              f"VALUES ({self.load_segmentation_database()})"
-        self.runQuery(sql)
 
     def set_geom_srid_as_4674(self):
         """Set SRID as 4674 to geom column."""
@@ -142,18 +139,19 @@ class LoadSegmentationDatabase:
 
     def run_load_segmentation(self):
         """Run all process to load segmentation in draft database."""
-        self.create_scene_path_row_schema()
-        self.create_table_scene_path_row_scene()
-        self.del_table_scene_path_row_scene()
-        self.insert_geom()
+        # self.create_scene_path_row_schema()
+        # self.create_table_scene_path_row_scene()
+        # self.del_table_scene_path_row_scene()
+        self.load_segmentation_database()
+        # self.insert_geom()
         self.set_geom_srid_as_4674()
         self.create_gist_index_geom_colum()
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     load_seg = LoadSegmentationDatabase(segmentation_file_path="/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/CBERS/151116/2017/07_Julho/CBERS_4_MUX_20170718_151_116_L4/CBERS_151116_20170718_SLICO.shp",
-#     output_dir="/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/CBERS/151116/2017/07_Julho/CBERS_4_MUX_20170718_151_116_L4",
-#     output_file_name="CBERS_151116_20170718", tmp_dir = 
-#     satellite_index="151116", satellite_initials_name="CBERS", date="20170718")
-#     load_seg.run_load_segmentation()
+    load_seg = LoadSegmentationDatabase(segmentation_file_path="/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/LC08/215068/2017/12_Dezembro/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_215068_20171205_SLICO.shp",
+    output_dir="/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/LC08/215068/2017/12_Dezembro/LC08_L1TP_215068_20171205_20171222_01_T1",
+    output_file_name="LC08_215068_20171205", tmp_dir = "/tmp/tmp8nyi8g30",
+    satellite_index="215068", satellite_initials_name="LC08", date="20171205")
+    load_seg.run_load_segmentation()
