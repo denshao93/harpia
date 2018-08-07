@@ -136,15 +136,19 @@ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D CMAKE_INSTALL_PREFIX=/usr/local \
 	-D INSTALL_PYTHON_EXAMPLES=ON \
 	-D INSTALL_C_EXAMPLES=OFF \
-	-D OPENCV_EXTRA_MODULES_PATH=~/src/opencv_contrib-3.4.1/modules \ 
-	-D PYTHON_EXECUTABLE=~/.ve/harpia/bin/python \
+	-D OPENCV_EXTRA_MODULES_PATH=/home/diogocaribe/src/opencv_contrib-3.4.1/modules \ 
+	-D PYTHON_EXECUTABLE=/home/diogocaribe/.ve/harpia/bin/python \
 	-D BUILD_EXAMPLES=ON ..
 
 
 Ubuntu 16.04
-sudo cmake CMAKE_VERBOSE=1 -D OPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules -DCMAKE_SKIP_RPATH=ON ../
+
+cmake CMAKE_VERBOSE=1 -D CMAKE_INSTALL_PREFIX=/usr/local -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules -DPYTHON_EXECUTABLE=/home/diogocaribe/.ve/harpia/bin/python -DCMAKE_SKIP_RPATH=ON ../
+
+sudo cmake CMAKE_VERBOSE=1 -D OPENCV_EXTRA_MODULES_PATH=/home/diogocaribe/src/opencv_contrib-3.4.1/modules -DCMAKE_SKIP_RPATH=ON ../
 make -j4
 sudo make install
+sudo ldconfig
 
 ```
 
