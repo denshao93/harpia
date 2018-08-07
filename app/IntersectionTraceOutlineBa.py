@@ -4,6 +4,7 @@ import constants as const
 import geo_utils as gu
 from osgeo import ogr
 from shapely.geometry import shape
+import Raster as R
 
 
 class IntersectionTraceOutlineBa:
@@ -12,7 +13,7 @@ class IntersectionTraceOutlineBa:
 
         self.dir_tmp_img = dir_tmp_img
 
-    def intersetion_pathrow_ba(self):
+    def intersetion_pathrow_ba_(self):
         """Raster file is in 4674 and it is necessary to convert
         trace outline to it because it is in WGS UTM 24N
         """
@@ -30,8 +31,8 @@ class IntersectionTraceOutlineBa:
         inter = trace_outline.Intersection(ba_buffer).ExportToWkt()
 
         return inter
-
+    
     def save_intersection_as_shapefile(self):
 
-        gu.save_wkt_as_shapefile(self.intersetion_pathrow_ba(),
+        gu.save_wkt_as_shapefile(self.intersetion_pathrow_ba_(),
                                  self.dir_tmp_img, "intersect_pathrow_ba")

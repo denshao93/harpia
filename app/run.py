@@ -12,6 +12,8 @@ import PyramidRaster as PR
 import OrganizeDirectory as OD
 import SatelliteFileInfo as SFI
 import Connection2Database as CDB
+import Raster as R
+import LoadSegmentationDatabase as LSD
 
 
 if __name__ == "__main__":
@@ -184,10 +186,18 @@ if __name__ == "__main__":
         
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
-            # SEG.Segmentation(output_dir=output_dir, 
-            #                 output_file_name=sat.get_output_file_name())\
-            #                 .run_segmentation()
-            pass
+            s = SEG.Segmentation(output_dir=output_dir,
+                            output_file_name=sat.get_output_file_name())
+            s.run_segmentation()
+            
+            # Load database
+        
+        l = LSD.LoadSegmentationDatabase(segmentation_file_path=s.get_segmentation_path(),
+        output_dir=output_dir, output_file_name=sat.get_output_file_name(), 
+                    satellite_index=sat.get_parameter_satellite()["index"],
+                    satellite_initials_name=sat.get_parameter_satellite()["initials_name"],
+                    date=sat.get_parameter_satellite()["aquisition_date"],
+                    tmp_dir=tmp_dir)
         # Cloud/Shadow
             # Thinking about compose image in fuction for fmask
         shutil.rmtree(tmp_dir)

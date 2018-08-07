@@ -13,7 +13,7 @@ class Raster:
     def __init__(self, img_path):
 
         self.image_path = img_path
-        # self.dir_img_path = dir_img_path
+
 
     def read_image(self):
 
@@ -42,6 +42,23 @@ class Raster:
 
                 return trace_outline
                 
+    def intersetion_pathrow_ba_(self):
+        """Verify if image have to be cliped.
+
+        If img overlap boundery of area of interested project (aoi),
+        It should be cliped to remove image that not be useless.
+        This processing avoid to save raster useless areas.
+
+        """
+        ba_line = gu.read_shapefile_poly("/home/diogocaribe/workspace/harpia/data/vector/ba_4674_buffer.shp")
+        
+        from shapely import wkt
+        trace_outline = wkt.loads(self.trace_outline_from_raster_wkt())
+
+        intersection = trace_outline.intersection(ba_line)
+
+        return intersection
+        
     def trace_outline_from_raster_shapefile(self):
 
         try:
@@ -49,8 +66,8 @@ class Raster:
             if os.path.isfile(vct_output) is not True:
 
                 command = "gdal_trace_outline {img_input} -ndv 0 -out-cs en -dp-toler 10 " \
-                "-ogr-out {vct_output}".format(img_input=self.image_path, vct_output=vct_output)
-
+                "-ogr-out {vct_output}".format(img_input=self.image_path, vct_output=self.image_path)
+                print(command)
                 os.system(command)
         except Exception:
             print("Problem to run gdal_trace_outline")
@@ -65,6 +82,6 @@ class Raster:
 
 if __name__ == "__main__":
 
-    Raster(img_path=f"/tmp/tmp2qtqk6i6/" \
-                    f"LC08_L1TP_215068_20171205_20171222_01_T1.TIF")\
-                    .trace_outline_from_raster_wkt()
+    r = Raster(img_path=f"/media/diogocaribe/56A22ED6A22EBA7F/PROCESSADA/LC08/215068/2017/"
+                    f"12_Dezembro/LC08_L1TP_215068_20171205_20171222_01_T1/LC08_215068_20171205.TIF")
+    r.intersetion_pathrow_ba_()

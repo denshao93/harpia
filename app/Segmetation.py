@@ -2,8 +2,11 @@ import os #NOQA
 
 class Segmentation:
     
+    algo="SLICO"
+
     def __init__(self, output_dir, output_file_name):
 
+        self.algo="SLICO"
         # The folder where output processed is stored.
         self.output_dir = output_dir
 
@@ -29,8 +32,14 @@ class Segmentation:
         
         os.system(command)
 
+    def get_segmentation_path(self):
+        
+        output_segmentation = os.path.join(self.output_dir, f"{self.output_file_name}_{self.algo}.shp")
+        
+        return output_segmentation
+
     def run_segmentation(self):
         """
         Segmenting landsat image
         """
-        self.get_segmentation(r=5, i=10, algo="SLICO")
+        self.get_segmentation(r=5, i=10, algo=self.algo)
