@@ -61,6 +61,11 @@ class LoadSegmentationDatabase:
         
         os.system(command)
 
+    def del_nodata_segmentation(self):
+        sql =   f"SELECT * FROM {self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name}"\
+                f"WHERE 4_average = 0"
+
+        self.runQuery(sql)
 
     def delete_columns_from_segmentation(self):
         sql =   f"ALTER TABLE  {self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name}"\
@@ -72,15 +77,17 @@ class LoadSegmentationDatabase:
                 f"DROP COLUMN 1_stddev; "\
                 f"DROP COLUMN 2_stddev; "\
                 f"DROP COLUMN 3_stddev; "\
-                f"DROP COLUMN 4_stddev; "\
+                f"DROP COLUMN 4_stddev; "
         
         self.runQuery(sql)
 
     def run_load_segmentation(self):
         """Run all process to load segmentation in draft database."""
         self.create_scene_path_row_schema()
-        # self.del_table_scene_path_row_scene()
         self.load_segmentation_database()
+        self.del_nodata_segmentation()
+        self.delete_columns_from_segmentation()
+
 
 
 if __name__ == "__main__":
