@@ -48,7 +48,7 @@ if __name__ == "__main__":
         
         # Create instance of landsat file where scene features are
         sat = SFI.SatelliteFileInfo(file_path)
-
+        
         # Instanciate conection to database log
         with open("/home/diogocaribe/workspace/harpia/app/config/const.yaml", 'r') as f:
             harpia_db = yaml.load(f)
@@ -65,7 +65,13 @@ if __name__ == "__main__":
         # Create directory to save results
         output_dir = od.create_output_dir()
 
-        # Cbers4
+        # Instatiation segmentation class
+        s = SEG.Segmentation(output_dir=output_dir,
+                            output_file_name=sat.get_output_file_name())
+        
+        #####################################################################################
+        ################################### Cbers4/ResorceSat2###############################
+        #####################################################################################
         if sat.is_cbers4_file() or sat.is_resourcesat2_file():
             exp = f"{sys.argv[1]}/*/{sat.get_parameter_satellite()['scene_file_name']}*.zip"
             for i in glob.glob(exp):
@@ -109,14 +115,16 @@ if __name__ == "__main__":
             # CDB.Connection(string).save_db_composition_done(dict=dict, scene_path=output_dir)
 
             # Segmentation
-            SEG.Segmentation(output_dir=output_dir,output_file_name=sat.get_output_file_name()).run_segmentation()
+            s.run_segmentation()
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
             continue
+        
         # Create objet to unpack files
         up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
-
-        # Work with Sentinel2
+        #####################################################################################
+        ################################### Sentinel2 #######################################
+        #####################################################################################
         # Bands: 2 = Blue | 3 = Green | 4 = Red | 8 = Nir |
         if sat.is_sentinel_file():
             # Unzip setinel file
@@ -142,8 +150,9 @@ if __name__ == "__main__":
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
             continue
-        
-        # Work with Landsat 8
+        #####################################################################################
+        ################################### Landsat 8 #######################################
+        #####################################################################################
         elif sat.get_parameter_satellite()['initials_name'] == 'LC08':
             # Set bands to unpack from landsat 8
             bands=[1,2,3,4,5,6,7,9,10,11]
@@ -153,7 +162,9 @@ if __name__ == "__main__":
             # Clip 
             band_order = [3,2,1,4]
 
-        # Work with Landsat 5 and 7
+        #####################################################################################
+        ################################### Landsat 5/7 #####################################
+        #####################################################################################
         elif sat.is_landsat_file():
             # Set bands to unpack from landsat 5 and 7
             bands=[2,3,4,5]
@@ -198,6 +209,7 @@ if __name__ == "__main__":
                     satellite_initials_name=sat.get_parameter_satellite()["initials_name"],
                     date=sat.get_parameter_satellite()["aquisition_date"],
                     tmp_dir=tmp_dir)
+        l.run_load_segmentation()
         # Cloud/Shadow
             # Thinking about compose image in fuction for fmask
-        shutil.rmtree(tmp_dir)
+        # shutil.rmtree(tmp_dir)
