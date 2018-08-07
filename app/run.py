@@ -69,6 +69,13 @@ if __name__ == "__main__":
         s = SEG.Segmentation(output_dir=output_dir,
                             output_file_name=sat.get_output_file_name())
         
+        l = LSD.LoadSegmentationDatabase(segmentation_file_path=s.get_segmentation_path(),
+        output_dir=output_dir, output_file_name=sat.get_output_file_name(), 
+                    satellite_index=sat.get_parameter_satellite()["index"],
+                    satellite_initials_name=sat.get_parameter_satellite()["initials_name"],
+                    date=sat.get_parameter_satellite()["aquisition_date"],
+                    tmp_dir=tmp_dir)
+        
         #####################################################################################
         ################################### Cbers4/ResorceSat2###############################
         #####################################################################################
@@ -116,6 +123,8 @@ if __name__ == "__main__":
 
             # Segmentation
             s.run_segmentation()
+            # Load segmentation
+            l.run_load_segmentation()
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
             continue
@@ -147,6 +156,7 @@ if __name__ == "__main__":
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
             # Segmentation
+            s.run_segmentation()
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
             continue
@@ -197,19 +207,18 @@ if __name__ == "__main__":
         
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
-            s = SEG.Segmentation(output_dir=output_dir,
-                            output_file_name=sat.get_output_file_name())
+
             s.run_segmentation()
             
             # Load database
         
-        l = LSD.LoadSegmentationDatabase(segmentation_file_path=s.get_segmentation_path(),
-        output_dir=output_dir, output_file_name=sat.get_output_file_name(), 
-                    satellite_index=sat.get_parameter_satellite()["index"],
-                    satellite_initials_name=sat.get_parameter_satellite()["initials_name"],
-                    date=sat.get_parameter_satellite()["aquisition_date"],
-                    tmp_dir=tmp_dir)
-        l.run_load_segmentation()
+        # l = LSD.LoadSegmentationDatabase(segmentation_file_path=s.get_segmentation_path(),
+        # output_dir=output_dir, output_file_name=sat.get_output_file_name(), 
+        #             satellite_index=sat.get_parameter_satellite()["index"],
+        #             satellite_initials_name=sat.get_parameter_satellite()["initials_name"],
+        #             date=sat.get_parameter_satellite()["aquisition_date"],
+        #             tmp_dir=tmp_dir)
+        # l.run_load_segmentation()
         # Cloud/Shadow
             # Thinking about compose image in fuction for fmask
         # shutil.rmtree(tmp_dir)
