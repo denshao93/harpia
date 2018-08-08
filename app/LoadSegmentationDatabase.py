@@ -1,24 +1,49 @@
-import os # NOQA
+import os
 import psycopg2
 
 
 class LoadSegmentationDatabase:
     """Load segmetation in draft database."""
 
-    def __init__(self, segmentation_file_path, output_dir, output_file_name, 
-                    satellite_index, satellite_initials_name, date, tmp_dir):
-        """Init."""
-        
-        self.segmentation_file_path = segmentation_file_path
+    def __init__(self, output_dir, 
+                satellite_parameters, 
+                output_file_name):
+        """Set docstring here.
 
+        Parameters
+        ----------
+        self: 
+        output_dir: str
+            Directory where image file be.
+        output_file_name: str
+            Name give to image file save in output directory.
+        satellite_parameters: dict
+            Important parameters from satellite file.
+            Options:
+                dict["initials_name]
+                dict["sensor"]
+                dict["scene_file_name"]
+                dict["aquisition_date"]
+                dict["aquisition_year"]
+                dict["aquisition_month"]
+                dict["aquisition_day"]
+                dict["julian_day"]
+                dict["days_from_today"]
+                dict["index"]
+        Returns
+        -------
+
+        """   
+        # Directory where image file is stored.
+        self.output_dir = output_dir
+        # Dictionary with all parameters from satellite files.
+        self.satellite_parameters = satellite_parameters
+        # Name given to file store in output directory
         self.output_file_name = output_file_name
 
-        self.satellite_index = satellite_index
-        self.satellite_initials_name = satellite_initials_name
-
-        self.output_dir = output_dir
-        
-        self.date = date
+        # Select variables from satellite parameters in order to use.
+        self.satellite_initials_name = self.satellite_parameters["initials_name"]
+        self.satellite_index = self.satellite_parameters["index"]
 
     @staticmethod
     def runQuery(query):
@@ -35,6 +60,7 @@ class LoadSegmentationDatabase:
         """Create schema in draft database where segmentation will be save."""
         sql =   f"CREATE SCHEMA IF NOT EXISTS "\
                 f"{self.satellite_initials_name}_{self.satellite_index}"
+
         self.runQuery(sql)
 
     def create_table_scene_path_row_scene(self):
@@ -43,31 +69,36 @@ class LoadSegmentationDatabase:
                 f"CREATE TABLE IF NOT EXISTS "\
                 f"{self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name} "\
                 f"(id SERIAL PRIMARY KEY, geom GEOMETRY(POLYGON));"
+
         self.runQuery(sql)
 
     def del_table_scene_path_row_scene(self):
         """Clear table to load segmentation."""
         sql =   f"DELETE FROM "\
                 f"{self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name};"
+        
         self.runQuery(sql)
 
     def load_segmentation_database(self):
-
         """Load segmetation in draft database."""
+        segmentation_file_path = os.path.join(self.output_dir, f"{self.output_file_name}_*.shp")
+
         command =   f"ogr2ogr -f \"PostgreSQL\" -a_srs \"EPSG:4674\" -nlt POLYGON -overwrite "\
                     f"PG:\"host=172.16.0.175 user=postgres dbname=ta7_rascunho password=123456\" -progress "\
                     f"-nln {self.satellite_initials_name.lower()}_{self.satellite_index}.{self.output_file_name} "\
-                    f"{self.segmentation_file_path}"
+                    f"{segmentation_file_path}"
         
         os.system(command)
 
     def del_nodata_segmentation(self):
+        """Delete polygons created in dummy region from raster (background)."""   
         sql =   f"SELECT * FROM {self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name} "\
                 f"WHERE '4_average' = 0"
 
         self.runQuery(sql)
 
     def delete_columns_from_segmentation(self):
+        """Delete created by segmentation shapefile that are useless."""
         sql =   f"ALTER TABLE  {self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name}"\
                 f"DROP COLUMN class; "\
                 f"DROP COLUMN 1_average; "\
@@ -84,16 +115,6 @@ class LoadSegmentationDatabase:
     def run_load_segmentation(self):
         """Run all process to load segmentation in draft database."""
         self.create_scene_path_row_schema()
-        # self.load_segmentation_database()
+        self.load_segmentation_database()
         self.del_nodata_segmentation()
         self.delete_columns_from_segmentation()
-
-
-
-if __name__ == "__main__":
-
-    load_seg = LoadSegmentationDatabase(segmentation_file_path="/mnt/cotic/COTIC/GEOPROCESSAMENTO/GEO_DADOS/2_RASTER/2.1_ORTO/PROCESSADA/CBERS/149116/2018/06_Junho/CBERS_4_MUX_20180627_149_116_L2/CBERS_149116_20180627_SLICO.shp",
-    output_dir="/mnt/cotic/COTIC/GEOPROCESSAMENTO/GEO_DADOS/2_RASTER/2.1_ORTO/PROCESSADA/CBERS/149116/2018/06_Junho",
-    output_file_name="CBERS_149116_20180627", tmp_dir = "/tmp",
-    satellite_index="149116", satellite_initials_name="CBERS", date="20180627")
-    load_seg.run_load_segmentation()
