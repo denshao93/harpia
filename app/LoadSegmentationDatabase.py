@@ -48,8 +48,8 @@ class LoadSegmentationDatabase:
     @staticmethod
     def runQuery(query):
         """Run postgres query."""
-        connect_text = """dbname='ta7_rascunho' user='postgres'
-                          host=172.16.0.175 port=5432 password='123456'"""
+        connect_text = """dbname='harpia_rascunho' user='postgres'
+                          host=localhost port=5432 password='postgres'"""
         con = psycopg2.connect(connect_text)
         cur = con.cursor()
         cur.execute(query)

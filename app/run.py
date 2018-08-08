@@ -69,12 +69,9 @@ if __name__ == "__main__":
         s = SEG.Segmentation(output_dir=output_dir,
                             output_file_name=sat.get_output_file_name())
         
-        l = LSD.LoadSegmentationDatabase(segmentation_file_path=s.get_segmentation_path(),
-        output_dir=output_dir, output_file_name=sat.get_output_file_name(), 
-                    satellite_index=sat.get_parameter_satellite()["index"],
-                    satellite_initials_name=sat.get_parameter_satellite()["initials_name"],
-                    date=sat.get_parameter_satellite()["aquisition_date"],
-                    tmp_dir=tmp_dir)
+        l = LSD.LoadSegmentationDatabase(output_dir=output_dir,
+                                        satellite_parameters=parameter_satellite,
+                                        output_file_name=sat.get_output_file_name())
         
         #####################################################################################
         ################################### Cbers4/ResorceSat2###############################
