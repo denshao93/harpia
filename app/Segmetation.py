@@ -42,4 +42,4 @@ class Segmentation:
         """
         Segmenting landsat image
         """
-        self.get_segmentation(r=50, i=10, algo=self.algo)
+        self.get_segmentation(r=5, i=10, algo=self.algo)
