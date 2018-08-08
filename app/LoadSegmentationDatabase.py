@@ -121,12 +121,12 @@ class LoadSegmentationDatabase:
         self.delete_columns_from_segmentation()
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     
-    import SatelliteFileInfo as SFI
-    s = SFI.SatelliteFileInfo(file_path="/home/diogocaribe/BRUTA/CEBERS4/CBERS_4_MUX_20180627_149_116_L2_BAND5.zip")
-    LoadSegmentationDatabase(output_dir="/home/diogocaribe/PROCESSADA/CBERS/149116/2018/06_Junho/CBERS_4_MUX_20180627_149_116_L2",
-                            satellite_parameters=s.get_parameter_satellite(),
-                            output_file_name="CBERS_149116_20180627").run_load_segmentation()
+#     import SatelliteFileInfo as SFI
+#     s = SFI.SatelliteFileInfo(file_path="/home/diogocaribe/BRUTA/CEBERS4/CBERS_4_MUX_20180627_149_116_L2_BAND5.zip")
+#     LoadSegmentationDatabase(output_dir="/home/diogocaribe/PROCESSADA/CBERS/149116/2018/06_Junho/CBERS_4_MUX_20180627_149_116_L2",
+#                             satellite_parameters=s.get_parameter_satellite(),
+#                             output_file_name="CBERS_149116_20180627").run_load_segmentation()
 
     
