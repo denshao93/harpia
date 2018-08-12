@@ -208,14 +208,7 @@ if __name__ == "__main__":
             s.run_segmentation()
             
             # Load database
-        
-        # l = LSD.LoadSegmentationDatabase(segmentation_file_path=s.get_segmentation_path(),
-        # output_dir=output_dir, output_file_name=sat.get_output_file_name(), 
-        #             satellite_index=sat.get_parameter_satellite()["index"],
-        #             satellite_initials_name=sat.get_parameter_satellite()["initials_name"],
-        #             date=sat.get_parameter_satellite()["aquisition_date"],
-        #             tmp_dir=tmp_dir)
-        # l.run_load_segmentation()
+            l.run_load_segmentation()
         # Cloud/Shadow
             # Thinking about compose image in fuction for fmask
-        # shutil.rmtree(tmp_dir)
+        shutil.rmtree(tmp_dir)

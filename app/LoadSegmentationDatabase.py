@@ -48,8 +48,8 @@ class LoadSegmentationDatabase:
     @staticmethod
     def runQuery(query):
         """Run postgres query."""
-        connect_text = """dbname='harpia_rascunho' user='postgres'
-                          host=localhost port=5432 password='postgres'"""
+        connect_text = """dbname='ta7_rascunho' user='postgres'
+                          host=172.16.0.175 port=5432 password='123456'"""
         con = psycopg2.connect(connect_text)
         cur = con.cursor()
         cur.execute(query)
@@ -92,23 +92,24 @@ class LoadSegmentationDatabase:
 
     def del_nodata_segmentation(self):
         """Delete polygons created in dummy region from raster (background)."""   
-        sql =   f"SELECT * FROM {self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name} "\
-                f"WHERE '4_average' = 0"
+        sql =   f"DELETE FROM {self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name} "\
+                f"WHERE \"4_average\" = 0.0"
 
         self.runQuery(sql)
 
     def delete_columns_from_segmentation(self):
         """Delete created by segmentation shapefile that are useless."""
-        sql =   f"ALTER TABLE  {self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name}"\
-                f"DROP COLUMN class; "\
-                f"DROP COLUMN 1_average; "\
-                f"DROP COLUMN 2_average; "\
-                f"DROP COLUMN 3_average; "\
-                f"DROP COLUMN 4_average; "\
-                f"DROP COLUMN 1_stddev; "\
-                f"DROP COLUMN 2_stddev; "\
-                f"DROP COLUMN 3_stddev; "\
-                f"DROP COLUMN 4_stddev; "
+        sql =   f"ALTER TABLE  {self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name} "\
+                f"DROP COLUMN class, "\
+                f"DROP COLUMN area, "\
+                f"DROP COLUMN \"1_average\", "\
+                f"DROP COLUMN \"2_average\", "\
+                f"DROP COLUMN \"3_average\", "\
+                f"DROP COLUMN \"4_average\", "\
+                f"DROP COLUMN \"1_stddev\", "\
+                f"DROP COLUMN \"2_stddev\", "\
+                f"DROP COLUMN \"3_stddev\", "\
+                f"DROP COLUMN \"4_stddev\"; "
         
         self.runQuery(sql)
 
@@ -118,3 +119,14 @@ class LoadSegmentationDatabase:
         self.load_segmentation_database()
         self.del_nodata_segmentation()
         self.delete_columns_from_segmentation()
+
+
+# if __name__ == '__main__':
+    
+#     import SatelliteFileInfo as SFI
+#     s = SFI.SatelliteFileInfo(file_path="/home/diogocaribe/BRUTA/CEBERS4/CBERS_4_MUX_20180627_149_116_L2_BAND5.zip")
+#     LoadSegmentationDatabase(output_dir="/home/diogocaribe/PROCESSADA/CBERS/149116/2018/06_Junho/CBERS_4_MUX_20180627_149_116_L2",
+#                             satellite_parameters=s.get_parameter_satellite(),
+#                             output_file_name="CBERS_149116_20180627").run_load_segmentation()
+
+    
