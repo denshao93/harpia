@@ -119,7 +119,7 @@ if __name__ == "__main__":
             # CDB.Connection(string).save_db_composition_done(dict=dict, scene_path=output_dir)
 
             # Segmentation
-            s.run_segmentation()
+            s.get_segmentation(r=5, i=10, algo='SLICO')
             # Load segmentation
             l.run_load_segmentation()
             # Cloud/Shadow
@@ -153,7 +153,10 @@ if __name__ == "__main__":
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
             # Segmentation
-            s.run_segmentation()
+            s.get_segmentation(r=10, i=10, algo='SEEDS')
+            
+            l.run_load_segmentation()
+
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
             continue
@@ -205,7 +208,7 @@ if __name__ == "__main__":
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
 
-            s.run_segmentation()
+            s.get_segmentation(r=5, i=10, algo='SLICO')
             
             # Load database
             l.run_load_segmentation()
