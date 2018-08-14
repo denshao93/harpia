@@ -59,15 +59,15 @@ class LoadSegmentationDatabase:
     def create_scene_path_row_schema(self):
         """Create schema in draft database where segmentation will be save."""
         sql =   f"CREATE SCHEMA IF NOT EXISTS "\
-                f"{self.satellite_initials_name}_{self.satellite_index}"
+                f"{self.satellite_initials_name.lower()}_{self.satellite_index.lower()};"
 
         self.runQuery(sql)
 
     def create_table_scene_path_row_scene(self):
         """Clear table to load segmentation."""
-        sql =   f"DROP TABLE IF EXISTS {self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name};"\
+        sql =   f"DROP TABLE IF EXISTS {self.satellite_initials_name.lower()}_{self.satellite_index.lower()}.{self.output_file_name.lower()};"\
                 f"CREATE TABLE IF NOT EXISTS "\
-                f"{self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name} "\
+                f"{self.satellite_initials_name.lower()}_{self.satellite_index.lower()}.{self.output_file_name.lower()} "\
                 f"(id SERIAL PRIMARY KEY, geom GEOMETRY(POLYGON));"
 
         self.runQuery(sql)
@@ -75,7 +75,7 @@ class LoadSegmentationDatabase:
     def del_table_scene_path_row_scene(self):
         """Clear table to load segmentation."""
         sql =   f"DELETE FROM "\
-                f"{self.satellite_initials_name}_{self.satellite_index}.{self.output_file_name};"
+                f"{self.satellite_initials_name.lower()}_{self.satellite_index.lower()}.{self.output_file_name.lower()};"
         
         self.runQuery(sql)
 
@@ -85,7 +85,7 @@ class LoadSegmentationDatabase:
 
         command =   f"ogr2ogr -f \"PostgreSQL\" -a_srs \"EPSG:4674\" -nlt POLYGON -overwrite "\
                     f"PG:\"host=172.16.0.175 user=postgres dbname=ta7_rascunho password=123456\" -progress "\
-                    f"-nln {self.satellite_initials_name.lower()}_{self.satellite_index}.{self.output_file_name} "\
+                    f"-nln {self.satellite_initials_name.lower()}_{self.satellite_index.lower()}.{self.output_file_name.lower()} "\
                     f"{segmentation_file_path}"
         
         os.system(command)
@@ -121,12 +121,10 @@ class LoadSegmentationDatabase:
         self.delete_columns_from_segmentation()
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     
-#     import SatelliteFileInfo as SFI
-#     s = SFI.SatelliteFileInfo(file_path="/home/diogocaribe/BRUTA/CEBERS4/CBERS_4_MUX_20180627_149_116_L2_BAND5.zip")
-#     LoadSegmentationDatabase(output_dir="/home/diogocaribe/PROCESSADA/CBERS/149116/2018/06_Junho/CBERS_4_MUX_20180627_149_116_L2",
-#                             satellite_parameters=s.get_parameter_satellite(),
-#                             output_file_name="CBERS_149116_20180627").run_load_segmentation()
-
-    
+    import SatelliteFileInfo as SFI
+    s = SFI.SatelliteFileInfo(file_path="/home/diogocaribe/BRUTA/Sentinel2A/S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.zip")
+    LoadSegmentationDatabase(output_dir="//home/diogocaribe/PROCESSADA/S2A/24LVK/2017/08_Agosto/S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522",
+                            satellite_parameters=s.get_parameter_satellite(),
+                            output_file_name="S2A_24LVK_20170804").run_load_segmentation()
