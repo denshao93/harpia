@@ -121,10 +121,10 @@ class LoadSegmentationDatabase:
         self.delete_columns_from_segmentation()
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     
-    import SatelliteFileInfo as SFI
-    s = SFI.SatelliteFileInfo(file_path="/home/diogocaribe/BRUTA/LANDSAT/LC08_L1TP_216071_20170619_20170629_01_T1.tar.gz")
-    LoadSegmentationDatabase(output_dir="/mnt/cotic/COTIC/GEOPROCESSAMENTO/GEO_DADOS/2_RASTER/2.1_ORTO/PROCESSADA/LC08/216071/2017/06_Junho",
-                            satellite_parameters=s.get_parameter_satellite(),
-                            output_file_name="LC08_216071_20170619").run_load_segmentation()
+#     import SatelliteFileInfo as SFI
+#     s = SFI.SatelliteFileInfo(file_path="/home/diogocaribe/BRUTA/LANDSAT/LC08_L1TP_216071_20170619_20170629_01_T1.tar.gz")
+#     LoadSegmentationDatabase(output_dir="/mnt/cotic/COTIC/GEOPROCESSAMENTO/GEO_DADOS/2_RASTER/2.1_ORTO/PROCESSADA/LC08/216071/2017/06_Junho",
+#                             satellite_parameters=s.get_parameter_satellite(),
+#                             output_file_name="LC08_216071_20170619").run_load_segmentation()
