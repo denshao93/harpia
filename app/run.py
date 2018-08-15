@@ -153,7 +153,7 @@ if __name__ == "__main__":
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
             # Segmentation
-            s.get_segmentation(r=8, i=10, algo='SLICO')
+            s.get_segmentation(r=10, i=10, algo='SLICO')
             
             l.run_load_segmentation()
 
