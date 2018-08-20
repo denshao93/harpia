@@ -147,7 +147,7 @@ class SatelliteFileInfo:
                     # Sentinel
                     "sentinel": 
                         {
-                        "initials_name": scene_file_name[:3],
+                        "initials_name": scene_file_name[:2],
                         "sensor": scene_file_name[4:7],
                         "scene_file_name": scene_file_name,
                         "aquisition_date": scene_file_name[11:19],
