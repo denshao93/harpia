@@ -1,6 +1,6 @@
 import os #NOQA
 import sys
-import yaml
+# import yaml
 import glob
 import shutil
 import tempfile #NOQA
@@ -50,8 +50,8 @@ if __name__ == "__main__":
         sat = SFI.SatelliteFileInfo(file_path)
         
         # Instanciate conection to database log
-        with open("/home/diogocaribe/workspace/harpia/app/config/const.yaml", 'r') as f:
-            harpia_db = yaml.load(f)
+        # with open("/home/diogo.sousa/workspace/harpia/app/config/const.yaml", 'r') as f:
+        #     harpia_db = yaml.load(f)
         
         # Create director where files will be saved
         parameter_satellite = sat.get_parameter_satellite()
@@ -144,11 +144,23 @@ if __name__ == "__main__":
                             utm_zone=sat.get_parameter_satellite()["utm_zone"])
             # Clip
             img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
-            CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
+            
+            c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
                           scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
                           output_dir = output_dir, 
-                          output_file_name = sat.get_output_file_name())\
-                          .run_clip(band_order=[4,3,2,1])
+                          output_file_name = sat.get_output_file_name())
+            c.reproject_raster_to_epsg4674()
+            
+            r = R.Raster(img_path=img_path)
+            
+            if r.intersects_trace_outline_aoi():
+                c.clip_raster_by_mask(band_order=[4,3,2,1])
+            else:
+                import RasterTranslate as RT
+                rt = RT.RasterTranslate(img_path=img_path, output_dir = output_dir, 
+                                   output_file_name= sat.get_output_file_name())
+                rt.translate_8bit()
+
             # Make pyramid
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()

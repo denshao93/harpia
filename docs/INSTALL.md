@@ -136,8 +136,8 @@ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D CMAKE_INSTALL_PREFIX=/usr/local \
 	-D INSTALL_PYTHON_EXAMPLES=ON \
 	-D INSTALL_C_EXAMPLES=OFF \
-	-D OPENCV_EXTRA_MODULES_PATH=/home/diogocaribe/src/opencv_contrib-3.4.1/modules \ 
-	-D PYTHON_EXECUTABLE=/home/diogocaribe/.ve/harpia/bin/python \
+	-D OPENCV_EXTRA_MODULES_PATH=/home/diogo/src/opencv_contrib-3.4.2/modules \ 
+	-D PYTHON_EXECUTABLE=/home/diogo/.ve/harpia/bin/python \
 	-D BUILD_EXAMPLES=ON ..
 
 

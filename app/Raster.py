@@ -50,7 +50,7 @@ class Raster:
         This processing avoid to save raster useless areas.
 
         """
-        ba_line = gu.read_shapefile_poly("/home/diogocaribe/workspace/harpia/data/vector/ba_4674_buffer.shp")
+        ba_line = gu.read_shapefile_poly("/home/diogo.sousa/workspace/harpia/data/vector/ba_4674_buffer.shp")
         
         from shapely import wkt
         trace_outline = wkt.loads(self.trace_outline_from_raster_wkt())
@@ -59,6 +59,23 @@ class Raster:
 
         return intersection
         
+    def intersects_trace_outline_aoi(self):
+        """Verify if image have to be cliped.
+
+        If img overlap boundery of area of interested project (aoi),
+        It should be cliped to remove image that not be useless.
+        This processing avoid to save raster useless areas.
+
+        """
+        ba_line = gu.read_shapefile_poly("/home/diogo.sousa/workspace/harpia/data/vector/ba_4674_line.shp")
+        
+        from shapely import wkt
+        trace_outline = wkt.loads(self.trace_outline_from_raster_wkt())
+
+        intersects = trace_outline.intersects(ba_line)
+
+        return intersects
+
     def trace_outline_from_raster_shapefile(self):
 
         try:
