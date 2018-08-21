@@ -5,7 +5,7 @@ import psycopg2
 class LoadSegmentationDatabase:
     """Load segmetation in draft database."""
 
-    def __init__(self, output_dir, 
+    def __init__(self, tmp_dir, 
                 satellite_parameters, 
                 output_file_name):
         """Set docstring here.
@@ -35,7 +35,7 @@ class LoadSegmentationDatabase:
 
         """   
         # Directory where image file is stored.
-        self.output_dir = output_dir
+        self.output_dir = tmp_dir
         # Dictionary with all parameters from satellite files.
         self.satellite_parameters = satellite_parameters
         # Name given to file store in output directory

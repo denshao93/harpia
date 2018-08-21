@@ -69,7 +69,7 @@ if __name__ == "__main__":
         s = SEG.Segmentation(tmp_dir=tmp_dir,
                             output_file_name=sat.get_output_file_name())
         
-        l = LSD.LoadSegmentationDatabase(output_dir=output_dir,
+        l = LSD.LoadSegmentationDatabase(tmp_dir=tmp_dir,
                                         satellite_parameters=parameter_satellite,
                                         output_file_name=sat.get_output_file_name())
         
