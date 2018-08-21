@@ -4,11 +4,11 @@ class Segmentation:
     
     algo="SLICO"
 
-    def __init__(self, output_dir, output_file_name):
+    def __init__(self, tmp_dir, output_file_name):
 
         self.algo="SLICO"
         # The folder where output processed is stored.
-        self.output_dir = output_dir
+        self.output_dir = tmp_dir
 
         # Name of image file save the will be segmented.
         self.output_file_name = output_file_name
