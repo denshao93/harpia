@@ -58,7 +58,7 @@ class ComposeBands:
         os.chdir(path)
         command = 'gdal_translate SENTINEL2_L1C:{scene_file_name}.SAFE/' \
                   'MTD_MSIL1C.xml:10m:EPSG_327{utm_zone} -ot Byte -scale ' \
-                  '{output_file_name}.TIF -a_nodata 0 --config ' \
+                  '{output_file_name}.TIF --config ' \
                   'GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS ALL_CPUS ' \
                   '-co COMPRESS=DEFLATE' \
                   .format(scene_file_name=scene_file_name,

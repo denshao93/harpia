@@ -4,11 +4,14 @@ class Segmentation:
     
     algo="SLICO"
 
-    def __init__(self, tmp_dir, output_file_name):
+    def __init__(self, tmp_dir, output_dir, output_file_name):
 
         self.algo="SLICO"
+
+        self.tmp_dir = tmp_dir
+
         # The folder where output processed is stored.
-        self.output_dir = tmp_dir
+        self.output_dir = output_dir
 
         # Name of image file save the will be segmented.
         self.output_file_name = output_file_name
@@ -25,7 +28,7 @@ class Segmentation:
         print("........Segmentanção.........")
       
         input_img = os.path.join(self.output_dir, f"{self.output_file_name}.TIF")
-        output_segmentation = os.path.join(self.output_dir, f"{self.output_file_name}_{algo}.shp")
+        output_segmentation = os.path.join(self.tmp_dir, f"{self.output_file_name}_{algo}.shp")
         
         command = f"$HOME/gdal-segment/bin/gdal-segment -region {r} -niter {i} "\
                   f"-algo {algo} {input_img} -out {output_segmentation}"
@@ -37,9 +40,3 @@ class Segmentation:
         output_segmentation = os.path.join(self.output_dir, f"{self.output_file_name}_{self.algo}.shp")
         
         return output_segmentation
-
-    def run_segmentation(self):
-        """
-        Segmenting landsat image
-        """
-        self.get_segmentation(r=5, i=10, algo=self.algo)

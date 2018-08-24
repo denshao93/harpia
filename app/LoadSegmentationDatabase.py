@@ -124,7 +124,7 @@ class LoadSegmentationDatabase:
 # if __name__ == '__main__':
     
 #     import SatelliteFileInfo as SFI
-#     s = SFI.SatelliteFileInfo(file_path="/home/diogocaribe/BRUTA/LANDSAT/LC08_L1TP_216071_20170619_20170629_01_T1.tar.gz")
-#     LoadSegmentationDatabase(output_dir="/mnt/cotic/COTIC/GEOPROCESSAMENTO/GEO_DADOS/2_RASTER/2.1_ORTO/PROCESSADA/LC08/216071/2017/06_Junho",
+#     s = SFI.SatelliteFileInfo(file_path="/home/diogo.sousa/BRUTA/LANDSAT/LC08_L1TP_215068_20151114_20170402_01_T1.tar.gz")
+#     LoadSegmentationDatabase(tmp_dir="/home/diogo.sousa/Desktop",
 #                             satellite_parameters=s.get_parameter_satellite(),
-#                             output_file_name="LC08_216071_20170619").run_load_segmentation()
+#                             output_file_name="LC08_215068_20151114").run_load_segmentation()

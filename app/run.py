@@ -66,7 +66,7 @@ if __name__ == "__main__":
         output_dir = od.create_output_dir()
 
         # Instatiation segmentation class
-        s = SEG.Segmentation(tmp_dir=tmp_dir,
+        s = SEG.Segmentation(output_dir=output_dir, tmp_dir=tmp_dir,
                             output_file_name=sat.get_output_file_name())
         
         l = LSD.LoadSegmentationDatabase(tmp_dir=tmp_dir,
