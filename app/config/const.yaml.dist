@@ -1,0 +1,4 @@
+draft_db = {host: <host_address>,
+            dbname: <database_name>,
+            user: <user>,
+            password: <password>}

@@ -2,8 +2,6 @@
 *.img
 .idea
 .vscode
-organizar
 *.pyc
-env
 __pycache__
-config/const.yaml
+app/config/const.yaml
