@@ -13,6 +13,7 @@ import OrganizeDirectory as OD
 import SatelliteFileInfo as SFI
 import Connection2Database as CDB
 import Raster as R
+import RasterReproject as RR
 import LoadSegmentationDatabase as LSD
 
 
@@ -142,6 +143,11 @@ if __name__ == "__main__":
                             output_file_name=sat.get_output_file_name()) \
             .stack_sentinel(scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
                             utm_zone=sat.get_parameter_satellite()["utm_zone"])
+            
+            # Reproject to Sirgas 2000 
+            rprj = RR.RasterReproject(tmp_dir=tmp_dir, output_file_name=sat.get_output_file_name())
+            rprj.reproject_raster_to_epsg4674()
+
             # Clip
             img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
             
@@ -149,7 +155,6 @@ if __name__ == "__main__":
                           scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
                           output_dir = output_dir, 
                           output_file_name = sat.get_output_file_name())
-            c.reproject_raster_to_epsg4674()
             
             r = R.Raster(img_path=img_path)
             
@@ -164,10 +169,11 @@ if __name__ == "__main__":
             # Make pyramid
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
-            # Segmentation
-            s.get_segmentation(r=10, i=10, algo='SLICO')
             
-            l.run_load_segmentation()
+            # Segmentation
+            # s.get_segmentation(r=10, i=10, algo='SLICO')
+            
+            # l.run_load_segmentation()
 
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
@@ -206,13 +212,29 @@ if __name__ == "__main__":
                         output_file_name=sat.get_output_file_name()) \
                         .stack_img(expression=expression,
                                 extension = '.TIF')
+        
+        # Reproject to Sirgas 2000 
+        rprj = RR.RasterReproject(tmp_dir=tmp_dir, output_file_name=sat.get_output_file_name())
+        rprj.reproject_raster_to_epsg4674()
+
         # Clip
-        img_path = f"{tmp_dir}/{sat.get_parameter_satellite()['scene_file_name']}.TIF"
-        CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
-                        scene_file_name=sat.get_scene_file_name(),
+        img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
+        
+        c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
+                        scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
                         output_dir = output_dir, 
-                        output_file_name = sat.get_output_file_name())\
-                        .run_clip(band_order=band_order)
+                        output_file_name = sat.get_output_file_name())
+        
+        r = R.Raster(img_path=img_path)
+        
+        if r.intersects_trace_outline_aoi():
+            c.clip_raster_by_mask(band_order=band_order)
+        else:
+            import RasterTranslate as RT
+            rt = RT.RasterTranslate(img_path=img_path, output_dir = output_dir, 
+                                output_file_name= sat.get_output_file_name())
+            rt.translate_8bit()
+        
         # Make pyramid
         img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
         PR.PyramidRaster(img_path=img_path).create_img_pyramid()
@@ -220,10 +242,11 @@ if __name__ == "__main__":
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
 
-            s.get_segmentation(r=5, i=10, algo='SLICO')
+            # s.get_segmentation(r=5, i=10, algo='SLICO')
             
             # Load database
-            l.run_load_segmentation()
+            # l.run_load_segmentation()
+            pass
         # Cloud/Shadow
             # Thinking about compose image in fuction for fmask
         shutil.rmtree(tmp_dir)
