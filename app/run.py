@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     # Create list of zip and tar.gz files from folder where they are store.
     files = [f for f_ in [glob.glob(e)
-            for e in (sys.argv[1]+'/*/S2A*.zip',
+            for e in (sys.argv[1]+'/*/S2*.zip',
                       sys.argv[1]+'/*/CBERS*BAND5.zip',
                       sys.argv[1]+'/*/CBERS*BAND13.zip', 
                       sys.argv[1]+'/*/R2*BAND5*.zip',
