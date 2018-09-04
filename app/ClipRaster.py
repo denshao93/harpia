@@ -22,22 +22,6 @@ class ClipRaster:
         self.output_dir = output_dir
 
         self.output_file_name = output_file_name
-
-    def check_img_will_be_cliped(self):
-        """Verify if image have to be cliped.
-
-        If img overlap boundery of area of interested project (aoi),
-        It should be cliped to remove image that not be useless.
-        This processing avoid to save raster useless areas.
-
-        """
-        ba_line = gu.read_shapefile_poly("data/vector/ba_4674_line.shp")
-        trace_outline = R.Raster(self.image_path).trace_outline_from_raster_wkt()
-        trace_outline = wkt.loads(trace_outline)
-
-        check_intersects = trace_outline.intersects(ba_line)
-
-        return check_intersects
     
     #Transform to uint8
     @staticmethod
@@ -59,7 +43,7 @@ class ClipRaster:
                 "width": out_image.shape[2],
                 "transform": out_transform,
                 "alpha": 'NO',
-                "COMPRESS": 'LZW',
+                "COMPRESS": 'DEFLATE',
                 "PHOTOMETRIC": 'RGB',
                 "dtype": "uint8"})
             out_image = self.scale8bit(out_image)
@@ -69,20 +53,8 @@ class ClipRaster:
             # This bands not the same in LC08
             dest.write(out_image, band_order) 
 
-   
-    def reproject_raster_to_epsg4674(self):
-
-        command =   f"gdalwarp -t_srs EPSG:4674 -wo NUM_THREADS=ALL_CPUS "\
-                    f"-wo SOURCE_EXTRA=1000 --config GDAL_CACHEMAX 500 -wm 500 "\
-                    f"{self.tmp_dir}/{self.output_file_name}.TIF "\
-                    f"{self.tmp_dir}/r{self.output_file_name}.TIF"
-
-        os.system(command)
-
-    
     def run_clip(self, band_order):
         """
         band_order = ex. [4,3,2,1]
         """
-        self.reproject_raster_to_epsg4674()
         self.clip_raster_by_mask(band_order)

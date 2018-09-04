@@ -48,8 +48,8 @@ class LoadSegmentationDatabase:
     @staticmethod
     def runQuery(query):
         """Run postgres query."""
-        connect_text = """dbname='ta7_rascunho' user='postgres'
-                          host=172.16.0.175 port=5432 password='123456'"""
+        connect_text = """dbname='harpia_rascunho' user='postgres'
+                          host=localhost port=postgres password='123456'"""
         con = psycopg2.connect(connect_text)
         cur = con.cursor()
         cur.execute(query)
@@ -84,7 +84,7 @@ class LoadSegmentationDatabase:
         segmentation_file_path = os.path.join(self.output_dir, f"{self.output_file_name}_*.shp")
 
         command =   f"ogr2ogr -f \"PostgreSQL\" -a_srs \"EPSG:4674\" -nlt POLYGON -overwrite "\
-                    f"PG:\"host=172.16.0.175 user=postgres dbname=ta7_rascunho password=123456\" -progress "\
+                    f"PG:\"host=localhost user=postgres dbname=harpia_rascunho password=postgres\" -progress "\
                     f"-nln {self.satellite_initials_name.lower()}_{self.satellite_index.lower()}.{self.output_file_name.lower()} "\
                     f"{segmentation_file_path}"
         
