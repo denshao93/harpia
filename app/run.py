@@ -1,25 +1,25 @@
 import os #NOQA
 import sys
-# import yaml
 import glob
 import shutil
 import tempfile #NOQA
+import Raster as R
 import UnpackFile as UF
 import ClipRaster as CR
 import ComposeBands as CB
 import Segmetation as SEG
 import PyramidRaster as PR
+import CloudShadowLC8 as CL
+import RasterReproject as RR
 import OrganizeDirectory as OD
 import SatelliteFileInfo as SFI
 import Connection2Database as CDB
-import Raster as R
-import RasterReproject as RR
 import LoadSegmentationDatabase as LSD
 
 
 if __name__ == "__main__":
     # argv[1] = directory where targz files are stored.
-    # argv[2] = directory where folder tree will be created to sabe processed
+    # argv[2] = directory where folder tree will be created to save processed
     # files.
 
     # Important variables:
@@ -145,8 +145,10 @@ if __name__ == "__main__":
                             utm_zone=sat.get_parameter_satellite()["utm_zone"])
             
             # Reproject to Sirgas 2000 
-            rprj = RR.RasterReproject(tmp_dir=tmp_dir, 
-                                      output_file_name=sat.get_output_file_name())
+            input_img_path = os.path.join(tmp_dir, f"{sat.get_output_file_name()}.TIF")
+            output_img_path = os.path.join(tmp_dir, f"r{sat.get_output_file_name()}.TIF")
+            
+            rprj = RR.RasterReproject(input_img_path, output_img_path)
             rprj.reproject_raster_to_epsg4674()
 
             # Clip
@@ -216,7 +218,10 @@ if __name__ == "__main__":
                                 extension = '.TIF')
         
         # Reproject to Sirgas 2000 
-        rprj = RR.RasterReproject(tmp_dir=tmp_dir, output_file_name=sat.get_output_file_name())
+        input_img_path = os.path.join(tmp_dir, f"{sat.get_output_file_name()}.TIF")
+        output_img_path = os.path.join(tmp_dir, f"r{sat.get_output_file_name()}.TIF")
+            
+        rprj = RR.RasterReproject(input_img_path, output_img_path)
         rprj.reproject_raster_to_epsg4674()
 
         # Clip
@@ -229,6 +234,7 @@ if __name__ == "__main__":
         
         r = R.Raster(img_path=img_path)
         
+        # Only clip raster if it intersects limit of project
         if r.intersects_trace_outline_aoi():
             c.clip_raster_by_mask(band_order=band_order)
         else:
@@ -248,7 +254,10 @@ if __name__ == "__main__":
             
             # Load database
             # l.run_load_segmentation()
+            # cloud = CL.CloudShadow(tmp_dir=tmp_dir, output_dir=output_dir,
+            #                       file_name=sat.get_scene_file_name)
+            # cloud.run_cloud_shadow_fmask()
             pass
         # Cloud/Shadow
             # Thinking about compose image in fuction for fmask
-        shutil.rmtree(tmp_dir)
+        # shutil.rmtree(tmp_dir)
