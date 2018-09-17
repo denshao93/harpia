@@ -145,7 +145,8 @@ if __name__ == "__main__":
                             utm_zone=sat.get_parameter_satellite()["utm_zone"])
             
             # Reproject to Sirgas 2000 
-            rprj = RR.RasterReproject(tmp_dir=tmp_dir, output_file_name=sat.get_output_file_name())
+            rprj = RR.RasterReproject(tmp_dir=tmp_dir, 
+                                      output_file_name=sat.get_output_file_name())
             rprj.reproject_raster_to_epsg4674()
 
             # Clip
@@ -162,8 +163,9 @@ if __name__ == "__main__":
                 c.clip_raster_by_mask(band_order=[4,3,2,1])
             else:
                 import RasterTranslate as RT
-                rt = RT.RasterTranslate(img_path=img_path, output_dir = output_dir, 
-                                   output_file_name= sat.get_output_file_name())
+                rt = RT.RasterTranslate(img_path=img_path, 
+                                        output_dir = output_dir, 
+                                        output_file_name= sat.get_output_file_name())
                 rt.translate_8bit()
 
             # Make pyramid
