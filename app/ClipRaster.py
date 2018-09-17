@@ -47,7 +47,7 @@ class ClipRaster:
                 "PHOTOMETRIC": 'RGB',
                 "dtype": "uint8"})
             # If raster data type is diffent from 8bits convert to it
-            if out_meta['dtype'] != 'uint8':
+            if out_image.dtype != 'uint8':
                 out_image = self.scale8bit(out_image)
         
         with rasterio.open(f"{self.output_dir}/{self.output_file_name}.TIF", "w", **out_meta) as dest:
