@@ -111,13 +111,10 @@ if __name__ == "__main__":
                           output_dir = output_dir, 
                           output_file_name = sat.get_output_file_name())\
                           .run_clip(band_order=band_order)
+            
             # Make pyramid
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
-
-            # string = "host=localhost dbname=harpia user='postgres' password='postgres'"
-            # dict = sat.get_parameter_satellite()
-            # CDB.Connection(string).save_db_composition_done(dict=dict, scene_path=output_dir)
 
             # Segmentation
             s.get_segmentation(r=5, i=10, algo='SLICO')
@@ -144,7 +141,7 @@ if __name__ == "__main__":
             .stack_sentinel(scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
                             utm_zone=sat.get_parameter_satellite()["utm_zone"])
             
-            # Reproject to Sirgas 2000 
+            # Reproject to Sirgas 2000
             input_img_path = os.path.join(tmp_dir, f"{sat.get_output_file_name()}.TIF")
             output_img_path = os.path.join(tmp_dir, f"r{sat.get_output_file_name()}.TIF")
             
