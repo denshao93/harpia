@@ -214,7 +214,7 @@ if __name__ == "__main__":
                         .stack_img(expression=expression,
                                 extension = '.TIF')
         
-        # Reproject to Sirgas 2000 
+        # Reproject to compose bands (3456) to Sirgas 2000 
         input_img_path = os.path.join(tmp_dir, f"{sat.get_output_file_name()}.TIF")
         output_img_path = os.path.join(tmp_dir, f"r{sat.get_output_file_name()}.TIF")
             
@@ -251,9 +251,9 @@ if __name__ == "__main__":
             
             # Load database
             # l.run_load_segmentation()
-            # cloud = CL.CloudShadow(tmp_dir=tmp_dir, output_dir=output_dir,
-            #                       file_name=sat.get_scene_file_name)
-            # cloud.run_cloud_shadow_fmask()
+            cloud = CL.CloudShadow(tmp_dir, output_dir, sat.get_scene_file_name(),
+                                  sat.get_output_file_name())
+            cloud.run_cloud_shadow_fmask()
             pass
         # Cloud/Shadow
             # Thinking about compose image in fuction for fmask
