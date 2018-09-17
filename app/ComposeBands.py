@@ -35,7 +35,7 @@ class ComposeBands:
         output_image_path = os.path.join(self.output_dir,
                                          self.output_file_name + extension)
 
-        command = 'gdal_merge.py -separate -a_nodata 0 -o ' \
+        command = 'gdal_merge.py -separate -a_nodata 0 -co PHOTOMETRIC=RGB -o ' \
                   ' {output_image_path} {input_img_dir}' \
                   .format(output_image_path=output_image_path,
                           input_img_dir=input_img_dir)
