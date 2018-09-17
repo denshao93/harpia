@@ -32,7 +32,7 @@ class ClipRaster:
     def clip_raster_by_mask(self, band_order):
         print(".........Clip raster..........")
         
-        with fiona.open("../data/vector/ba_4674_buffer.shp", "r") as shapefile:
+        with fiona.open("/home/diogocaribe/workspace/harpia/app/data/ba_4674_buffer.shp", "r") as shapefile:
             features = [feature["geometry"] for feature in shapefile]
         
         with rasterio.open(f"{self.tmp_dir}/r{self.output_file_name}.TIF") as src:
@@ -46,7 +46,7 @@ class ClipRaster:
                 "COMPRESS": 'DEFLATE',
                 "PHOTOMETRIC": 'RGB',
                 "dtype": "uint8"})
-            out_image = self.scale8bit(out_image)
+            #out_image = self.scale8bit(out_image)
         
         with rasterio.open(f"{self.output_dir}/{self.output_file_name}.TIF", "w", **out_meta) as dest:
             # Set order bands to save (NIR/GREEN/RED/BLUE)
