@@ -4,6 +4,7 @@ import Raster as R
 import ClipRaster as CR
 import RasterReproject as RR
 
+
 class CloudShadow:
 
     def __init__(self,
@@ -25,7 +26,7 @@ class CloudShadow:
         command = f"gdal_merge.py -separate -of HFA -co COMPRESSED=YES "\
                   f"-o {self.tmp_dir}/ref.img {self.tmp_dir}/LC08*_B[1-7,9].TIF"
         os.system(command)
-    
+
     def compose_bands_thermal(self):
         print(".....Compose Thermal....")
         command = f"gdal_merge.py -separate -of HFA -co COMPRESSED=YES "\
@@ -60,32 +61,34 @@ class CloudShadow:
                   f"-z {self.tmp_dir}/angles.img -s {self.tmp_dir}/saturationmask.img "\
                   f"-o {self.tmp_dir}/c{self.scene_file_name}.tif"
         os.system(command)
-    
+
     def reproject_cloud_detection(self):
-        # Reproject to compose bands (3456) to Sirgas 2000 
-        input_img_path = os.path.join(self.tmp_dir, f"c{self.scene_file_name}.tif")
-        output_img_path = os.path.join(self.tmp_dir, f"rc{self.scene_file_name}.tif")
-            
+        # Reproject to compose bands (3456) to Sirgas 2000
+        input_img_path = os.path.join(
+            self.tmp_dir, f"c{self.scene_file_name}.tif")
+        output_img_path = os.path.join(
+            self.tmp_dir, f"rc{self.scene_file_name}.tif")
+
         rprj = RR.RasterReproject(input_img_path, output_img_path)
         rprj.reproject_raster_to_epsg4674()
-    
+
     def clip_cloud(self):
-        
+
         # Clip
 
         # Cloud reprojected file
         rc = os.path.join(self.tmp_dir, f"rc{self.scene_file_name}.tif")
-        
+
         r = R.Raster(img_path=rc)
-        
+
         # Only clip raster if it intersects limit of project
         if r.intersects_trace_outline_aoi():
-            
-            c = CR.ClipRaster(img_path=rc, tmp_dir=self.tmp_dir, 
-                        scene_file_name=self.scene_file_name,
-                        output_dir = self.output_dir, 
-                        output_file_name = f"c{self.output_file_name}.TIF")
-            
+
+            c = CR.ClipRaster(img_path=rc, tmp_dir=self.tmp_dir,
+                              scene_file_name=self.scene_file_name,
+                              output_dir=self.output_dir,
+                              output_file_name=f"c{self.output_file_name}.TIF")
+
             c.clip_raster_by_mask()
         else:
             dst = os.path.join(self.output_dir, f"c{self.scene_file_name}.tif")
@@ -106,12 +109,3 @@ class CloudShadow:
         self.cloud_detection()
         self.reproject_cloud_detection()
         self.clip_cloud()
-
-
-# if __name__ == '__main__':
-
-    
-#     c = CloudShadow(tmp_dir="/tmp/tmpne7c6khj", output_dir,
-#                  scene_file_name,
-#                  output_file_name):
-
