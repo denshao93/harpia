@@ -164,3 +164,20 @@ cmake ../
 sudo make
 
 ```
+
+## Install fmask
+
+```c
+
+cd ~/Downloads
+workon harpia
+wget 'https://bitbucket.org/chchrsc/rios/downloads/rios-1.4.6.tar.gz'
+wget 'https://bitbucket.org/chchrsc/python-fmask/downloads/python-fmask-0.4.5.tar.gz'
+tar -xvzf rios-1.4.6.tar.gz
+tar -xvzf python-fmask-0.4.5.tar.gz
+
+workon harpia
+cd rios-1.4.6 && python setup.py install
+cd python-fmask-0.4.5 && python setup.py install
+
+```
