@@ -46,7 +46,9 @@ class ClipRaster:
                 "COMPRESS": 'DEFLATE',
                 "PHOTOMETRIC": 'RGB',
                 "dtype": "uint8"})
-            #out_image = self.scale8bit(out_image)
+            # If raster data type is diffent from 8bits convert to it
+            if out_meta['dtype'] != 'uint8':
+                out_image = self.scale8bit(out_image)
         
         with rasterio.open(f"{self.output_dir}/{self.output_file_name}.TIF", "w", **out_meta) as dest:
             # Set order bands to save (NIR/GREEN/RED/BLUE)
