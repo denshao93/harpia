@@ -1,4 +1,5 @@
 import os
+import yaml
 import psycopg2
 
 
@@ -45,11 +46,25 @@ class LoadSegmentationDatabase:
         self.satellite_initials_name = self.satellite_parameters["initials_name"]
         self.satellite_index = self.satellite_parameters["index"]
 
-    @staticmethod
-    def runQuery(query):
+    def connection_string_db(self):
+        # Open yaml 
+        with open("config/const.yaml", 'r') as f:
+            const = yaml.load(f)
+        host = const['draft_db']['host']
+        dbname = const['draft_db']['dbname']
+        user = const['draft_db']['user']
+        password = const['draft_db']['password']
+        port = const['draft_db']['port']
+
+        db_string = f'host={host},database={dbname},user={user},'\
+                    f'password={password},port={port}'
+        print(db_string)
+                        
+        return db_string
+    
+    def runQuery(self, query):
         """Run postgres query."""
-        connect_text = """dbname='harpia_rascunho' user='postgres'
-                          host=localhost port=postgres password='123456'"""
+        connect_text = self.connection_string_db()
         con = psycopg2.connect(connect_text)
         cur = con.cursor()
         cur.execute(query)
@@ -83,9 +98,10 @@ class LoadSegmentationDatabase:
         """Load segmetation in draft database."""
         segmentation_file_path = os.path.join(self.output_dir, f"{self.output_file_name}_*.shp")
 
-        command =   f"ogr2ogr -f \"PostgreSQL\" -a_srs \"EPSG:4674\" -nlt POLYGON -overwrite "\
-                    f"PG:\"host=localhost user=postgres dbname=harpia_rascunho password=postgres\" -progress "\
-                    f"-nln {self.satellite_initials_name.lower()}_{self.satellite_index.lower()}.{self.output_file_name.lower()} "\
+        command =   f"ogr2ogr -f \"PostgreSQL\" -a_srs \"EPSG:4674\" -nlt POLYGON "\
+                    f"-overwrite PG:\"{self.connection_string_db}\" -progress "\
+                    f"-nln {self.satellite_initials_name.lower()}_"\
+                    f"{self.satellite_index.lower()}.{self.output_file_name.lower()} "\
                     f"{segmentation_file_path}"
         
         os.system(command)
@@ -121,10 +137,10 @@ class LoadSegmentationDatabase:
         self.delete_columns_from_segmentation()
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     
-#     import SatelliteFileInfo as SFI
-#     s = SFI.SatelliteFileInfo(file_path="/home/diogo.sousa/BRUTA/LANDSAT/LC08_L1TP_215068_20151114_20170402_01_T1.tar.gz")
-#     LoadSegmentationDatabase(tmp_dir="/home/diogo.sousa/Desktop",
-#                             satellite_parameters=s.get_parameter_satellite(),
-#                             output_file_name="LC08_215068_20151114").run_load_segmentation()
+    import SatelliteFileInfo as SFI
+    s = SFI.SatelliteFileInfo(file_path="/home/diogo.sousa/BRUTA/LANDSAT/LC08_L1TP_215068_20151114_20170402_01_T1.tar.gz")
+    LoadSegmentationDatabase(tmp_dir="/home/diogo.sousa/Desktop",
+                            satellite_parameters=s.get_parameter_satellite(),
+                            output_file_name="LC08_215068_20151114").run_load_segmentation()
