@@ -110,7 +110,7 @@ if __name__ == "__main__":
                           scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
                           output_dir = output_dir, 
                           output_file_name = sat.get_output_file_name())\
-                          .run_clip(band_order=band_order)
+                          .clip_raster_by_mask(band_order=band_order)
             
             # Make pyramid
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
@@ -165,7 +165,7 @@ if __name__ == "__main__":
                 rt = RT.RasterTranslate(img_path=img_path, 
                                         output_dir = output_dir, 
                                         output_file_name= sat.get_output_file_name())
-                rt.translate_8bit()
+                rt.translate_8bit(band_order=[4,3,2,1])
 
             # Make pyramid
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
@@ -238,7 +238,7 @@ if __name__ == "__main__":
             import RasterTranslate as RT
             rt = RT.RasterTranslate(img_path=img_path, output_dir = output_dir, 
                                 output_file_name= sat.get_output_file_name())
-            rt.translate_8bit()
+            rt.translate_8bit(band_order)
         
         # Make pyramid
         img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
