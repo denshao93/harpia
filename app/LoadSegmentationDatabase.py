@@ -48,7 +48,7 @@ class LoadSegmentationDatabase:
 
     def connection_string_db(self):
         # Open yaml 
-        with open("config/const.yaml", 'r') as f:
+        with open("/home/diogocaribe/workspace/harpia/app/config/const.yaml", 'r') as f:
             const = yaml.load(f)
         host = const['draft_db']['host']
         dbname = const['draft_db']['dbname']
@@ -56,10 +56,9 @@ class LoadSegmentationDatabase:
         password = const['draft_db']['password']
         port = const['draft_db']['port']
 
-        db_string = f'host={host},database={dbname},user={user},'\
-                    f'password={password},port={port}'
-        print(db_string)
-                        
+        db_string = f"host={host} dbname={dbname} user={user}"\
+                    f" password={password} port={port}"
+
         return db_string
     
     def runQuery(self, query):
@@ -99,7 +98,7 @@ class LoadSegmentationDatabase:
         segmentation_file_path = os.path.join(self.output_dir, f"{self.output_file_name}_*.shp")
 
         command =   f"ogr2ogr -f \"PostgreSQL\" -a_srs \"EPSG:4674\" -nlt POLYGON "\
-                    f"-overwrite PG:\"{self.connection_string_db}\" -progress "\
+                    f"-overwrite PG:\"{self.connection_string_db()}\" -progress "\
                     f"-nln {self.satellite_initials_name.lower()}_"\
                     f"{self.satellite_index.lower()}.{self.output_file_name.lower()} "\
                     f"{segmentation_file_path}"
@@ -140,7 +139,7 @@ class LoadSegmentationDatabase:
 if __name__ == '__main__':
     
     import SatelliteFileInfo as SFI
-    s = SFI.SatelliteFileInfo(file_path="/home/diogo.sousa/BRUTA/LANDSAT/LC08_L1TP_215068_20151114_20170402_01_T1.tar.gz")
-    LoadSegmentationDatabase(tmp_dir="/home/diogo.sousa/Desktop",
+    s = SFI.SatelliteFileInfo(file_path="/home/diogocaribe/BRUTA/CEBERS4/CBERS_4_MUX_20170718_151_116_L4_BAND5.zip")
+    LoadSegmentationDatabase(tmp_dir="/tmp/tmp69jlnbop",
                             satellite_parameters=s.get_parameter_satellite(),
-                            output_file_name="LC08_215068_20151114").run_load_segmentation()
+                            output_file_name="CBERS_151116_20170718").run_load_segmentation()
