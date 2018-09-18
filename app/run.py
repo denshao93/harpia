@@ -103,27 +103,45 @@ if __name__ == "__main__":
                             output_file_name=sat.get_output_file_name())\
                             .stack_img(expression=expression,
                                        extension = '.TIF')
-                        
-            # Clip
+
+            # Reproject to Sirgas 2000
+            input_img_path = os.path.join(tmp_dir, f"{sat.get_output_file_name()}.TIF")
+            output_img_path = os.path.join(tmp_dir, f"r{sat.get_output_file_name()}.TIF")
+            
+            rprj = RR.RasterReproject(input_img_path, output_img_path)
+            rprj.reproject_raster_to_epsg4674()
+
+             # Clip
             img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
-            CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
+            
+            c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
                           scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
                           output_dir = output_dir, 
-                          output_file_name = sat.get_output_file_name())\
-                          .clip_raster_by_mask(band_order=band_order)
+                          output_file_name = sat.get_output_file_name())
+            
+            r = R.Raster(img_path=img_path)
+            
+            if r.intersects_trace_outline_aoi():
+                c.clip_raster_by_mask(band_order)
+            else:
+                import RasterTranslate as RT
+                rt = RT.RasterTranslate(img_path=img_path, 
+                                        output_dir = output_dir, 
+                                        output_file_name= sat.get_output_file_name())
+                rt.translate_8bit(band_order)
             
             # Make pyramid
             img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
-            s.get_segmentation(r=5, i=10, algo='SLICO')
+            # s.get_segmentation(r=5, i=10, algo='SLICO')
             # Load segmentation
-            l.run_load_segmentation()
+            # l.run_load_segmentation()
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
             continue
-        
+
         # Create objet to unpack files
         up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
         #####################################################################################
