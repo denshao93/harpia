@@ -1,4 +1,15 @@
-draft_db = {host: <host_address>,
-            dbname: <database_name>,
-            user: <user>,
-            password: <password>}
+draft_db: 
+    host: 'host'
+    dbname: 'dbname'
+    user: 'user'
+    password: 'password'
+    port: port
+
+data_hub:
+    user: 'user>
+    password: 'password'
+
+
+usgs:
+    user: 'user_name'
+    password: 'password'
