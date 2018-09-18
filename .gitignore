@@ -5,3 +5,4 @@
 *.pyc
 __pycache__
 app/config/const.yaml
+app/download/baixo_sul.geojson
