@@ -1,8 +1,8 @@
-import os #NOQA
+import os  # NOQA
 import sys
 import glob
 import shutil
-import tempfile #NOQA
+import tempfile  # NOQA
 import Raster as R
 import UnpackFile as UF
 import ClipRaster as CR
@@ -30,50 +30,49 @@ if __name__ == "__main__":
         # output_dir = directory where results will be stored.
         # It is created by OrganizedDirectory class
 
-
     # Create list of zip and tar.gz files from folder where they are store.
     files = [f for f_ in [glob.glob(e)
-            for e in (sys.argv[1]+'/*/S2*.zip',
-                      sys.argv[1]+'/*/CBERS*BAND5.zip',
-                      sys.argv[1]+'/*/CBERS*BAND13.zip', 
-                      sys.argv[1]+'/*/R2*BAND5*.zip',
-                      sys.argv[1]+'/*/L*.tar.gz')]
-            for f in f_]
+                          for e in (sys.argv[1]+'/*/S2*.zip',
+                                    sys.argv[1]+'/*/CBERS*BAND5.zip',
+                                    sys.argv[1]+'/*/CBERS*BAND13.zip',
+                                    sys.argv[1]+'/*/R2*BAND5*.zip',
+                                    sys.argv[1]+'/*/L*.tar.gz')]
+             for f in f_]
 
     for file_path in files:
-        
+
         print(file_path)
 
         # Create tmp director to put all temp files
         tmp_dir = tempfile.mkdtemp()
-        
+
         # Create instance of landsat file where scene features are
         sat = SFI.SatelliteFileInfo(file_path)
-        
+
         # Instanciate conection to database log
         # with open("/home/diogo.sousa/workspace/harpia/app/config/const.yaml", 'r') as f:
         #     harpia_db = yaml.load(f)
-        
+
         # Create director where files will be saved
         parameter_satellite = sat.get_parameter_satellite()
         od = OD.OrganizeDirectory(root_dir_path=sys.argv[2],
-                satellite_name=parameter_satellite["initials_name"],
-                satellite_index=parameter_satellite["index"],
-                year=parameter_satellite["aquisition_year"],
-                month=parameter_satellite["aquisition_month"],
-                file_name=parameter_satellite["scene_file_name"])
+                                  satellite_name=parameter_satellite["initials_name"],
+                                  satellite_index=parameter_satellite["index"],
+                                  year=parameter_satellite["aquisition_year"],
+                                  month=parameter_satellite["aquisition_month"],
+                                  file_name=parameter_satellite["scene_file_name"])
 
         # Create directory to save results
         output_dir = od.create_output_dir()
 
         # Instatiation segmentation class
         s = SEG.Segmentation(output_dir=output_dir, tmp_dir=tmp_dir,
-                            output_file_name=sat.get_output_file_name())
-        
+                             output_file_name=sat.get_output_file_name())
+
         l = LSD.LoadSegmentationDatabase(tmp_dir=tmp_dir,
-                                        satellite_parameters=parameter_satellite,
-                                        output_file_name=sat.get_output_file_name())
-        
+                                         satellite_parameters=parameter_satellite,
+                                         output_file_name=sat.get_output_file_name())
+
         #####################################################################################
         ################################### Cbers4/ResorceSat2###############################
         #####################################################################################
@@ -86,7 +85,7 @@ if __name__ == "__main__":
             # Bands: 5 = Blue | 6 = Green | 7 = Red | 8 = Nir |
             if sat.is_cbers4_file():
                 bands_expression = '5-8'
-                band_order = [4,3,2,1]
+                band_order = [4, 3, 2, 1]
                 expression = f"CBERS*BAND[{bands_expression}].tif"
 
                 if parameter_satellite['sensor'] == 'WFI':
@@ -96,49 +95,53 @@ if __name__ == "__main__":
             elif sat.is_resourcesat2_file():
                 bands_expression = '2-5'
                 expression = f"R2*BAND[{bands_expression}]*.tif"
-                band_order = [3,2,1,4]
-            
+                band_order = [3, 2, 1, 4]
+
             CB.ComposeBands(input_dir=tmp_dir,
                             output_dir=tmp_dir,
                             output_file_name=sat.get_output_file_name())\
-                            .stack_img(expression=expression,
-                                       extension = '.TIF')
+                .stack_img(expression=expression,
+                           extension='.TIF')
 
             # Reproject to Sirgas 2000
-            input_img_path = os.path.join(tmp_dir, f"{sat.get_output_file_name()}.TIF")
-            output_img_path = os.path.join(tmp_dir, f"r{sat.get_output_file_name()}.TIF")
-            
+            input_img_path = os.path.join(
+                tmp_dir, f"{sat.get_output_file_name()}.TIF")
+            output_img_path = os.path.join(
+                tmp_dir, f"r{sat.get_output_file_name()}.TIF")
+
             rprj = RR.RasterReproject(input_img_path, output_img_path)
             rprj.reproject_raster_to_epsg4674()
 
-             # Clip
+            # Clip
             img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
-            
-            c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
-                          scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
-                          output_dir = output_dir, 
-                          output_file_name = sat.get_output_file_name())
-            
+
+            c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir,
+                              scene_file_name=sat.get_parameter_satellite()[
+                                  "scene_file_name"],
+                              output_dir=output_dir,
+                              output_file_name=sat.get_output_file_name())
+
             r = R.Raster(img_path=img_path)
-            
+
             if r.intersects_trace_outline_aoi():
                 c.clip_raster_by_mask(band_order)
             else:
                 import RasterTranslate as RT
-                rt = RT.RasterTranslate(img_path=img_path, 
-                                        output_dir = output_dir, 
-                                        output_file_name= sat.get_output_file_name())
+                rt = RT.RasterTranslate(img_path=img_path,
+                                        output_dir=output_dir,
+                                        output_file_name=sat.get_output_file_name())
                 rt.translate_8bit(band_order)
-            
+
             # Make pyramid
-            img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
+            img_path = os.path.join(
+                output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
-            # s.get_segmentation(r=5, i=10, algo='SLICO')
+            s.get_segmentation(r=5, i=10, algo='SLICO')
             # Load segmentation
-            # l.run_load_segmentation()
-            # Cloud/Shadow
+            l.run_load_segmentation()
+
             shutil.rmtree(tmp_dir)
             continue
 
@@ -156,39 +159,43 @@ if __name__ == "__main__":
             CB.ComposeBands(input_dir=tmp_dir,
                             output_dir=tmp_dir,
                             output_file_name=sat.get_output_file_name()) \
-            .stack_sentinel(scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
-                            utm_zone=sat.get_parameter_satellite()["utm_zone"])
-            
+                .stack_sentinel(scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
+                                utm_zone=sat.get_parameter_satellite()["utm_zone"])
+
             # Reproject to Sirgas 2000
-            input_img_path = os.path.join(tmp_dir, f"{sat.get_output_file_name()}.TIF")
-            output_img_path = os.path.join(tmp_dir, f"r{sat.get_output_file_name()}.TIF")
-            
+            input_img_path = os.path.join(
+                tmp_dir, f"{sat.get_output_file_name()}.TIF")
+            output_img_path = os.path.join(
+                tmp_dir, f"r{sat.get_output_file_name()}.TIF")
+
             rprj = RR.RasterReproject(input_img_path, output_img_path)
             rprj.reproject_raster_to_epsg4674()
 
             # Clip
             img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
-            
-            c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
-                          scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
-                          output_dir = output_dir, 
-                          output_file_name = sat.get_output_file_name())
-            
+
+            c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir,
+                              scene_file_name=sat.get_parameter_satellite()[
+                                  "scene_file_name"],
+                              output_dir=output_dir,
+                              output_file_name=sat.get_output_file_name())
+
             r = R.Raster(img_path=img_path)
-            
+
             if r.intersects_trace_outline_aoi():
-                c.clip_raster_by_mask(band_order=[4,3,2,1])
+                c.clip_raster_by_mask(band_order=[4, 3, 2, 1])
             else:
                 import RasterTranslate as RT
-                rt = RT.RasterTranslate(img_path=img_path, 
-                                        output_dir = output_dir, 
-                                        output_file_name= sat.get_output_file_name())
-                rt.translate_8bit(band_order=[4,3,2,1])
+                rt = RT.RasterTranslate(img_path=img_path,
+                                        output_dir=output_dir,
+                                        output_file_name=sat.get_output_file_name())
+                rt.translate_8bit(band_order=[4, 3, 2, 1])
 
             # Make pyramid
-            img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
+            img_path = os.path.join(
+                output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
-            
+
             # Segmentation
             s.get_segmentation(r=10, i=10, algo='SLICO')
             l.run_load_segmentation()
@@ -201,24 +208,24 @@ if __name__ == "__main__":
         #####################################################################################
         elif sat.get_parameter_satellite()['initials_name'] == 'LC08':
             # Set bands to unpack from landsat 8
-            bands=[1,2,3,4,5,6,7,9,10,11]
+            bands = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11]
             # Stack images
             # Bands: 3 = Green | 4 = Red | 5 = Nir | 6 = Swir1 |
             bands_expression = '3-6'
-            # Clip 
-            band_order = [3,2,1,4]
+            # Clip
+            band_order = [3, 2, 1, 4]
 
         #####################################################################################
         ################################### Landsat 5/7 #####################################
         #####################################################################################
         elif sat.is_landsat_file():
             # Set bands to unpack from landsat 5 and 7
-            bands=[2,3,4,5]
+            bands = [2, 3, 4, 5]
             # Stack images
             # Bands: 2 = Green | 3 = Red | 4 = Nir | 5 = Swir |
             bands_expression = '2-5'
             # Clip
-            band_order = [3,2,1,4]
+            band_order = [3, 2, 1, 4]
 
         # Unpack files from landsat
         up.uncompres_file(bands)
@@ -228,52 +235,56 @@ if __name__ == "__main__":
         CB.ComposeBands(input_dir=tmp_dir,
                         output_dir=tmp_dir,
                         output_file_name=sat.get_output_file_name()) \
-                        .stack_img(expression=expression,
-                                extension = '.TIF')
-        
-        # Reproject to compose bands (3456) to Sirgas 2000 
-        input_img_path = os.path.join(tmp_dir, f"{sat.get_output_file_name()}.TIF")
-        output_img_path = os.path.join(tmp_dir, f"r{sat.get_output_file_name()}.TIF")
-            
+            .stack_img(expression=expression,
+                       extension='.TIF')
+
+        # Reproject to compose bands (3456) to Sirgas 2000
+        input_img_path = os.path.join(
+            tmp_dir, f"{sat.get_output_file_name()}.TIF")
+        output_img_path = os.path.join(
+            tmp_dir, f"r{sat.get_output_file_name()}.TIF")
+
         rprj = RR.RasterReproject(input_img_path, output_img_path)
         rprj.reproject_raster_to_epsg4674()
 
         # Clip
         img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
-        
-        c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir, 
-                        scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
-                        output_dir = output_dir, 
-                        output_file_name = sat.get_output_file_name())
-        
+
+        c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir,
+                          scene_file_name=sat.get_parameter_satellite()[
+                              "scene_file_name"],
+                          output_dir=output_dir,
+                          output_file_name=sat.get_output_file_name())
+
         r = R.Raster(img_path=img_path)
-        
+
         # Only clip raster if it intersects limit of project
         if r.intersects_trace_outline_aoi():
             c.clip_raster_by_mask(band_order=band_order)
         else:
             import RasterTranslate as RT
-            rt = RT.RasterTranslate(img_path=img_path, output_dir = output_dir, 
-                                output_file_name= sat.get_output_file_name())
+            rt = RT.RasterTranslate(img_path=img_path, output_dir=output_dir,
+                                    output_file_name=sat.get_output_file_name())
             rt.translate_8bit(band_order)
-        
+
         # Make pyramid
-        img_path = os.path.join(output_dir, f"{sat.get_output_file_name()}.TIF")
+        img_path = os.path.join(
+            output_dir, f"{sat.get_output_file_name()}.TIF")
         PR.PyramidRaster(img_path=img_path).create_img_pyramid()
-        
+
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
 
             s.get_segmentation(r=5, i=10, algo='SLICO')
-            
+
             # Load database
             l.run_load_segmentation()
-            
+
             # Cloud/Shadow
             cloud = CL.CloudShadow(tmp_dir, output_dir, sat.get_scene_file_name(),
-                                  sat.get_output_file_name())
+                                   sat.get_output_file_name())
             cloud.run_cloud_shadow_fmask()
             pass
-        
+
             # Thinking about compose image in fuction for fmask
         shutil.rmtree(tmp_dir)
