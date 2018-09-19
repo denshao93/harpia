@@ -1,5 +1,6 @@
 import os  # NOQA
 import sys
+import csv
 import glob
 import shutil
 import tempfile  # NOQA
@@ -142,7 +143,17 @@ if __name__ == "__main__":
             # Load segmentation
             l.run_load_segmentation()
 
+            # Remove tmp directory
             shutil.rmtree(tmp_dir)
+
+            # Write log of scene processed in csv
+            with open('/home/diogocaribe/workspace/harpia/app/log/log.csv', 'a', newline='') as csvfile:
+                logwriter = csv.writer(csvfile, delimiter=',')
+                logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
+                                    sat.get_parameter_satellite()[
+                    'aquisition_date'],
+                    sat.get_parameter_satellite()['index']])
+
             continue
 
         # Create objet to unpack files
@@ -201,7 +212,17 @@ if __name__ == "__main__":
             l.run_load_segmentation()
 
             # Cloud/Shadow
+
+            # Remove tmp directory
             shutil.rmtree(tmp_dir)
+
+            # Write log of scene processed in csv
+            with open('/home/diogocaribe/workspace/harpia/app/log/log.csv', 'a', newline='') as csvfile:
+                logwriter = csv.writer(csvfile, delimiter=',')
+                logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
+                                    sat.get_parameter_satellite()[
+                    'aquisition_date'],
+                    sat.get_parameter_satellite()['index']])
             continue
         #####################################################################################
         ################################### Landsat 8 #######################################
@@ -286,5 +307,11 @@ if __name__ == "__main__":
             cloud.run_cloud_shadow_fmask()
             pass
 
-            # Thinking about compose image in fuction for fmask
         shutil.rmtree(tmp_dir)
+
+        with open('/home/diogocaribe/workspace/harpia/app/log/log.csv', 'a', newline='') as csvfile:
+            logwriter = csv.writer(csvfile, delimiter=',')
+            logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
+                                sat.get_parameter_satellite()[
+                'aquisition_date'],
+                sat.get_parameter_satellite()['index']])
