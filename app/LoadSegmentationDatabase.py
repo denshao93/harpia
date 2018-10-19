@@ -48,7 +48,7 @@ class LoadSegmentationDatabase:
 
     def connection_string_db(self):
         # Open yaml 
-        with open("/home/diogocaribe/workspace/harpia/app/config/const.yaml", 'r') as f:
+        with open("./config/const.yaml", 'r') as f:
             const = yaml.load(f)
         host = const['draft_db']['host']
         dbname = const['draft_db']['dbname']

@@ -50,10 +50,6 @@ if __name__ == "__main__":
         # Create instance of landsat file where scene features are
         sat = SFI.SatelliteFileInfo(file_path)
 
-        # Instanciate conection to database log
-        # with open("/home/diogo.sousa/workspace/harpia/app/config/const.yaml", 'r') as f:
-        #     harpia_db = yaml.load(f)
-
         # Create director where files will be saved
         parameter_satellite = sat.get_parameter_satellite()
         od = OD.OrganizeDirectory(root_dir_path=sys.argv[2],
@@ -147,7 +143,7 @@ if __name__ == "__main__":
             shutil.rmtree(tmp_dir)
 
             # Write log of scene processed in csv
-            with open('/home/diogocaribe/workspace/harpia/app/log/log.csv', 'a', newline='') as csvfile:
+            with open('./log/log.csv', 'a', newline='') as csvfile:
                 logwriter = csv.writer(csvfile, delimiter=',')
                 logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
                                     sat.get_parameter_satellite()[
@@ -217,7 +213,7 @@ if __name__ == "__main__":
             shutil.rmtree(tmp_dir)
 
             # Write log of scene processed in csv
-            with open('/home/diogocaribe/workspace/harpia/app/log/log.csv', 'a', newline='') as csvfile:
+            with open('./log/log.csv', 'a', newline='') as csvfile:
                 logwriter = csv.writer(csvfile, delimiter=',')
                 logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
                                     sat.get_parameter_satellite()[
@@ -309,7 +305,7 @@ if __name__ == "__main__":
 
         shutil.rmtree(tmp_dir)
 
-        with open('/home/diogocaribe/workspace/harpia/app/log/log.csv', 'a', newline='') as csvfile:
+        with open('./log/log.csv', 'a', newline='') as csvfile:
             logwriter = csv.writer(csvfile, delimiter=',')
             logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
                                 sat.get_parameter_satellite()[
