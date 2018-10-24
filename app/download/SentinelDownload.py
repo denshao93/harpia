@@ -1,10 +1,11 @@
-from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt
-from datetime import date
 import yaml
+from pathlib import Path
+from datetime import date
+from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt
 
 
 # Open yaml 
-with open("../config/const.yaml", 'r') as f:
+with open(Path("../config/const.yaml"), 'r') as f:
         const = yaml.load(f)
 
 user = const['data_hub']['user']
