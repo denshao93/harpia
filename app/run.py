@@ -7,6 +7,7 @@ import tempfile  # NOQA
 import Raster as R
 import UnpackFile as UF
 import ClipRaster as CR
+from pathlib import Path
 import ComposeBands as CB
 import Segmetation as SEG
 import PyramidRaster as PR
@@ -143,7 +144,7 @@ if __name__ == "__main__":
             shutil.rmtree(tmp_dir)
 
             # Write log of scene processed in csv
-            with open('./log/log.csv', 'a', newline='') as csvfile:
+            with open(Path('./log/log.csv'), 'a', newline='') as csvfile:
                 logwriter = csv.writer(csvfile, delimiter=',')
                 logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
                                     sat.get_parameter_satellite()[
@@ -213,7 +214,7 @@ if __name__ == "__main__":
             shutil.rmtree(tmp_dir)
 
             # Write log of scene processed in csv
-            with open('./log/log.csv', 'a', newline='') as csvfile:
+            with open(Path('./log/log.csv'), 'a', newline='') as csvfile:
                 logwriter = csv.writer(csvfile, delimiter=',')
                 logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
                                     sat.get_parameter_satellite()[
@@ -305,7 +306,7 @@ if __name__ == "__main__":
 
         shutil.rmtree(tmp_dir)
 
-        with open('./log/log.csv', 'a', newline='') as csvfile:
+        with open(Path('./log/log.csv'), 'a', newline='') as csvfile:
             logwriter = csv.writer(csvfile, delimiter=',')
             logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
                                 sat.get_parameter_satellite()[

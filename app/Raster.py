@@ -1,10 +1,11 @@
 import os
-import shapefile
-from osgeo import gdal
 import rasterio
-import rasterio.warp
+import shapefile
 import numpy as np
+import rasterio.warp
+from osgeo import gdal
 import geo_utils as gu
+from pathlib import Path
 import rasterio.features as features
 from shapely.geometry import shape
 
@@ -50,7 +51,7 @@ class Raster:
         This processing avoid to save raster useless areas.
 
         """
-        ba_line = gu.read_shapefile_poly("./data/vector/ba_4674_line.shp")
+        ba_line = gu.read_shapefile_poly(Path('./data/vector/ba_4674_line.shp'))
         
         from shapely import wkt
         trace_outline = wkt.loads(self.trace_outline_from_raster_wkt())

@@ -18,7 +18,7 @@ api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
 # api.download(<product_id>)
 
 # search by polygon, time, and Hub query keywords
-footprint = geojson_to_wkt(read_geojson("../download/baixo_sul.geojson"))
+footprint = geojson_to_wkt(read_geojson(Path('../download/baixo_sul.geojson')))
 products = api.query(footprint,
                      date = ('20180801', '20180830'),
                      platformname = 'Sentinel-2',

@@ -1,7 +1,7 @@
 import os
 import yaml
 import psycopg2
-
+from pathlib import Path
 
 class LoadSegmentationDatabase:
     """Load segmetation in draft database."""
@@ -48,7 +48,7 @@ class LoadSegmentationDatabase:
 
     def connection_string_db(self):
         # Open yaml 
-        with open("./config/const.yaml", 'r') as f:
+        with open(Path('./config/const.yaml'), 'r') as f:
             const = yaml.load(f)
         host = const['draft_db']['host']
         dbname = const['draft_db']['dbname']
