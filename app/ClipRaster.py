@@ -33,7 +33,7 @@ class ClipRaster:
     def clip_raster_by_mask(self, band_order=None):
         print(".........Clip raster..........")
         
-        with fiona.open(Path("data/vector/ba_4674_buffer.shp"), "r") as shapefile:
+        with fiona.open(str(Path("app/data/vector/ba_4674_buffer.shp")), "r") as shapefile:
             features = [feature["geometry"] for feature in shapefile]
         
         with rasterio.open(self.img_path) as src:

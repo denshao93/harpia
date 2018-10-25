@@ -144,7 +144,7 @@ if __name__ == "__main__":
             shutil.rmtree(tmp_dir)
 
             # Write log of scene processed in csv
-            with open(Path('./log/log.csv'), 'a', newline='') as csvfile:
+            with open(Path('app/log/log.csv'), 'a', newline='') as csvfile:
                 logwriter = csv.writer(csvfile, delimiter=',')
                 logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
                                     sat.get_parameter_satellite()[
@@ -214,7 +214,7 @@ if __name__ == "__main__":
             shutil.rmtree(tmp_dir)
 
             # Write log of scene processed in csv
-            with open(Path('./log/log.csv'), 'a', newline='') as csvfile:
+            with open(Path('log/log.csv'), 'a', newline='') as csvfile:
                 logwriter = csv.writer(csvfile, delimiter=',')
                 logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
                                     sat.get_parameter_satellite()[
@@ -293,10 +293,10 @@ if __name__ == "__main__":
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
 
-            s.get_segmentation(r=5, i=10, algo='SLICO')
+            # s.get_segmentation(r=5, i=10, algo='SLICO')
 
             # Load database
-            l.run_load_segmentation()
+            # l.run_load_segmentation()
 
             # Cloud/Shadow
             cloud = CL.CloudShadow(tmp_dir, output_dir, sat.get_scene_file_name(),
@@ -306,7 +306,7 @@ if __name__ == "__main__":
 
         shutil.rmtree(tmp_dir)
 
-        with open(Path('./log/log.csv'), 'a', newline='') as csvfile:
+        with open(Path('log/log.csv'), 'a', newline='') as csvfile:
             logwriter = csv.writer(csvfile, delimiter=',')
             logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
                                 sat.get_parameter_satellite()[

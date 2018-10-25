@@ -51,7 +51,8 @@ class Raster:
         This processing avoid to save raster useless areas.
 
         """
-        ba_line = gu.read_shapefile_poly(Path('./data/vector/ba_4674_line.shp'))
+        aoi_line = Path('app/data/vector/ba_4674_line.shp')
+        ba_line = gu.read_shapefile_poly(str(aoi_line))
         
         from shapely import wkt
         trace_outline = wkt.loads(self.trace_outline_from_raster_wkt())
