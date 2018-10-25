@@ -6,6 +6,7 @@ import tempfile  # NOQA
 import Raster as R
 import UnpackFile as UF
 import ClipRaster as CR
+from pathlib import Path
 import ComposeBands as CB
 import Segmetation as SEG
 import PyramidRaster as PR
@@ -48,10 +49,6 @@ if __name__ == "__main__":
 
         # Create instance of landsat file where scene features are
         sat = SFI.SatelliteFileInfo(file_path)
-
-        # Instanciate conection to database log
-        # with open("/home/diogo.sousa/workspace/harpia/app/config/const.yaml", 'r') as f:
-        #     harpia_db = yaml.load(f)
 
         # Create director where files will be saved
         parameter_satellite = sat.get_parameter_satellite()
@@ -143,6 +140,18 @@ if __name__ == "__main__":
             l.run_load_segmentation()
 
             shutil.rmtree(tmp_dir)
+<<<<<<< HEAD
+=======
+
+            # Write log of scene processed in csv
+            with open(Path('app/log/log.csv'), 'a', newline='') as csvfile:
+                logwriter = csv.writer(csvfile, delimiter=',')
+                logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
+                                    sat.get_parameter_satellite()[
+                    'aquisition_date'],
+                    sat.get_parameter_satellite()['index']])
+
+>>>>>>> dev
             continue
 
         # Create objet to unpack files
@@ -202,6 +211,17 @@ if __name__ == "__main__":
 
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
+<<<<<<< HEAD
+=======
+
+            # Write log of scene processed in csv
+            with open(Path('log/log.csv'), 'a', newline='') as csvfile:
+                logwriter = csv.writer(csvfile, delimiter=',')
+                logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
+                                    sat.get_parameter_satellite()[
+                    'aquisition_date'],
+                    sat.get_parameter_satellite()['index']])
+>>>>>>> dev
             continue
         #####################################################################################
         ################################### Landsat 8 #######################################
@@ -275,10 +295,10 @@ if __name__ == "__main__":
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
 
-            s.get_segmentation(r=5, i=10, algo='SLICO')
+            # s.get_segmentation(r=5, i=10, algo='SLICO')
 
             # Load database
-            l.run_load_segmentation()
+            # l.run_load_segmentation()
 
             # Cloud/Shadow
             cloud = CL.CloudShadow(tmp_dir, output_dir, sat.get_scene_file_name(),
@@ -288,3 +308,13 @@ if __name__ == "__main__":
 
             # Thinking about compose image in fuction for fmask
         shutil.rmtree(tmp_dir)
+<<<<<<< HEAD
+=======
+
+        with open(Path('log/log.csv'), 'a', newline='') as csvfile:
+            logwriter = csv.writer(csvfile, delimiter=',')
+            logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
+                                sat.get_parameter_satellite()[
+                'aquisition_date'],
+                sat.get_parameter_satellite()['index']])
+>>>>>>> dev

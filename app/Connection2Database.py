@@ -59,14 +59,3 @@ class Connection:
             cursor.close()
         except Exception:
             print("Exception")
-        
-
-if __name__ == '__main__':
-    
-    import yaml
-    c = open("/home/diogocaribe/workspace/harpia/app/config/const.yaml", 'r')
-    string = "host=localhost dbname=harpia user='postgres' password='postgres'"
-    # harpia_db = yaml.load(f)
-    # print(harpia_db["host"])
-    a = Connection(str_connection=string)
-    print(a)
