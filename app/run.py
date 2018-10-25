@@ -1,4 +1,5 @@
 import os  # NOQA
+import csv
 import sys
 import glob
 import shutil
@@ -140,8 +141,6 @@ if __name__ == "__main__":
             l.run_load_segmentation()
 
             shutil.rmtree(tmp_dir)
-<<<<<<< HEAD
-=======
 
             # Write log of scene processed in csv
             with open(Path('app/log/log.csv'), 'a', newline='') as csvfile:
@@ -151,7 +150,6 @@ if __name__ == "__main__":
                     'aquisition_date'],
                     sat.get_parameter_satellite()['index']])
 
->>>>>>> dev
             continue
 
         # Create objet to unpack files
@@ -211,8 +209,6 @@ if __name__ == "__main__":
 
             # Cloud/Shadow
             shutil.rmtree(tmp_dir)
-<<<<<<< HEAD
-=======
 
             # Write log of scene processed in csv
             with open(Path('log/log.csv'), 'a', newline='') as csvfile:
@@ -221,7 +217,6 @@ if __name__ == "__main__":
                                     sat.get_parameter_satellite()[
                     'aquisition_date'],
                     sat.get_parameter_satellite()['index']])
->>>>>>> dev
             continue
         #####################################################################################
         ################################### Landsat 8 #######################################
@@ -308,8 +303,6 @@ if __name__ == "__main__":
 
             # Thinking about compose image in fuction for fmask
         shutil.rmtree(tmp_dir)
-<<<<<<< HEAD
-=======
 
         with open(Path('log/log.csv'), 'a', newline='') as csvfile:
             logwriter = csv.writer(csvfile, delimiter=',')
@@ -317,4 +310,3 @@ if __name__ == "__main__":
                                 sat.get_parameter_satellite()[
                 'aquisition_date'],
                 sat.get_parameter_satellite()['index']])
->>>>>>> dev
