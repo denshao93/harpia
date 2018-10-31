@@ -243,6 +243,7 @@ class SatelliteFileInfo:
         if self.is_resourcesat2_file(): 
             month = self.get_scene_file_name()[7:10]
             return MD.month_R2LS3[month]
+
             
 # if __name__ == '__main__':
 
