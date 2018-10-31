@@ -160,6 +160,9 @@ class SatelliteFileInfo:
                 "sensor": sensor,
                 "scene_file_name": scene_file_name,
                 "aquisition_date": acquisition_date,
+                "aquisition_year": acquisition_date[:4],
+                "aquisition_month": acquisition_date[4:6],
+                "aquisition_day": acquisition_date[6:8],
                 "index": index
                 }
 
@@ -241,19 +244,19 @@ class SatelliteFileInfo:
             month = self.get_scene_file_name()[7:10]
             return MD.month_R2LS3[month]
             
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
-#     s = SatelliteFileInfo(file_path="/test/files/S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.zip")
-#     print(s.get_parameter_satellite())
-#     s = SatelliteFileInfo(file_path="/test/files/CBERS_4_MUX_20170718_151_116_L4_BAND5.zip")
-#     print(s.get_parameter_satellite())
-#     s = SatelliteFileInfo(file_path="/test/files/CBERS_4_AWFI_20180729_173_135_L4_BAND13.zip")
-#     print(s.get_parameter_satellite())
-#     s = SatelliteFileInfo(file_path="/test/files/LC08_L1GT_037035_20160314_20160314_01_RT.tar.gz")
-#     print(s.get_parameter_satellite())
-#     s = SatelliteFileInfo(file_path="/test/files/LE07_L1TP_215068_20171205_20171222_01_T1.tar.gz")
-#     print(s.get_parameter_satellite())
-#     s = SatelliteFileInfo(file_path="/test/files/LT05_L1TP_220069_20110903_20161008_01_T1.tar.gz")
-#     print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.zip")
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/CBERS_4_MUX_20170718_151_116_L4_BAND5.zip")
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/CBERS_4_AWFI_20180729_173_135_L4_BAND13.zip")
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/LC08_L1GT_037035_20160314_20160314_01_RT.tar.gz")
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/LE07_L1TP_215068_20171205_20171222_01_T1.tar.gz")
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/LT05_L1TP_220069_20110903_20161008_01_T1.tar.gz")
+    print(s.get_parameter_satellite())
     # s = SatelliteFileInfo(file_path="/test/files/R2LS326JUL2018336087STUC00GODP_BAND2_RPC.tif.zip")
     # print(s.get_initial_name())
