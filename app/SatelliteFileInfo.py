@@ -93,7 +93,6 @@ class SatelliteFileInfo:
         satellite_name = self.get_satellite_name_from_file()
         satallite_row_data_table = satellite_table['name'] == satellite_name
 
-        # Path
         slice_path = satellite_table.loc[satallite_row_data_table,
                                                 "path"].values[0] 
         slice_row = satellite_table.loc[satallite_row_data_table,
