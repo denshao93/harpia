@@ -242,8 +242,6 @@ class SatelliteFileInfo:
             month = self.get_scene_file_name()[7:10]
             return MD.month_R2LS3[month]
             
-
-
 if __name__ == '__main__':
 
     s = SatelliteFileInfo(file_path="/test/files/S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.zip")
