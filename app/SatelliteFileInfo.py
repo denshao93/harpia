@@ -1,8 +1,10 @@
 """This class collect information from satellite file."""
-import os #NOQA
+import os
 import re
 import datetime
 import utils as u
+import pandas as pd
+from pathlib import Path
 import MonthDictionary as MD
 
 
@@ -27,6 +29,14 @@ class SatelliteFileInfo:
         
         return file_name
 
+    @staticmethod
+    def _read_satallite_data_table():
+        """ Read table where to register satallite from image file."""
+        csv_path = Path('app/data/table/satallite_data.csv')
+        df = pd.read_csv(csv_path, sep=',')
+
+        return df
+
     def is_landsat_file(self):
         """Check if file is from landsat satellite."""
         
@@ -43,8 +53,120 @@ class SatelliteFileInfo:
     def is_resourcesat2_file(self):
         """Check if file is from sentinel satellite."""
         return self.get_scene_file_name().startswith("R2")
+
+    def _which_cbers4_sensor(self):
+        """Answer if file come from MUX sensor of Cbers 4 satellite."""
+        if self.is_cbers4_file() and 'MUX' in self.get_scene_file_name():
+            
+            return 'mux'
+
+        elif self.is_cbers4_file() and 'AWFI' in self.get_scene_file_name():
     
-    def get_dictionary_key_satellite_dict(self):
+            return 'awfi'
+    
+    def _get_path_row_from_file_landsat(self):
+        """."""
+        satellite_table = self._read_satallite_data_table()
+        scene_file_name = self.get_scene_file_name()
+        satellite_name = self.get_satellite_name_from_file()
+
+        satallite_row_data_table = satellite_table['name'] == satellite_name
+
+        # Path
+        slice_path = satellite_table.loc[satallite_row_data_table,
+                                                "path"].values[0]     
+        path = eval('scene_file_name[' + slice_path + ']')
+
+        # Row
+        slice_row = satellite_table.loc[satallite_row_data_table,
+                                                "row"].values[0]     
+        row = eval('scene_file_name[' + slice_row + ']')
+
+        path_row = f'{path}{row}'
+
+        return path_row
+   
+    def _get_path_row_from_file_cbers(self):
+        """."""
+        satellite_table = self._read_satallite_data_table()
+        scene_file_name = self.get_scene_file_name()
+        satellite_name = self.get_satellite_name_from_file()
+        satallite_row_data_table = satellite_table['name'] == satellite_name
+
+        # Path
+        slice_path = satellite_table.loc[satallite_row_data_table,
+                                                "path"].values[0] 
+        slice_row = satellite_table.loc[satallite_row_data_table,
+                                                "row"].values[0] 
+        slice_path = slice_path.split(',')
+        slice_row = slice_row.split(',')
+        
+        if self._which_cbers4_sensor() == 'mux':
+            slice_path = slice_path[0]
+            slice_row = slice_row[0]
+
+        elif self._which_cbers4_sensor() == 'awfi':
+            slice_path = slice_path[1]
+            slice_row = slice_row[1]
+        
+        path = eval('scene_file_name[' + slice_path + ']')
+        row = eval('scene_file_name[' + slice_row + ']')
+        
+        path_row = f'{path}{row}'
+
+        return path_row
+
+    def get_parameter_satellite(self):
+        """."""
+        satellite_table = self._read_satallite_data_table()
+        scene_file_name = self.get_scene_file_name()
+        satellite_name = self.get_satellite_name_from_file()
+
+        satallite_row_data_table = satellite_table['name'] == satellite_name
+
+        # Initial name
+        slice_initial_name = satellite_table.loc[satallite_row_data_table,
+                                         "satellite_initial_name"].values[0]     
+        initials_name = eval('scene_file_name[' + slice_initial_name + ']')
+
+        # Sensor
+        if self.is_cbers4_file():
+            sensor = self._which_cbers4_sensor()
+            
+        else:
+            slice_sensor = satellite_table.loc[satallite_row_data_table,
+                                                "sensor"].values[0]     
+            sensor = eval('scene_file_name[' + slice_sensor + ']')
+        
+        # Acquisition Date
+        slice_acquisition_date = satellite_table.loc[satallite_row_data_table,
+                                         "acquisition_date"].values[0]     
+        acquisition_date = eval('scene_file_name[' + slice_acquisition_date + ']')
+
+        # Index
+        if self.is_landsat_file():
+            index = self._get_path_row_from_file_landsat()
+        
+        elif self.is_sentinel_file():
+            slice_index = satellite_table.loc[satallite_row_data_table,
+                                         "tile"].values[0]     
+            tile = eval('scene_file_name[' + slice_index + ']')
+            
+            index = tile
+        
+        elif self.is_cbers4_file():
+            index = self._get_path_row_from_file_cbers()
+    
+        dict = {"initials_name": initials_name,
+                "sensor": sensor,
+                "scene_file_name": scene_file_name,
+                "aquisition_date": acquisition_date,
+                "index": index
+                }
+
+        return dict
+
+    def get_satellite_name_from_file(self):
         """Get short name of satellite."""
         try:
 
@@ -114,134 +236,27 @@ class SatelliteFileInfo:
 
         return day_from_today
 
-    def __get_month_resourcesat2(self):
+    def _get_month_resourcesat2(self):
         """Get month as cardinal number from ResourceSat2 satellite"""
         if self.is_resourcesat2_file(): 
             month = self.get_scene_file_name()[7:10]
             return MD.month_R2LS3[month]
-
-    def get_parameter_satellite(self):
-        """Dictionary to cadastrete satellite features.
-        
-        This method return dictionary where basic parameters of file 
-        can be capture.
-        """
-        scene_file_name = self.get_scene_file_name()
-        try:
-            dict = {
-                    # Landsat
-                    "landsat": 
-                        {
-                        "initials_name": scene_file_name[:4],
-                        "sensor": scene_file_name[1:2],
-                        "scene_file_name": scene_file_name,
-                        "aquisition_date": scene_file_name[17:25],
-                        "aquisition_year": scene_file_name[17:21],
-                        "aquisition_month": scene_file_name[21:23],
-                        "aquisition_day": scene_file_name[23:25],
-                        "julian_day": "",
-                        "days_from_today": "",
-                        "index":f"{scene_file_name[10:13]}"
-                                f"{scene_file_name[13:16]}"
-                        },
-                    # Sentinel
-                    "sentinel": 
-                        {
-                        "initials_name": scene_file_name[:2],
-                        "sensor": scene_file_name[4:7],
-                        "scene_file_name": scene_file_name,
-                        "aquisition_date": scene_file_name[11:19],
-                        "aquisition_year": scene_file_name[11:15],
-                        "aquisition_month": scene_file_name[15:17],
-                        "aquisition_day": scene_file_name[17:19],
-                        "utm_zone": scene_file_name[39:41],
-                        "julian_day": "",
-                        "days_from_today": "",
-                        "index": scene_file_name[39:44]
-                        },
-                    # Cbers4
-                    "cbers4": 
-                        {
-                        "initials_name": scene_file_name[:5],
-                        "sensor": scene_file_name[8:11],
-                        "scene_file_name": scene_file_name[:-6],
-                        "aquisition_date": scene_file_name[12:20],
-                        "aquisition_year": scene_file_name[12:16],
-                        "aquisition_month": scene_file_name[16:18],
-                        "aquisition_day": scene_file_name[18:20],
-                        "julian_day": "",
-                        "days_from_today": "",
-                        "index":f"{scene_file_name[21:24]}"
-                                f"{scene_file_name[25:28]}"
-                        },
-                        # Resoucesat2
-                    "resourcesat2": 
-                        {
-                        "initials_name": scene_file_name[:5],
-                        "sensor": scene_file_name[2:5],
-                        "scene_file_name": scene_file_name[:-10],
-                        "aquisition_date":  f"{scene_file_name[10:14]}"
-                                            f"{self.__get_month_resourcesat2()}"
-                                            f"{scene_file_name[5:7]}",
-                        "aquisition_year": scene_file_name[10:14],
-                        "aquisition_month": self.__get_month_resourcesat2(),
-                        "aquisition_day": scene_file_name[5:7],
-                        "julian_day": "",
-                        "days_from_today": "",
-                        "index":scene_file_name[14:20]                            
-                        }
-                    }
-            
-            dict = dict[self.get_dictionary_key_satellite_dict()]
-            
-            # Add julian day and how many days image will be processed.
-            dict["julian_day"] = self.get_julian_day_aquisition_date(dict)
-            
-            # dict["days_from_today"] = self.get_days_from_today(dict)
-
-            return dict
-
-        except Exception:
-            dict = {}
-            scene_file_name = self.get_scene_file_name()
-            if self.is_cbers4_file and self.get_scene_file_name()[9:12] == 'WFI':
-                dict = {
-                # Cbers4
-                    "initials_name": scene_file_name[:5],
-                    "sensor": scene_file_name[9:12],
-                    "scene_file_name": scene_file_name[:-7],
-                    "aquisition_date": scene_file_name[13:21],
-                    "aquisition_year": scene_file_name[13:17],
-                    "aquisition_month": scene_file_name[17:19],
-                    "aquisition_day": scene_file_name[19:21],
-                    "julian_day": "",
-                    "days_from_today": "",
-                    "index":f"{scene_file_name[22:25]}"
-                            f"{scene_file_name[26:29]}"
-                    }
-        
-            # Add julian day and how many days image will be processed.
-            dict["julian_day"] = self.get_julian_day_aquisition_date(dict)
-            
-            # dict["days_from_today"] = self.get_days_from_today(dict)
-
-            return dict
             
 
 
 if __name__ == '__main__':
 
-    # s = SatelliteFileInfo(file_path="/test/files/S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.zip")
-    # print(s.get_parameter_satellite())
-    # s = SatelliteFileInfo(file_path="/test/files/CBERS_4_MUX_20170718_151_116_L4_BAND5.zip")
-    # print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/S2A_MSIL1C_20170804T125311_N0205_R052_T24LVK_20170804T125522.zip")
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/CBERS_4_MUX_20170718_151_116_L4_BAND5.zip")
+    print(s.get_parameter_satellite())
     s = SatelliteFileInfo(file_path="/test/files/CBERS_4_AWFI_20180729_173_135_L4_BAND13.zip")
     print(s.get_parameter_satellite())
-    # s = SatelliteFileInfo(file_path="/test/files/LC08_L1GT_037035_20160314_20160314_01_RT.tar.gz")
-    # print(s.get_parameter_satellite())
-    # s = SatelliteFileInfo(file_path="/test/files/LE07_L1TP_215068_20171205_20171222_01_T1.tar.gz")
-    # print(s.get_parameter_satellite())
-    # s = SatelliteFileInfo(file_path="/test/files/LT05_L1TP_220069_20110903_20161008_01_T1.tar.gz")
-    # print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/LC08_L1GT_037035_20160314_20160314_01_RT.tar.gz")
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/LE07_L1TP_215068_20171205_20171222_01_T1.tar.gz")
+    print(s.get_parameter_satellite())
+    s = SatelliteFileInfo(file_path="/test/files/LT05_L1TP_220069_20110903_20161008_01_T1.tar.gz")
+    print(s.get_parameter_satellite())
     # s = SatelliteFileInfo(file_path="/test/files/R2LS326JUL2018336087STUC00GODP_BAND2_RPC.tif.zip")
-    # print(s.get_parameter_satellite())
+    # print(s.get_initial_name())
