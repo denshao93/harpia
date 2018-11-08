@@ -5,7 +5,12 @@ from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt
 
 
 # Open yaml 
-with open(Path("config/const.yaml"), 'r') as f:
+
+home_path = str(Path.home())
+yaml_path = str(Path('workspace/harpia/app/config/const.yaml'))
+yaml_path = f'{home_path}/{yaml_path}'
+
+with open(yaml_path, 'r') as f:
         const = yaml.load(f)
 
 user = const['data_hub']['user']
@@ -18,14 +23,20 @@ api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
 # api.download(<product_id>)
 
 # search by polygon, time, and Hub query keywords
-footprint = geojson_to_wkt(read_geojson(Path('download/baixo_sul.geojson')))
+
+geojson_path = str(Path('workspace/harpia/app/download/baixo_sul.geojson'))
+geojson_path = f'{home_path}/{geojson_path}'
+
+footprint = geojson_to_wkt(read_geojson(geojson_path))
 products = api.query(footprint,
-                     date = ('20180801', '20180830'),
+                     date = ('20181006', '20181107'),
                      platformname = 'Sentinel-2',
                      producttype = "S2MSI1C",
-                     cloudcoverpercentage = (0, 30),
-                     limit=1)
+                     cloudcoverpercentage = (0, 80))
 print(products)
 
 # download all results from the search
-api.download_all(products, directory_path='~/BRUTA/Sentinel2A/')
+directory_path = 'BRUTA/Sentinel2'
+directory_path = f'{home_path}/{directory_path}'
+
+api.download_all(products, directory_path=directory_path)
