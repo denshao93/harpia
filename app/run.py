@@ -43,7 +43,6 @@ if __name__ == "__main__":
 
     for file_path in files:
         
-        print('###' + os.getcwd())
         print(file_path)
 
         # Create tmp director to put all temp files
@@ -215,8 +214,8 @@ if __name__ == "__main__":
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
-            s.get_segmentation(r=10, i=10, algo='SLICO')
-            l.run_load_segmentation()
+            # s.get_segmentation(r=10, i=10, algo='SLICO')
+            # l.run_load_segmentation()
 
             # Cloud/Shadow
             
@@ -227,6 +226,10 @@ if __name__ == "__main__":
                 logwriter.writerow([parameter_satellite['initials_name'],
                                     parameter_satellite['aquisition_date'],
                                     parameter_satellite['index']])
+            
+            
+            dst = Path(sys.argv[1], 'Sentinel2/processada')
+            shutil.move(file_path, dst=dst)
             
             shutil.rmtree(tmp_dir)
             
