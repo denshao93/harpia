@@ -89,7 +89,7 @@ class SatelliteFileInfo:
     def _get_path_row_from_file_cbers(self):
         """."""
         satellite_table = self._read_satallite_data_table()
-        scene_file_name = self.get_scene_file_name()
+        scene_file_name = self.get_scene_file_name() 
         satellite_name = self.get_satellite_name_from_file()
         satallite_row_data_table = satellite_table['name'] == satellite_name
 

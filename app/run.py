@@ -42,7 +42,8 @@ if __name__ == "__main__":
              for f in f_]
 
     for file_path in files:
-
+        
+        print('###' + os.getcwd())
         print(file_path)
 
         # Create tmp director to put all temp files
@@ -51,8 +52,16 @@ if __name__ == "__main__":
         # Create instance of landsat file where scene features are
         sat = SFI.SatelliteFileInfo(file_path)
 
-        # Create director where files will be saved
         parameter_satellite = sat.get_parameter_satellite()
+        output_file_name = sat.get_output_file_name()
+        scene_file_name = parameter_satellite["scene_file_name"]
+
+        # Csv parameters for log
+        home_path = str(Path.home())
+        csv_path = str(Path('workspace/harpia/app/log/log.csv'))
+        csv_path = f'{home_path}/{csv_path}'
+        
+        # Create director where files will be saved
         od = OD.OrganizeDirectory(root_dir_path=sys.argv[2],
                                   satellite_name=parameter_satellite["initials_name"],
                                   satellite_index=parameter_satellite["index"],
@@ -140,15 +149,17 @@ if __name__ == "__main__":
             # Load segmentation
             l.run_load_segmentation()
 
-            shutil.rmtree(tmp_dir)
+            
 
-            # Write log of scene processed in csv
-            with open(Path('app/log/log.csv'), 'a', newline='') as csvfile:
+            # Write log of cene processed in csv            
+            with open(csv_path, 'a', newline='') as csvfile:
                 logwriter = csv.writer(csvfile, delimiter=',')
                 logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
                                     sat.get_parameter_satellite()[
                     'aquisition_date'],
                     sat.get_parameter_satellite()['index']])
+
+            shutil.rmtree(tmp_dir)
 
             continue
 
@@ -167,40 +178,40 @@ if __name__ == "__main__":
                             output_dir=tmp_dir,
                             output_file_name=sat.get_output_file_name()) \
                 .stack_sentinel(scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
-                                utm_zone=sat.get_parameter_satellite()["utm_zone"])
+                                utm_zone=sat.get_parameter_satellite()["index"])
 
             # Reproject to Sirgas 2000
             input_img_path = os.path.join(
-                tmp_dir, f"{sat.get_output_file_name()}.TIF")
+                tmp_dir, f'{output_file_name}.TIF')
             output_img_path = os.path.join(
-                tmp_dir, f"r{sat.get_output_file_name()}.TIF")
+                tmp_dir, f"r{output_file_name}.TIF")
 
             rprj = RR.RasterReproject(input_img_path, output_img_path)
             rprj.reproject_raster_to_epsg4674()
 
             # Clip
-            img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
+            img_path = f"{tmp_dir}/r{output_file_name}.TIF"
 
             c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir,
-                              scene_file_name=sat.get_parameter_satellite()[
-                                  "scene_file_name"],
+                              scene_file_name=parameter_satellite["scene_file_name"],
                               output_dir=output_dir,
-                              output_file_name=sat.get_output_file_name())
+                              output_file_name=output_file_name)
 
             r = R.Raster(img_path=img_path)
 
+            
             if r.intersects_trace_outline_aoi():
                 c.clip_raster_by_mask(band_order=[4, 3, 2, 1])
             else:
                 import RasterTranslate as RT
                 rt = RT.RasterTranslate(img_path=img_path,
                                         output_dir=output_dir,
-                                        output_file_name=sat.get_output_file_name())
+                                        output_file_name=output_file_name)
                 rt.translate_8bit(band_order=[4, 3, 2, 1])
 
             # Make pyramid
             img_path = os.path.join(
-                output_dir, f"{sat.get_output_file_name()}.TIF")
+                output_dir, f"{output_file_name}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
@@ -208,15 +219,17 @@ if __name__ == "__main__":
             l.run_load_segmentation()
 
             # Cloud/Shadow
-            shutil.rmtree(tmp_dir)
+            
 
             # Write log of scene processed in csv
-            with open(Path('log/log.csv'), 'a', newline='') as csvfile:
+            with open(csv_path, 'a', newline='') as csvfile:
                 logwriter = csv.writer(csvfile, delimiter=',')
-                logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
-                                    sat.get_parameter_satellite()[
-                    'aquisition_date'],
-                    sat.get_parameter_satellite()['index']])
+                logwriter.writerow([parameter_satellite['initials_name'],
+                                    parameter_satellite['aquisition_date'],
+                                    parameter_satellite['index']])
+            
+            shutil.rmtree(tmp_dir)
+            
             continue
         #####################################################################################
         ################################### Landsat 8 #######################################

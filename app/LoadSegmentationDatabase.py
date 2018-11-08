@@ -47,8 +47,13 @@ class LoadSegmentationDatabase:
         self.satellite_index = self.satellite_parameters["index"]
 
     def connection_string_db(self):
-        # Open yaml 
-        with open(Path('config/const.yaml'), 'r') as f:
+        # Open yaml
+        
+        home_path = str(Path.home())
+        yaml_path = str(Path('workspace/harpia/app/config/const.yaml'))
+        yaml_path = f'{home_path}/{yaml_path}'
+        
+        with open(yaml_path, 'r') as f:
             const = yaml.load(f)
         host = const['draft_db']['host']
         dbname = const['draft_db']['dbname']

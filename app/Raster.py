@@ -51,8 +51,11 @@ class Raster:
         This processing avoid to save raster useless areas.
 
         """
-        aoi_line = Path('app/data/vector/ba_4674_line.shp')
-        ba_line = gu.read_shapefile_poly(str(aoi_line))
+        home_path = str(Path.home())
+        aoi_line = str(Path('workspace/harpia/app/data/vector/ba_4674_line.shp'))
+        aoi_line_path = f'{home_path}/{aoi_line}'
+        
+        ba_line = gu.read_shapefile_poly(aoi_line_path)
         
         from shapely import wkt
         trace_outline = wkt.loads(self.trace_outline_from_raster_wkt())
