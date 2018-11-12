@@ -214,8 +214,8 @@ if __name__ == "__main__":
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
-            # s.get_segmentation(r=10, i=10, algo='SLICO')
-            # l.run_load_segmentation()
+            s.get_segmentation(r=10, i=10, algo='SLICO')
+            l.run_load_segmentation()
 
             # Cloud/Shadow
             
@@ -271,21 +271,20 @@ if __name__ == "__main__":
 
         # Reproject to compose bands (3456) to Sirgas 2000
         input_img_path = os.path.join(
-            tmp_dir, f"{sat.get_output_file_name()}.TIF")
+            tmp_dir, f"{output_file_name}.TIF")
         output_img_path = os.path.join(
-            tmp_dir, f"r{sat.get_output_file_name()}.TIF")
+            tmp_dir, f"r{output_file_name}.TIF")
 
         rprj = RR.RasterReproject(input_img_path, output_img_path)
         rprj.reproject_raster_to_epsg4674()
 
         # Clip
-        img_path = f"{tmp_dir}/r{sat.get_output_file_name()}.TIF"
+        img_path = f"{tmp_dir}/r{output_file_name}.TIF"
 
         c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir,
-                          scene_file_name=sat.get_parameter_satellite()[
-                              "scene_file_name"],
+                          scene_file_name=parameter_satellite["scene_file_name"],
                           output_dir=output_dir,
-                          output_file_name=sat.get_output_file_name())
+                          output_file_name=output_file_name)
 
         r = R.Raster(img_path=img_path)
 
@@ -294,19 +293,20 @@ if __name__ == "__main__":
             c.clip_raster_by_mask(band_order=band_order)
         else:
             import RasterTranslate as RT
-            rt = RT.RasterTranslate(img_path=img_path, output_dir=output_dir,
-                                    output_file_name=sat.get_output_file_name())
+            rt = RT.RasterTranslate(img_path=img_path, 
+                                    output_dir=output_dir,
+                                    output_file_name=output_file_name)
             rt.translate_8bit(band_order)
 
         # Make pyramid
         img_path = os.path.join(
-            output_dir, f"{sat.get_output_file_name()}.TIF")
+            output_dir, f"{output_file_name}.TIF")
         PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
 
-            # s.get_segmentation(r=5, i=10, algo='SLICO')
+            s.get_segmentation(r=5, i=10, algo='SLICO')
 
             # Load database
             # l.run_load_segmentation()
@@ -317,12 +317,16 @@ if __name__ == "__main__":
             cloud.run_cloud_shadow_fmask()
             pass
 
-            # Thinking about compose image in fuction for fmask
-        shutil.rmtree(tmp_dir)
-
-        with open(Path('log/log.csv'), 'a', newline='') as csvfile:
+        # Write log of scene processed in csv
+        with open(csv_path, 'a', newline='') as csvfile:
             logwriter = csv.writer(csvfile, delimiter=',')
-            logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
-                                sat.get_parameter_satellite()[
-                'aquisition_date'],
-                sat.get_parameter_satellite()['index']])
+            logwriter.writerow([parameter_satellite['initials_name'],
+                                parameter_satellite['aquisition_date'],
+                                parameter_satellite['index']])
+        
+        dst = Path(sys.argv[1], 'Landsat/processada')
+        shutil.move(file_path, dst=dst)
+        
+        shutil.rmtree(tmp_dir)
+        
+        continue
