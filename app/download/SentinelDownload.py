@@ -24,7 +24,7 @@ geojson_path = f'{home_path}/{geojson_path}'
 footprint = geojson_to_wkt(read_geojson(geojson_path))
 
 products = api.query(footprint,
-                     date = ('20181015', '20181107'),
+                     date = ('20181107', '20181112'),
                      platformname = 'Sentinel-2',
                      producttype = "S2MSI1C",
                      cloudcoverpercentage = (0, 80))
