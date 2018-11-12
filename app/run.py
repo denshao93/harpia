@@ -306,7 +306,7 @@ if __name__ == "__main__":
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
 
-            s.get_segmentation(r=5, i=10, algo='SLICO')
+            # s.get_segmentation(r=5, i=10, algo='SLICO')
 
             # Load database
             # l.run_load_segmentation()

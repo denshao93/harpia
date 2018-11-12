@@ -87,11 +87,11 @@ class CloudShadow:
             c = CR.ClipRaster(img_path=rc, tmp_dir=self.tmp_dir,
                               scene_file_name=self.scene_file_name,
                               output_dir=self.output_dir,
-                              output_file_name=f"fmask_{self.output_file_name}.TIF")
+                              output_file_name=f"fmask_{self.output_file_name}")
 
             c.clip_raster_by_mask()
         else:
-            dst = os.path.join(self.output_dir, f"fmask_{self.scene_file_name}.tif")
+            dst = os.path.join(self.output_dir, f"fmask_{self.scene_file_name}")
             shutil.move(src=rc, dst=dst)
 
     def run_cloud_shadow_fmask(self):
