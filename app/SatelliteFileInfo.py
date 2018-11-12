@@ -32,7 +32,10 @@ class SatelliteFileInfo:
     @staticmethod
     def _read_satallite_data_table():
         """ Read table where to register satallite from image file."""
-        csv_path = Path('app/data/table/satallite_data.csv')
+        home_path = str(Path.home())
+        csv_path = str(Path('workspace/harpia/app/data/table/satallite_data.csv'))
+        csv_path = f'{home_path}/{csv_path}'
+        
         df = pd.read_csv(csv_path, sep=',')
 
         return df
