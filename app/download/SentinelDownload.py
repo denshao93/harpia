@@ -3,9 +3,7 @@ from pathlib import Path
 from datetime import date
 from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt
 
-
 # Open yaml 
-
 home_path = str(Path.home())
 yaml_path = str(Path('workspace/harpia/app/config/const.yaml'))
 yaml_path = f'{home_path}/{yaml_path}'
@@ -19,21 +17,17 @@ password = const['data_hub']['password']
 # connect to the API
 api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
 
-# download single scene by known product id
-# api.download(<product_id>)
 
 # search by polygon, time, and Hub query keywords
-
 geojson_path = str(Path('workspace/harpia/app/download/baixo_sul.geojson'))
 geojson_path = f'{home_path}/{geojson_path}'
-
 footprint = geojson_to_wkt(read_geojson(geojson_path))
+
 products = api.query(footprint,
-                     date = ('20181006', '20181107'),
+                     date = ('20181015', '20181107'),
                      platformname = 'Sentinel-2',
                      producttype = "S2MSI1C",
                      cloudcoverpercentage = (0, 80))
-print(products)
 
 # download all results from the search
 directory_path = 'BRUTA/Sentinel2'
