@@ -214,14 +214,14 @@ if __name__ == "__main__":
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
-            s.get_segmentation(r=10, i=10, algo='SLICO')
-            l.run_load_segmentation()
+            # s.get_segmentation(r=10, i=10, algo='SLICO')
+            # l.run_load_segmentation()
 
             # Cloud/Shadow
             
 
             # Write log of scene processed in csv
-            with open(csv_path, 'a', newline='') as csvfile:
+            with open(csv_path, 'wr', newline='') as csvfile:
                 logwriter = csv.writer(csvfile, delimiter=',')
                 logwriter.writerow([parameter_satellite['initials_name'],
                                     parameter_satellite['aquisition_date'],
@@ -229,7 +229,7 @@ if __name__ == "__main__":
             
             
             dst = Path(sys.argv[1], 'Sentinel2/processada')
-            shutil.move(file_path, dst=dst)
+            # shutil.move(file_path, dst=dst)
             
             shutil.rmtree(tmp_dir)
             

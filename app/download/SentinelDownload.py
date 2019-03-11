@@ -1,7 +1,7 @@
-import yaml
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt
+import yaml
 
 # Open yaml 
 home_path = str(Path.home())
@@ -24,10 +24,13 @@ geojson_path = f'{home_path}/{geojson_path}'
 footprint = geojson_to_wkt(read_geojson(geojson_path))
 
 products = api.query(footprint,
-                     date = ('20181107', '20181112'),
+                     date = ('2017516', '20181231'),
                      platformname = 'Sentinel-2',
-                     producttype = "S2MSI1C",
-                     cloudcoverpercentage = (0, 80))
+                     cloudcoverpercentage = (0, 20))
+
+# GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
+df = api.to_geodataframe(products)
+df.to_csv(Path('app/download/2017516_20181231_LXN_LXM.csv'))
 
 # download all results from the search
 directory_path = 'BRUTA/Sentinel2'
