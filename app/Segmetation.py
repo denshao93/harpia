@@ -6,7 +6,7 @@ class Segmentation:
 
     def __init__(self, tmp_dir, output_dir, output_file_name):
 
-        self.algo="SLICO"
+        self.algo="SLIC"
 
         self.tmp_dir = tmp_dir
 
