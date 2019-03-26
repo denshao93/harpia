@@ -24,14 +24,14 @@ geojson_path = f'{home_path}/{geojson_path}'
 footprint = geojson_to_wkt(read_geojson(geojson_path))
 
 products = api.query(footprint,
-                     date = ('2017516', '20181231'),
+                     date = ('20190101', '20190325'),
                      platformname = 'Sentinel-2',
-                     cloudcoverpercentage = (0, 20))
+                     cloudcoverpercentage = (0, 80))
 
 # GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
 df = api.to_geodataframe(products)
-df.to_csv(Path('app/download/2017516_20181231_LXN_LXM.csv'))
-
+df.to_csv(Path('app/download/20190101_20190325_LXN_LXM.csv'))
+print(df)
 # download all results from the search
 directory_path = 'BRUTA/Sentinel2'
 directory_path = f'{home_path}/{directory_path}'

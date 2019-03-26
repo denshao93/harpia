@@ -1,22 +1,24 @@
-import os  # NOQA
 import csv
-import sys
+import datetime
 import glob
+import os  # NOQA
 import shutil
+import sys
 import tempfile  # NOQA
-import Raster as R
-import UnpackFile as UF
-import ClipRaster as CR
 from pathlib import Path
-import ComposeBands as CB
-import Segmetation as SEG
-import PyramidRaster as PR
+
+import ClipRaster as CR
 import CloudShadowLC8 as CL
-import RasterReproject as RR
-import OrganizeDirectory as OD
-import SatelliteFileInfo as SFI
+import ComposeBands as CB
 import Connection2Database as CDB
 import LoadSegmentationDatabase as LSD
+import OrganizeDirectory as OD
+import PyramidRaster as PR
+import Raster as R
+import RasterReproject as RR
+import SatelliteFileInfo as SFI
+import Segmetation as SEG
+import UnpackFile as UF
 
 
 if __name__ == "__main__":
@@ -40,10 +42,12 @@ if __name__ == "__main__":
                                     sys.argv[1]+'/*/R2*BAND5*.zip',
                                     sys.argv[1]+'/*/L*.tar.gz')]
              for f in f_]
-
+    
+    
     for file_path in files:
         
         print(file_path)
+        now = datetime.datetime.now()
 
         # Create tmp director to put all temp files
         tmp_dir = tempfile.mkdtemp()
@@ -214,22 +218,23 @@ if __name__ == "__main__":
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
-            # s.get_segmentation(r=10, i=10, algo='SLICO')
-            # l.run_load_segmentation()
+            s.get_segmentation(r=10, i=10, algo='SLICO')
+            l.run_load_segmentation()
 
             # Cloud/Shadow
             
 
             # Write log of scene processed in csv
-            with open(csv_path, 'wr', newline='') as csvfile:
+            with open(csv_path, 'a', newline='') as csvfile:
                 logwriter = csv.writer(csvfile, delimiter=',')
-                logwriter.writerow([parameter_satellite['initials_name'],
+                logwriter.writerow([now,
+                                    parameter_satellite['initials_name'],
                                     parameter_satellite['aquisition_date'],
                                     parameter_satellite['index']])
             
             
             dst = Path(sys.argv[1], 'Sentinel2/processada')
-            # shutil.move(file_path, dst=dst)
+            shutil.move(file_path, dst=dst)
             
             shutil.rmtree(tmp_dir)
             
