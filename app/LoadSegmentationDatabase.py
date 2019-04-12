@@ -54,7 +54,7 @@ class LoadSegmentationDatabase:
         yaml_path = f'{home_path}/{yaml_path}'
         
         with open(yaml_path, 'r') as f:
-            const = yaml.load(f)
+            const = yaml.safe_load(f)
         host = const['draft_db']['host']
         dbname = const['draft_db']['dbname']
         user = const['draft_db']['user']
