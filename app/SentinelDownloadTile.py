@@ -1,12 +1,15 @@
 from collections import OrderedDict
 from os.path import exists, join
 from pathlib import Path
+import datetime 
 
+import ConnectionDB as C
 import geopandas as gpd
 import yaml
 from geopandas_postgis import PostGIS
 from sentinelsat import SentinelAPI
 from sqlalchemy import create_engine
+
 
 # Open yaml 
 with open(Path("app/config/const.yaml"), 'r') as f:
@@ -27,13 +30,13 @@ port = harpia_db['port']
 # connect to the API
 api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
 
-tiles = ['24LXN', '24LXM']
+tiles = ['24LXN', '24LXM', '24LWN', '24LWM', '24LWL', '24LVL', '24LVK']
 
 query_kwargs = {
         'platformname': 'Sentinel-2',
         'producttype': 'S2MSI1C',
-        'cloudcoverpercentage': (0, 30),
-        'date': ('20180907', '20181109')}
+        'cloudcoverpercentage': (0, 100),
+        'date': ('20180907', '20190415')}
 
 products = OrderedDict()
 for tile in tiles:
@@ -45,8 +48,12 @@ for tile in tiles:
 # GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
 gdf = api.to_geodataframe(products)
 
-# Connect to Database
-engine = create_engine(f'postgresql://{user_db}:{password_db}@{host}:{port}/{dbname}')
+# Connect to Database 
+conn_str = f'postgresql://{user_db}:{password_db}@{host}:{port}/{dbname}'
+engine = create_engine(conn_str)
+
+conn_string = f'host={host} dbname={dbname} user={user_db} password={password_db} port={port}'
+con = C.Connection(conn_string)
 
 home_path = str(Path.home())
 dst_folder = join(home_path, 'BRUTA')
@@ -57,14 +64,20 @@ for i in range(0, len(gdf)):
     # File path to know if it exist
     file_name = gdf['title'][i]
     file_path = join(dst_folder, f'{file_name}.zip')
-        
+
+    # Verificando se o arquivo já foi baixado alguma vez
+    query = f"SELECT index FROM sentinel WHERE index = '{uuid}'"
+    rs = con.run_query(query)
+ 
     if not exists(file_path):
-        print(file_name)
-        api.download(uuid, directory_path=dst_folder)
-        # Selecionando a linha do geodataframe
-        g = gdf[gdf['uuid'] == uuid] 
-        g.postgis.to_postgis(con=engine, if_exists='append', 
-                        table_name='sentinel', geometry='MultiPolygon')
+        if len(rs) == 0:
+            print(file_name)
+            # api.download(uuid, directory_path=dst_folder)
+            # Selecionando a linha do geodataframe
+            gdf['date_download'] = datetime.datetime.now()
+            g = gdf[gdf['uuid'] == uuid] 
+            g.postgis.to_postgis(con=engine, if_exists='append', 
+                            table_name='sentinel', geometry='MultiPolygon')
 
 # Create table in order save 
 '''
@@ -105,7 +118,13 @@ CREATE TABLE public.sentinel
     processinglevel text COLLATE pg_catalog."default",
     identifier text COLLATE pg_catalog."default",
     uuid text COLLATE pg_catalog."default",
-    geom geometry(MultiPolygon,4326)
+    geom geometry(MultiPolygon,4326),
+    id integer NOT NULL DEFAULT nextval('sentinel_id_seq'::regclass) ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    date_download timestamp without time zone,
+    level1cpdiidentifier character(250) COLLATE pg_catalog."default",
+    is_download boolean,
+    is_processed boolean,
+    file_path boolean
 )
 WITH (
     OIDS = FALSE
