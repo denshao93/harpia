@@ -29,14 +29,15 @@ port = harpia_db['port']
 
 # connect to the API
 api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
+# '24LXM', '24LWN', '24LWM', '24LWL', '24LVL', '24LVK'
 
-tiles = ['24LXN', '24LXM', '24LWN', '24LWM', '24LWL', '24LVL', '24LVK']
+tiles = ['24LXN']
 
 query_kwargs = {
         'platformname': 'Sentinel-2',
-        'producttype': 'S2MSI1C',
-        'cloudcoverpercentage': (0, 100),
-        'date': ('20180907', '20190415')}
+        # 'producttype': 'S2MSI1C',
+        'cloudcoverpercentage': (0, 30),
+        'date': ('NOW-14DAYS', 'NOW')}
 
 products = OrderedDict()
 for tile in tiles:
@@ -56,7 +57,7 @@ conn_string = f'host={host} dbname={dbname} user={user_db} password={password_db
 con = C.Connection(conn_string)
 
 home_path = str(Path.home())
-dst_folder = join(home_path, 'BRUTA')
+dst_folder = join(home_path, 'BRUTA_DEV')
 
 for i in range(0, len(gdf)):
     uuid = gdf['uuid'][i] #se existir não realizar o download
@@ -72,20 +73,23 @@ for i in range(0, len(gdf)):
     if not exists(file_path):
         if len(rs) == 0:
             print(file_name)
-            # api.download(uuid, directory_path=dst_folder)
+            api.download(uuid, directory_path=dst_folder)
             # Selecionando a linha do geodataframe
             gdf['date_download'] = datetime.datetime.now()
             g = gdf[gdf['uuid'] == uuid] 
-            g.postgis.to_postgis(con=engine, if_exists='append', 
+            g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
                             table_name='sentinel', geometry='MultiPolygon')
 
 # Create table in order save 
 '''
+CREATE SCHEMA metadado_img;
+
 -- Table: public.sentinel
 
 -- DROP TABLE public.sentinel;
+CREATE SEQUENCE sentinel_id_seq;
 
-CREATE TABLE public.sentinel
+CREATE TABLE metadado_img.sentinel
 (
     index text COLLATE pg_catalog."default",
     title text COLLATE pg_catalog."default",
@@ -131,24 +135,23 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.sentinel
-    OWNER to postgres;
+ALTER TABLE metadado_img.sentinel
+    OWNER to tmzuser;
 
 -- Index: idx_sentinel_geom
 
 -- DROP INDEX public.idx_sentinel_geom;
 
 CREATE INDEX idx_sentinel_geom
-    ON public.sentinel USING gist
-    (geom)
-    TABLESPACE pg_default;
-
+    ON metadado_img.sentinel USING gist
+    (geom);
+	
 -- Index: ix_sentinel_index
 
 -- DROP INDEX public.ix_sentinel_index;
 
-CREATE INDEX ix_sentinel_index
-    ON public.sentinel USING btree
-    (index COLLATE pg_catalog."default")
+CREATE INDEX idx_sentinel_index
+    ON metadado_img.sentinel USING btree
+    (index, id)
     TABLESPACE pg_default;
 '''
