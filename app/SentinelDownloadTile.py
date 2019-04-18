@@ -16,8 +16,9 @@ with open(Path("app/config/const.yaml"), 'r') as f:
         const = yaml.safe_load(f)
 
 # Open Datahub parameters
-user = const['data_hub']['user']
-password = const['data_hub']['password']
+data_hub = const['data_hub']
+user = data_hub['user']
+password = data_hub['password']
 
 # Database parameters
 harpia_db = const['harpia_db']
@@ -60,36 +61,44 @@ home_path = str(Path.home())
 dst_folder = join(home_path, 'BRUTA_DEV')
 
 for i in range(0, len(gdf)):
-    uuid = gdf['uuid'][i] #se existir não realizar o download
-        
+    uuid = gdf['uuid'][i] 
+    
     # File path to know if it exist
     file_name = gdf['title'][i]
     file_path = join(dst_folder, f'{file_name}.zip')
+    print(file_name)
 
-    # Verificando se o arquivo já foi baixado alguma vez
-    query = f"SELECT index FROM sentinel WHERE index = '{uuid}'"
+    # Check if file was downloaded anytime
+    query = f"SELECT index FROM metadado_img.metadado_sentinel WHERE index = '{uuid}'"
     rs = con.run_query(query)
- 
-    if not exists(file_path):
-        if len(rs) == 0:
-            print(file_name)
-            api.download(uuid, directory_path=dst_folder)
-            # Selecionando a linha do geodataframe
-            gdf['date_download'] = datetime.datetime.now()
-            g = gdf[gdf['uuid'] == uuid] 
-            g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
-                            table_name='sentinel', geometry='MultiPolygon')
+    metadado_save_db = (len(rs) == 1)
+
+    # Selecionando a linha do geodataframe
+    gdf['date_download'] = datetime.datetime.now()
+    g = gdf[gdf['uuid'] == uuid] 
+    
+    if not exists(file_path) and not metadado_save_db:
+        api.download(uuid, directory_path=dst_folder)
+        g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
+                        table_name='metadado_sentinel', geometry='MultiPolygon')
+    
+    elif exists(file_path) and not metadado_save_db:
+        g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
+                        table_name='metadado_sentinel', geometry='MultiPolygon')    
 
 # Create table in order save 
 '''
 CREATE SCHEMA metadado_img;
 
--- Table: public.sentinel
+GRANT USAGE ON SCHEMA metadado_img TO grp_consulta;
 
--- DROP TABLE public.sentinel;
-CREATE SEQUENCE sentinel_id_seq;
+GRANT ALL ON SCHEMA metadado_img TO tmzuser;
 
-CREATE TABLE metadado_img.sentinel
+-- Table: metadado_img.metadado_sentinel
+
+-- DROP TABLE metadado_img.metadado_sentinel;
+
+CREATE TABLE metadado_img.metadado_sentinel
 (
     index text COLLATE pg_catalog."default",
     title text COLLATE pg_catalog."default",
@@ -123,7 +132,7 @@ CREATE TABLE metadado_img.sentinel
     identifier text COLLATE pg_catalog."default",
     uuid text COLLATE pg_catalog."default",
     geom geometry(MultiPolygon,4326),
-    id integer NOT NULL DEFAULT nextval('sentinel_id_seq'::regclass) ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    id integer NOT NULL DEFAULT nextval('metadado_sentinel_id_seq'::regclass),
     date_download timestamp without time zone,
     level1cpdiidentifier character(250) COLLATE pg_catalog."default",
     is_download boolean,
@@ -135,23 +144,28 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE metadado_img.sentinel
+ALTER TABLE metadado_img.metadado_sentinel
     OWNER to tmzuser;
 
--- Index: idx_sentinel_geom
+GRANT SELECT ON TABLE metadado_img.metadado_sentinel TO grp_consulta;
 
--- DROP INDEX public.idx_sentinel_geom;
+GRANT ALL ON TABLE metadado_img.metadado_sentinel TO tmzuser;
 
-CREATE INDEX idx_sentinel_geom
-    ON metadado_img.sentinel USING gist
-    (geom);
-	
--- Index: ix_sentinel_index
+-- Index: idx_metadado_sentinel_geom
 
--- DROP INDEX public.ix_sentinel_index;
+-- DROP INDEX metadado_img.idx_metadado_sentinel_geom;
 
-CREATE INDEX idx_sentinel_index
-    ON metadado_img.sentinel USING btree
-    (index, id)
+CREATE INDEX idx_metadado_sentinel_geom
+    ON metadado_img.metadado_sentinel USING gist
+    (geom)
+    TABLESPACE pg_default;
+
+-- Index: idx_metadado_sentinel_index
+
+-- DROP INDEX metadado_img.idx_metadado_sentinel_index;
+
+CREATE INDEX idx_metadado_sentinel_index
+    ON metadado_img.metadado_sentinel USING btree
+    (index COLLATE pg_catalog."default", id)
     TABLESPACE pg_default;
 '''
