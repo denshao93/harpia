@@ -55,7 +55,8 @@ class ClipRaster:
             if out_image.dtype != 'uint8':
                 out_image = self.scale8bit(out_image)
         
-        with rasterio.open(f"{self.output_dir}/{self.output_file_name}.TIF", "w", **out_meta) as dest:
+        with rasterio.open(f"{self.output_dir}/{self.output_file_name}.TIF", "w", 
+                        tiled=True, blockxsize=512, blockysize=512,**out_meta) as dest:
             # Set order bands to save (NIR/GREEN/RED/BLUE)
             # This bands not the same in LC08
             dest.write(out_image, band_order)
