@@ -1,4 +1,4 @@
 name,satellite_initial_name,sensor,acquisition_date,path,row,tile,utm_zone,obs
 landsat,0:4,1:2,17:25,10:13,13:16,NULL,NULL,NULL
 sentinel,0:2,4:7,11:19,NULL,NULL,39:44,39:41,NULL
-cbers4,0:5,"8:11, 9:12",12:20,"21:24, 22:25","25:28, 26:29",NULL,NULL,first index to MUX else AWFI 
+cbers4,0:5,"8:11, 9:12","12:20, 15:23","21:24, 22:25, 24:27 ","25:28,  26:29, 28:31",NULL,NULL,"first index to MUX, AWFI, PAN10M"

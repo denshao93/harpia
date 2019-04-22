@@ -32,13 +32,13 @@ port = harpia_db['port']
 api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
 # '24LXM', '24LWN', '24LWM', '24LWL', '24LVL', '24LVK'
 
-tiles = ['24LXN']
+tiles = ['24LVJ', '24LUJ', '24LTJ', '24LVH', '24LUH', '24LTH']
 
 query_kwargs = {
         'platformname': 'Sentinel-2',
         # 'producttype': 'S2MSI1C',
-        'cloudcoverpercentage': (0, 30),
-        'date': ('NOW-14DAYS', 'NOW')}
+        'cloudcoverpercentage': (0, 5),
+        'date': ('20170101', '20171201')} # 'NOW-14DAYS', 'NOW'
 
 products = OrderedDict()
 for tile in tiles:
@@ -49,6 +49,8 @@ for tile in tiles:
 
 # GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
 gdf = api.to_geodataframe(products)
+
+print(gdf)
 
 # Connect to Database 
 conn_str = f'postgresql://{user_db}:{password_db}@{host}:{port}/{dbname}'

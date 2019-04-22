@@ -38,6 +38,7 @@ if __name__ == "__main__":
     files = [f for f_ in [glob.glob(e)
                           for e in (sys.argv[1]+'/*/S2*.zip',
                                     sys.argv[1]+'/*/CBERS*BAND5.zip',
+                                    sys.argv[1]+'/*/CBERS*BAND2.zip',
                                     sys.argv[1]+'/*/CBERS*BAND13.zip',
                                     sys.argv[1]+'/*/R2*BAND5*.zip',
                                     sys.argv[1]+'/*/L*.tar.gz')]
@@ -87,7 +88,7 @@ if __name__ == "__main__":
         ################################### Cbers4/ResorceSat2###############################
         #####################################################################################
         if sat.is_cbers4_file() or sat.is_resourcesat2_file():
-            exp = f"{sys.argv[1]}/*/{sat.get_parameter_satellite()['scene_file_name']}*.zip"
+            exp = f"{sys.argv[1]}/*/{sat.get_parameter_satellite()['scene_file_name'][:-1]}*.zip"
             for i in glob.glob(exp):
                 up = UF.UnpackFile(file_path=i, tmp_dir=tmp_dir)
                 up.uncompress_zip()
@@ -148,7 +149,7 @@ if __name__ == "__main__":
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
-            s.get_segmentation(r=5, i=10, algo='SLICO')
+            s.get_segmentation(r=5, i=13, algo='SLIC')
             # Load segmentation
             l.run_load_segmentation()
 
@@ -218,8 +219,8 @@ if __name__ == "__main__":
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
-            s.get_segmentation(r=10, i=10, algo='SLICO')
-            l.run_load_segmentation()
+            # s.get_segmentation(r=10, i=10, algo='SLICO')
+            # l.run_load_segmentation()
 
             # Cloud/Shadow
             

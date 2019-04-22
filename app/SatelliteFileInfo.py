@@ -66,6 +66,10 @@ class SatelliteFileInfo:
         elif self.is_cbers4_file() and 'AWFI' in self.get_scene_file_name():
     
             return 'awfi'
+        
+        elif self.is_cbers4_file() and 'PAN10M' in self.get_scene_file_name():
+    
+            return 'pan10m'
     
     def _get_path_row_from_file_landsat(self):
         """."""
@@ -111,6 +115,10 @@ class SatelliteFileInfo:
             slice_path = slice_path[1]
             slice_row = slice_row[1]
         
+        elif self._which_cbers4_sensor() == 'pan10m':
+            slice_path = slice_path[2]
+            slice_row = slice_row[2]
+        
         path = eval('scene_file_name[' + slice_path + ']')
         row = eval('scene_file_name[' + slice_row + ']')
         
@@ -141,6 +149,10 @@ class SatelliteFileInfo:
             sensor = eval('scene_file_name[' + slice_sensor + ']')
         
         # Acquisition Date
+        v = 0
+        if self._which_cbers4_sensor() == 'pan10m':
+            v = 1
+
         slice_acquisition_date = satellite_table.loc[satallite_row_data_table,
                                          "acquisition_date"].values[0]     
         acquisition_date = eval('scene_file_name[' + slice_acquisition_date + ']')
