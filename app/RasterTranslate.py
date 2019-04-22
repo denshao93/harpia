@@ -18,7 +18,7 @@ class RasterTranslate:
                 f"{self.output_file_name} -a_nodata 0 "\
                 f"-b {red} -b {green} -b {blue} --config " \
                 f"GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS ALL_CPUS " \
-                f"-co COMPRESS=DEFLATE -co ALPHA=NO -exponent 0.5"
+                f"-co COMPRESS=DEFLATE -co ALPHA=NO"
         else:
             last = band_order[3]
 
@@ -26,6 +26,6 @@ class RasterTranslate:
                     f"{self.output_file_name} -a_nodata 0 "\
                     f"-b {red} -b {green} -b {blue} -b {last} --config " \
                     f"GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS ALL_CPUS " \
-                    f"-co COMPRESS=DEFLATE -co ALPHA=NO -exponent 0.5"
+                    f"-co COMPRESS=DEFLATE -co ALPHA=NO"
         os.system(command)
         
