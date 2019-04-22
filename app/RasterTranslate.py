@@ -12,12 +12,20 @@ class RasterTranslate:
         red = band_order[0]
         green = band_order[1]
         blue = band_order[2]
-        last = band_order[3]
+        
+        if len(band_order) < 4:
+            command = f"gdal_translate {self.img_path} -ot Byte -scale " \
+                f"{self.output_file_name} -a_nodata 0 "\
+                f"-b {red} -b {green} -b {blue} --config " \
+                f"GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS ALL_CPUS " \
+                f"-co COMPRESS=DEFLATE -co ALPHA=NO -exponent 0.5"
+        else:
+            last = band_order[3]
 
-        command = f"gdal_translate {self.img_path} -ot Byte -scale " \
-                  f"{self.output_file_name} -a_nodata 0 "\
-                  f"-b {red} -b {green} -b {blue} -b {last} --config " \
-                  f"GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS ALL_CPUS " \
-                  f"-co COMPRESS=DEFLATE -co ALPHA=NO"
+            command = f"gdal_translate {self.img_path} -ot Byte -scale " \
+                    f"{self.output_file_name} -a_nodata 0 "\
+                    f"-b {red} -b {green} -b {blue} -b {last} --config " \
+                    f"GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS ALL_CPUS " \
+                    f"-co COMPRESS=DEFLATE -co ALPHA=NO -exponent 0.5"
         os.system(command)
         

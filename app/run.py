@@ -102,6 +102,11 @@ if __name__ == "__main__":
                 if parameter_satellite['sensor'] == 'WFI':
                     bands_expression = f"1[3-6]"
                     expression = f"CBERS*BAND{bands_expression}.tif"
+                
+                elif parameter_satellite['sensor'] == 'pan10m':
+                    bands_expression = f"[2-4]"
+                    expression = f"CBERS*BAND{bands_expression}.tif"
+                    band_order = [3, 2, 1]
 
             elif sat.is_resourcesat2_file():
                 bands_expression = '2-5'
@@ -149,19 +154,17 @@ if __name__ == "__main__":
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
-            s.get_segmentation(r=5, i=13, algo='SLIC')
+            # s.get_segmentation(r=5, i=13, algo='SLIC')
             # Load segmentation
-            l.run_load_segmentation()
-
+            # l.run_load_segmentation()
             
-
             # Write log of cene processed in csv            
-            with open(csv_path, 'a', newline='') as csvfile:
-                logwriter = csv.writer(csvfile, delimiter=',')
-                logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
-                                    sat.get_parameter_satellite()[
-                    'aquisition_date'],
-                    sat.get_parameter_satellite()['index']])
+            # with open(csv_path, 'a', newline='') as csvfile:
+            #     logwriter = csv.writer(csvfile, delimiter=',')
+            #     logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
+            #                         sat.get_parameter_satellite()[
+            #         'aquisition_date'],
+            #         sat.get_parameter_satellite()['index']])
 
             shutil.rmtree(tmp_dir)
 

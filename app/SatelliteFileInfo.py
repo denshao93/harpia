@@ -154,7 +154,10 @@ class SatelliteFileInfo:
             v = 1
 
         slice_acquisition_date = satellite_table.loc[satallite_row_data_table,
-                                         "acquisition_date"].values[0]     
+                                         "acquisition_date"].values[0]
+        
+        slice_acquisition_date = slice_acquisition_date.split(',')[v]
+
         acquisition_date = eval('scene_file_name[' + slice_acquisition_date + ']')
 
         # Index
