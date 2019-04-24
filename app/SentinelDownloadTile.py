@@ -17,50 +17,47 @@ with open(Path("app/config/const.yaml"), 'r') as f:
 
 # Open Datahub parameters
 data_hub = const['data_hub']
-user = data_hub['user']
-password = data_hub['password']
+user = data_hub['user'] # user_hub
+password = data_hub['password'] # password_hub
 
 # Database parameters
-harpia_db = const['harpia_db']
-host = harpia_db['host']
-dbname =  harpia_db['dbname']
-user_db = harpia_db['user']
-password_db = harpia_db['password']
-port = harpia_db['port']
+harpia_db = const['harpia_db'] 
+host = harpia_db['host'] # host
+dbname =  harpia_db['dbname'] # database 
+user_db = harpia_db['user'] # user
+password_db = harpia_db['password'] # password
+port = harpia_db['port'] # port
 
 # connect to the API
 api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
-# '24LXM', '24LWN', '24LWM', '24LWL', '24LVL', '24LVK'
 
-tiles = ['24LVJ', '24LUJ', '24LTJ', '24LVH', '24LUH', '24LTH']
+tiles = ['24LVJ'] # *tiles
 
 query_kwargs = {
         'platformname': 'Sentinel-2',
-        # 'producttype': 'S2MSI1C',
-        'cloudcoverpercentage': (0, 5),
-        'date': ('20170101', '20171201')} # 'NOW-14DAYS', 'NOW'
+        'producttype': 'S2MSI1C', # producttype
+        'cloudcoverpercentage': (0, 1), # cloudcoverpercetage (min, max)
+        'date': ('20170101', '20171201')} # date: begindate enddate (ex. 'NOW-14DAYS', 'NOW')
 
 products = OrderedDict()
 for tile in tiles:
     kw = query_kwargs.copy()
-    kw['tileid'] = tile  # products after 2017-03-31
+    kw['tileid'] = tile 
     pp = api.query(**kw)
     products.update(pp)
 
 # GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
 gdf = api.to_geodataframe(products)
 
-print(gdf)
-
 # Connect to Database 
-conn_str = f'postgresql://{user_db}:{password_db}@{host}:{port}/{dbname}'
+conn_str = f"postgresql://{user_db}:{password_db}@{host}:{port}/{dbname}"
 engine = create_engine(conn_str)
 
-conn_string = f'host={host} dbname={dbname} user={user_db} password={password_db} port={port}'
+conn_string = f"host={host} dbname={dbname} user={user_db} password={password_db} port={port}"
 con = C.Connection(conn_string)
 
 home_path = str(Path.home())
-dst_folder = join(home_path, 'BRUTA_DEV')
+dst_folder = join(home_path, 'BRUTA_DEV') # outputfile
 
 for i in range(0, len(gdf)):
     uuid = gdf['uuid'][i] 
@@ -68,33 +65,37 @@ for i in range(0, len(gdf)):
     # File path to know if it exist
     file_name = gdf['title'][i]
     file_path = join(dst_folder, f'{file_name}.zip')
-    print(file_name)
 
     # Check if file was downloaded anytime
-    query = f"SELECT index FROM metadado_img.metadado_sentinel WHERE index = '{uuid}'"
+    query = f"SELECT index FROM metadado_img.metadado_sentinel WHERE index = '{uuid}'" # schema table
     rs = con.run_query(query)
-    metadado_save_db = (len(rs) == 1)
+    metadado_is_save_db = (len(rs) == 1)
 
     # Selecionando a linha do geodataframe
-    gdf['date_download'] = datetime.datetime.now()
-    g = gdf[gdf['uuid'] == uuid] 
+    g = gdf[gdf['uuid'] == uuid].copy()
     
-    if not exists(file_path) and not metadado_save_db:
+    if not exists(file_path) and not metadado_is_save_db:
+        print(file_name)
+        g.loc[0, 'date_download'] = datetime.datetime.now()
         api.download(uuid, directory_path=dst_folder)
         g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
-                        table_name='metadado_sentinel', geometry='MultiPolygon')
+                        table_name='metadado_sentinel', geometry='Polygon')
     
-    elif exists(file_path) and not metadado_save_db:
+    elif exists(file_path) and not metadado_is_save_db:
         g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
-                        table_name='metadado_sentinel', geometry='MultiPolygon')    
+                        table_name='metadado_sentinel', geometry='Polygon')    
 
 # Create table in order save 
 '''
+DROP SCHEMA metadado_img CASCADE;
 CREATE SCHEMA metadado_img;
+DROP SEQUENCE metadado_sentinel_id_seq CASCADE;
 
-GRANT USAGE ON SCHEMA metadado_img TO grp_consulta;
+CREATE SEQUENCE metadado_sentinel_id_seq;
 
-GRANT ALL ON SCHEMA metadado_img TO tmzuser;
+-- GRANT USAGE ON SCHEMA metadado_img TO grp_consulta;
+
+-- GRANT ALL ON SCHEMA metadado_img TO tmzuser;
 
 -- Table: metadado_img.metadado_sentinel
 
@@ -133,7 +134,7 @@ CREATE TABLE metadado_img.metadado_sentinel
     processinglevel text COLLATE pg_catalog."default",
     identifier text COLLATE pg_catalog."default",
     uuid text COLLATE pg_catalog."default",
-    geom geometry(MultiPolygon,4326),
+    geom geometry(Polygon,4326),
     id integer NOT NULL DEFAULT nextval('metadado_sentinel_id_seq'::regclass),
     date_download timestamp without time zone,
     level1cpdiidentifier character(250) COLLATE pg_catalog."default",
@@ -149,9 +150,9 @@ TABLESPACE pg_default;
 ALTER TABLE metadado_img.metadado_sentinel
     OWNER to tmzuser;
 
-GRANT SELECT ON TABLE metadado_img.metadado_sentinel TO grp_consulta;
+-- GRANT SELECT ON TABLE metadado_img.metadado_sentinel TO grp_consulta;
 
-GRANT ALL ON TABLE metadado_img.metadado_sentinel TO tmzuser;
+-- GRANT ALL ON TABLE metadado_img.metadado_sentinel TO tmzuser;
 
 -- Index: idx_metadado_sentinel_geom
 
