@@ -59,6 +59,29 @@ con = C.Connection(conn_string)
 home_path = str(Path.home())
 dst_folder = join(home_path, 'BRUTA_DEV') # outputfile
 
+def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: str):
+    """Check is metadado from satellite image was saved in postgres database.
+    
+    Example:
+        conm_stromg --> host=localhost dbname=dbname user=user_db password=password_db port=5432
+
+    Arguments:
+        conn_string {str} -- String to connect to postgres database 
+        schema {str} -- shcema name
+        table {str} -- table name from schema
+        uuid {str} -- single identification of sentinel satellite 2 image 
+    
+    Returns:
+        The return value. True if file has metadata saved in database table, False otherwise.
+    """
+    query = f"SELECT index FROM {schema}.{table} WHERE index = '{uuid}'"
+    metadado_was_saved_db = (len(con.run_query(query)) == 1)
+    return metadado_was_saved_db
+
+
+def file_was_downloaded(folder: str, file_name: str):
+    pass
+
 for i in range(0, len(gdf)):
     uuid = gdf['uuid'][i] 
     
@@ -67,9 +90,8 @@ for i in range(0, len(gdf)):
     file_path = join(dst_folder, f'{file_name}.zip')
 
     # Check if file was downloaded anytime
-    query = f"SELECT index FROM metadado_img.metadado_sentinel WHERE index = '{uuid}'" # schema table
-    rs = con.run_query(query)
-    metadado_is_save_db = (len(rs) == 1)
+    metadado_is_save_db = metadata_img_is_saved_db(conn_string=conn_string, schema='metadado_img', 
+                                                        table='metadado_sentinel', uuid=uuid)
 
     # Selecionando a linha do geodataframe
     g = gdf[gdf['uuid'] == uuid].copy()
