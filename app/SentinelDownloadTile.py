@@ -10,6 +10,7 @@ from geopandas_postgis import PostGIS
 from sentinelsat import SentinelAPI
 from sqlalchemy import create_engine
 
+FOLDER_NAME = 'BRUTA_DEV'
 
 # Open yaml 
 with open(Path("app/config/const.yaml"), 'r') as f:
@@ -56,8 +57,18 @@ engine = create_engine(conn_str)
 conn_string = f"host={host} dbname={dbname} user={user_db} password={password_db} port={port}"
 con = C.Connection(conn_string)
 
-home_path = str(Path.home())
-dst_folder = join(home_path, 'BRUTA_DEV') # outputfile
+def path_output_folder(folder_name: str):
+    """Path of folder where files will store.
+    
+    Arguments:
+        folder_name {str} -- The name of folder where all zip files downloaded from scihub will store.
+    
+    Returns:
+        [str] -- Path of folder
+    """
+    home_path = str(Path.home())
+    dst_folder = join(home_path, folder_name)
+    return dst_folder
 
 def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: str):
     """Check is metadado from satellite image was saved in postgres database.
@@ -72,14 +83,15 @@ def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: st
         uuid {str} -- single identification of sentinel satellite 2 image 
     
     Returns:
-        The return value. True if file has metadata saved in database table, False otherwise.
+        [bool] -- The return value. True if file has metadata saved in database table, False otherwise.
     """
     query = f"SELECT index FROM {schema}.{table} WHERE index = '{uuid}'"
     metadado_was_saved_db = (len(con.run_query(query)) == 1)
     return metadado_was_saved_db
 
+dst_folder = path_output_folder('BRUTA_DEV')
 
-def file_was_downloaded(folder: str, file_name: str):
+def is_file_in_folder(folder: str, file_name: str):
     pass
 
 for i in range(0, len(gdf)):
