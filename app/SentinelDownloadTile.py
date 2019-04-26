@@ -1,14 +1,15 @@
+import datetime
 from collections import OrderedDict
 from os.path import exists, join
 from pathlib import Path
-import datetime 
 
-import ConnectionDB as C
 import geopandas as gpd
 import yaml
 from geopandas_postgis import PostGIS
 from sentinelsat import SentinelAPI
 from sqlalchemy import create_engine
+
+import ConnectionDB as C
 
 FOLDER_NAME = 'BRUTA_DEV'
 
@@ -21,18 +22,9 @@ data_hub = const['data_hub']
 user = data_hub['user'] # user_hub
 password = data_hub['password'] # password_hub
 
-# Database parameters
-harpia_db = const['harpia_db'] 
-host = harpia_db['host'] # host
-dbname =  harpia_db['dbname'] # database 
-user_db = harpia_db['user'] # user
-password_db = harpia_db['password'] # password
-port = harpia_db['port'] # port
-
 # connect to the API
 api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
 
-tiles = ['24LVJ'] # *tiles
 
 query_kwargs = {
         'platformname': 'Sentinel-2',
@@ -40,6 +32,7 @@ query_kwargs = {
         'cloudcoverpercentage': (0, 1), # cloudcoverpercetage (min, max)
         'date': ('20170101', '20171201')} # date: begindate enddate (ex. 'NOW-14DAYS', 'NOW')
 
+tiles = ['24LVJ'] # *tiles
 products = OrderedDict()
 for tile in tiles:
     kw = query_kwargs.copy()
@@ -50,12 +43,9 @@ for tile in tiles:
 # GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
 gdf = api.to_geodataframe(products)
 
-# Connect to Database 
-conn_str = f"postgresql://{user_db}:{password_db}@{host}:{port}/{dbname}"
-engine = create_engine(conn_str)
-
-conn_string = f"host={host} dbname={dbname} user={user_db} password={password_db} port={port}"
-con = C.Connection(conn_string)
+# Connect to Database
+con = C.Connection(const['harpia_db'])
+engine = create_engine('postgresql://', creator=con.open_connect())
 
 def path_output_folder(folder_name: str):
     """Path of folder where files will store.
@@ -89,10 +79,27 @@ def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: st
     metadado_was_saved_db = (len(con.run_query(query)) == 1)
     return metadado_was_saved_db
 
-dst_folder = path_output_folder('BRUTA_DEV')
+dst_folder = path_output_folder(FOLDER_NAME)
 
-def is_file_in_folder(folder: str, file_name: str):
-    pass
+def is_file_in_folder(folder: str, file_name: str, file_extention: str):
+    """Check if file exist in folder.
+    
+    Parameters
+    ----------
+    folder : str
+        Folder where file be
+    file_name : str
+        File name
+    file_extention : str
+        File extension
+    
+    Returns
+    -------
+    [bool]
+        If True file be in folder, False otherwise.
+    """
+    file_path = join(folder, file_name)
+    return exists(file_path)
 
 for i in range(0, len(gdf)):
     uuid = gdf['uuid'][i] 
@@ -102,20 +109,20 @@ for i in range(0, len(gdf)):
     file_path = join(dst_folder, f'{file_name}.zip')
 
     # Check if file was downloaded anytime
-    metadado_is_save_db = metadata_img_is_saved_db(conn_string=conn_string, schema='metadado_img', 
-                                                        table='metadado_sentinel', uuid=uuid)
+    metadata_is_save_db = metadata_img_is_saved_db(conn_string=const['harpia_db'], 
+        schema='metadado_img', table='metadado_sentinel', uuid=uuid)
 
     # Selecionando a linha do geodataframe
     g = gdf[gdf['uuid'] == uuid].copy()
     
-    if not exists(file_path) and not metadado_is_save_db:
+    if not exists(file_path) and not metadata_is_save_db:
         print(file_name)
         g.loc[0, 'date_download'] = datetime.datetime.now()
         api.download(uuid, directory_path=dst_folder)
         g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
                         table_name='metadado_sentinel', geometry='Polygon')
     
-    elif exists(file_path) and not metadado_is_save_db:
+    elif exists(file_path) and not metadata_is_save_db:
         g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
                         table_name='metadado_sentinel', geometry='Polygon')    
 
