@@ -100,7 +100,6 @@ def is_file_in_folder(folder: str, file_name: str, file_extention: str):
     file_path = join(folder, file_name)
     return exists(file_path)
 
-
 def load_metadata_db(geodataframe: GeoDataFrame, conn_string: str, schema: str, 
                     table_name: str, geometry: str, if_exists='append'):
     """Load metadata (geodataframe) in postgres database.
