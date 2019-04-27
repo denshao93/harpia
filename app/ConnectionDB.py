@@ -41,7 +41,7 @@ class Connection:
             # read connection parameters
             params = self.connection_string
             # connect to the PostgreSQL server
-            print("Connecting to the PostgreSQL database...")
+            # print("Connecting to the PostgreSQL database...")
             conn = pg.connect(params)
             conn.autocommit = True
 

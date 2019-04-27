@@ -4,6 +4,7 @@ from os.path import exists, join
 from pathlib import Path
 
 import geopandas as gpd
+from geopandas import GeoDataFrame
 import yaml
 from geopandas_postgis import PostGIS
 from sentinelsat import SentinelAPI
@@ -40,18 +41,16 @@ for tile in tiles:
     pp = api.query(**kw)
     products.update(pp)
 
-# GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
+# GeoPandas GeoDataFrame with the metadata of the scenes and the 
+# footprints as geometries
 gdf = api.to_geodataframe(products)
-
-# Connect to Database
-con = C.Connection(const['harpia_db'])
-engine = create_engine('postgresql://', creator=con.open_connect())
 
 def path_output_folder(folder_name: str):
     """Path of folder where files will store.
     
     Arguments:
-        folder_name {str} -- The name of folder where all zip files downloaded from scihub will store.
+        folder_name {str} -- The name of folder where all zip files downloaded 
+                            from scihub will store.
     
     Returns:
         [str] -- Path of folder
@@ -64,7 +63,7 @@ def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: st
     """Check is metadado from satellite image was saved in postgres database.
     
     Example:
-        conm_stromg --> host=localhost dbname=dbname user=user_db password=password_db port=5432
+        conn_strig --> host=localhost dbname=dbname user=user_db password=password_db port=5432
 
     Arguments:
         conn_string {str} -- String to connect to postgres database 
@@ -75,11 +74,11 @@ def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: st
     Returns:
         [bool] -- The return value. True if file has metadata saved in database table, False otherwise.
     """
+    # Connect to Database
+    con = C.Connection(const['harpia_db'])
     query = f"SELECT index FROM {schema}.{table} WHERE index = '{uuid}'"
     metadado_was_saved_db = (len(con.run_query(query)) == 1)
     return metadado_was_saved_db
-
-dst_folder = path_output_folder(FOLDER_NAME)
 
 def is_file_in_folder(folder: str, file_name: str, file_extention: str):
     """Check if file exist in folder.
@@ -101,30 +100,64 @@ def is_file_in_folder(folder: str, file_name: str, file_extention: str):
     file_path = join(folder, file_name)
     return exists(file_path)
 
+
+def load_metadata_db(geodataframe: GeoDataFrame, conn_string: str, schema: str, 
+                    table_name: str, geometry: str, if_exists='append'):
+    """Load metadata (geodataframe) in postgres database.
+    
+    Exemples:
+    ----------
+    conn_string:
+        host=localhost dbname=dbname user=user_db password=password_db port=5432
+    Parameters
+    ----------
+    geopandas : GeoDataFrame
+        Table with alphanumeric data and image footprint as GeoDataframe
+    conn_string : str
+        String to connect to postgres database
+    schema : str
+        Schema name
+    table_name : str
+        Table name
+    geometry : str
+        The kind of geometry (Polygon, Multipolygon)
+    if_exists : str, optional
+        If table exist in schema database the date will be store, 
+        by default 'append'.
+    """
+    con = C.Connection(conn_string)
+    engine = create_engine('postgresql://', creator=con.open_connect())
+    geodataframe.postgis.to_postgis(con=engine, schema='metadado_img', 
+            if_exists='append', table_name='metadado_sentinel', geometry='Polygon')
+
+
+dst_folder = path_output_folder(FOLDER_NAME)
 for i in range(0, len(gdf)):
     uuid = gdf['uuid'][i] 
     
-    # File path to know if it exist
     file_name = gdf['title'][i]
-    file_path = join(dst_folder, f'{file_name}.zip')
+    file_exist = is_file_in_folder(FOLDER_NAME, file_name, file_extention='.zip')
 
     # Check if file was downloaded anytime
     metadata_is_save_db = metadata_img_is_saved_db(conn_string=const['harpia_db'], 
         schema='metadado_img', table='metadado_sentinel', uuid=uuid)
 
-    # Selecionando a linha do geodataframe
+    # Select the line of geodataframe
     g = gdf[gdf['uuid'] == uuid].copy()
-    
-    if not exists(file_path) and not metadata_is_save_db:
-        print(file_name)
+    if not file_exist and not metadata_is_save_db:
+        # Set time value where file was downloaded
         g.loc[0, 'date_download'] = datetime.datetime.now()
+        # Downlod file
         api.download(uuid, directory_path=dst_folder)
-        g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
-                        table_name='metadado_sentinel', geometry='Polygon')
-    
-    elif exists(file_path) and not metadata_is_save_db:
-        g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
-                        table_name='metadado_sentinel', geometry='Polygon')    
+        # Load metadata in database
+        load_metadata_db(geodataframe=g, conn_string=const['harpia_db'], 
+                        schema='metadado_img', table_name='metadado_sentinel', 
+                        geometry='Polygon')
+
+    elif file_exist and not metadata_is_save_db:
+        load_metadata_db(geodataframe=g, conn_string=const['harpia_db'], 
+                        schema='metadado_img', table_name='metadado_sentinel', 
+                        geometry='Polygon')
 
 # Create table in order save 
 '''
