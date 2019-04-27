@@ -26,7 +26,6 @@ password = data_hub['password'] # password_hub
 # connect to the API
 api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
 
-
 query_kwargs = {
         'platformname': 'Sentinel-2',
         'producttype': 'S2MSI1C', # producttype
@@ -128,7 +127,6 @@ def load_metadata_db(geodataframe: GeoDataFrame, conn_string: str, schema: str,
     engine = create_engine('postgresql://', creator=con.open_connect())
     geodataframe.postgis.to_postgis(con=engine, schema='metadado_img', 
             if_exists='append', table_name='metadado_sentinel', geometry='Polygon')
-
 
 dst_folder = path_output_folder(FOLDER_NAME)
 for i in range(0, len(gdf)):
