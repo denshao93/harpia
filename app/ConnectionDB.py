@@ -41,7 +41,7 @@ class Connection:
             # read connection parameters
             params = self.connection_string
             # connect to the PostgreSQL server
-            print("Connecting to the PostgreSQL database...")
+            # print("Connecting to the PostgreSQL database...")
             conn = pg.connect(params)
             conn.autocommit = True
 
@@ -69,7 +69,7 @@ class Connection:
         finally:
             if conn is not None:
                 conn.close()
-                print('Database connection closed.')
+                # print('Database connection closed.')
 
 
     def run_query(self, query):
@@ -84,12 +84,20 @@ class Connection:
         -------
         Result of query where is runned in Postgres database
         """
-        conn = self.open_connect()
-        cursor = conn.cursor()
-        cursor.execute(query)
-        result = cursor.fetchall()
-        cursor.close()
-        return result
+        try:
+            conn = self.open_connect()
+            cursor = conn.cursor()
+            cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()
+            return result
+        except (Exception, pg.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+                # print('Database connection closed.')
+        
 
 
 if __name__ == "__main__":
