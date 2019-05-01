@@ -22,7 +22,7 @@ data_hub = const['data_hub']
 user = data_hub['user'] # user_hub
 password = data_hub['password'] # password_hub
 
-conn_string = " ".join(const['harpia_db_dev'])
+conn_string = "".join(const['harpia_db_dev'])
 
 # connect to the API
 api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
@@ -123,7 +123,7 @@ def insert_date_hour_db(conn_string: str, schema: str, table: str, column: str, 
     query = f"UPDATE {schema}.{table} SET {column} = current_timestamp WHERE uuid = '{uuid}'"
     con.run_query(query)
 
-engine_con = f'postgresql://postgres:123456@localhost:5432/harpia_dev'
+engine_con = f'postgresql://postgres:postgres@localhost:5432/harpia'
 engine = create_engine(engine_con)
 
 def insert_metadata_db(geodataframe, con: str, schema: str, if_exists: str, table_name: str, geometry: str):
