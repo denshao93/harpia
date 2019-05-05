@@ -1,97 +1,52 @@
-# Setting enviroment
+# Setting Python 3 enviroment 
 
 ___________________________________________________
 
-## Install dependecies to pyenv
-
-```c
-sudo apt install curl git-core gcc make zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libssl-dev
-```
+All settings were done in Linux Mint 19.1 with Ubuntu 18.04.
 
 ## Install pyenv
+### It separate harpia enviroment from system enviroment in order to don't break linux's behavior.
 
-```c
+For more help, see documentation in:
+
+[GitHub of pyenv](http://github.com/pyenv/pyenv)
+
+```bash
 git clone https://github.com/pyenv/pyenv.git $HOME/.pyenv
 ```
 
-## pyenv configs
-
-```c
-nano $HOME/.bashrc
+Settings of pyenv in order to bash can recognize its commands.
+```bash
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
 ```
 
-Copy and paste at the end of bashrc
-
-```c
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
-eval "$(pyenv init -)"
-fi
-```
-
-Save file
-
-```c
+Update bashrc to able pyenv commands works in bash
+```bash
 source $HOME/.bashrc
 ```
 
-## Install pyenv-virtualenv
+Create python 3 enviroment with pyenv
 
-```c
-git clone https://github.com/yyuu/pyenv-virtualenv.git   $HOME/.pyenv/plugins/pyenv-virtualenv
+
+```bash
+pyenv install 3.7.3
+pyenv global 3.7.3
 ```
 
-## Install python with pyenv
+Install virtualenv and virtualwrapper
 
-```c
-pyenv install 3.6.6
-```
-
-```c
-pyenv global 3.6.6
-```
-
-## Directory architecture
-
-```c
-mkdir ~/.ve
-"Project code is in:"
-mkdir ~/workspace
-```
-
-## Install virtualenvwrapper
-
-```c
-
-git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper
-
+```bash
 pip install virtualenv virtualenvwrapper
 ```
 
-## Open terminal
+Create dictory to save virtual enviroment of python
 
-```c
-nano $HOME/.bashrc
-
-export WORKON_HOME=~/.ve
-export PROJECT_HOME=~/workspace
-pyenv virtualenvwrapper_lazy
-
-
-Save file
-
-source ~/.bashrc
-bash
-
-```
-
-## Connect workspace to virtual environment
-
-```c
-
-mkvirtualenv -a ~/workspace/harpia/app harpia
-
+```bash
+mkdir ~/.ve
+mkdir ~/workspac/harpia
+mkvirtualenv harpia -a ~/workspace/harpia/app
 ```
 
 ## Install gdal in VirtualEnvironment
