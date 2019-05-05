@@ -8,3 +8,4 @@ app/config/const.yaml
 app/log
 app/download/baixo_sul.geojson
 app/download/
+pandas
