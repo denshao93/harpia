@@ -129,3 +129,5 @@ cd gdal-segment && mkdir build && cd build
 cmake ../
 sudo make
 ```
+
+## Install postgres and postgis
