@@ -26,7 +26,7 @@ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nf
 
 Update bashrc to able pyenv commands works in bash
 ```bash
-source $HOME/.bashrc
+exec "$SHELL"
 ```
 
 Create python 3 environment with pyenv
