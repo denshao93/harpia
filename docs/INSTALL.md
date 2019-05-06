@@ -37,17 +37,24 @@ pyenv install 3.7.3
 pyenv global 3.7.3
 ```
 
-Install virtualenv and virtualwrapper
+Install pyenv-virtualenv and pyenv-virtualwrapper
 
 ```bash
-pip install virtualenv virtualenvwrapper
+git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+
+git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper
+export PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV="true"
+pyenv virtualenvwrapper_lazy
+pyenv virtualenvwrapper
+exec "$SHELL"
 ```
 
 Create dictory to save virtual enviroment of python
 
 ```bash
 mkdir ~/.ve
-mkdir ~/workspac/harpia
+mkdir ~/workspace/harpia
 mkvirtualenv harpia -a ~/workspace/harpia/app
 ```
 
