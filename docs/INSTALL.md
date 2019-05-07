@@ -130,10 +130,95 @@ cmake ../
 sudo make
 ```
 
+## Change const.yaml.dist to const.yaml and setting the parameters
+
 ## Install postgres and postgis
 ```bash
 sudo apt install postgresql postgresql-contrib
 sudo apt install postgresql-10-postgis-2.4
 sudo apt install postgresql-10-postgis-scripts
-sudo passwd postgres
 ```
+```bash
+sudo -u postgres psql
+```
+```sql
+ALTER USER postgres PASSWORD 'newpassword';
+CREATE DATABASE harpia;
+CREATE EXTENSION postgis;
+```
+
+```sql
+-- DROP SCHEMA metadado_img CASCADE;
+
+CREATE SCHEMA metadado_img;
+
+-- DROP SEQUENCE metadado_sentinel_id_seq CASCADE;
+
+CREATE SEQUENCE metadado_sentinel_id_seq;
+
+-- Table: metadado_img.metadado_sentinel
+
+-- DROP TABLE metadado_img.metadado_sentinel;
+
+CREATE TABLE metadado_img.metadado_sentinel
+(
+    index text,
+    title text,
+    link text,
+    link_alternative text,
+    link_icon text,
+    summary text,
+    datatakesensingstart timestamp without time zone,
+    beginposition timestamp without time zone,
+    endposition timestamp without time zone,
+    ingestiondate timestamp without time zone,
+    orbitnumber bigint,
+    relativeorbitnumber bigint,
+    cloudcoverpercentage double precision,
+    sensoroperationalmode text,
+    tileid text,
+    hv_order_tileid text,
+    format text,
+    processingbaseline text,
+    platformname text,
+    filename text,
+    instrumentname text,
+    instrumentshortname text,
+    size text,
+    s2datatakeid text,
+    producttype text,
+    platformidentifier text,
+    orbitdirection text,
+    platformserialidentifier text,
+    processinglevel text,
+    identifier text,
+    uuid text,
+    geom geometry(Polygon,4326),
+    id integer NOT NULL DEFAULT nextval('metadado_sentinel_id_seq'::regclass),
+    date_download timestamp without time zone,
+    level1cpdiidentifier character(250),
+    is_download boolean,
+    is_processed boolean,
+    file_path boolean
+);
+
+ALTER TABLE metadado_img.metadado_sentinel
+    OWNER to postgres;
+
+-- Index: idx_metadado_sentinel_geom
+
+-- DROP INDEX metadado_img.idx_metadado_sentinel_geom;
+
+CREATE INDEX idx_metadado_sentinel_geom
+    ON metadado_img.metadado_sentinel USING gist
+    (geom);
+
+-- Index: idx_metadado_sentinel_index
+
+-- DROP INDEX metadado_img.idx_metadado_sentinel_index;
+
+CREATE INDEX idx_metadado_sentinel_index
+    ON metadado_img.metadado_sentinel USING btree
+    (index, id);
+```
+
