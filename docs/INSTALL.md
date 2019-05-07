@@ -131,3 +131,9 @@ sudo make
 ```
 
 ## Install postgres and postgis
+```bash
+sudo apt install postgresql postgresql-contrib
+sudo apt install postgresql-10-postgis-2.4
+sudo apt install postgresql-10-postgis-scripts
+sudo passwd postgres
+```
