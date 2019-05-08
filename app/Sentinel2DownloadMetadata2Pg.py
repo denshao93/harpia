@@ -1,0 +1,105 @@
+import datetime
+from collections import OrderedDict
+from os.path import exists, join
+from pathlib import Path
+
+import geopandas as gpd
+import yaml
+from geopandas_postgis import PostGIS
+from sentinelsat import SentinelAPI
+from sqlalchemy import create_engine
+
+import ConnectionDB as C
+
+FOLDER_NAME = 'BRUTA_DEV'
+
+# Open yaml 
+with open(Path("app/config/const.yaml"), 'r') as f:
+        const = yaml.safe_load(f)
+
+# Open Datahub parameters
+data_hub = const['data_hub']
+user = data_hub['user'] # user_hub
+password = data_hub['password'] # password_hub
+
+conn_string = "".join(const['harpia_db_dev'])
+
+# connect to the API
+api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
+
+
+query_kwargs = {
+        'platformname': 'Sentinel-2',
+        'producttype': 'S2MSI1C', 
+        'cloudcoverpercentage': (0, 100), # cloudcoverpercetage (min, max)
+        'date': ('20160101', '20191201')} # date: begindate enddate (ex. 'NOW-14DAYS', 'NOW')
+
+tiles = ['24LVJ'] # *tiles
+products = OrderedDict()
+for tile in tiles:
+    kw = query_kwargs.copy()
+    kw['tileid'] = tile 
+    pp = api.query(**kw)
+    products.update(pp)
+
+# GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
+gdf = api.to_geodataframe(products)
+
+
+def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: str):
+    """Check is metadado from satellite image was saved in postgres database.
+    
+    Arguments:
+        conn_string {str} -- String to connect to postgres database 
+             conn_stromg --> host=localhost dbname=dbname user=user_db password=password_db port=5432
+        schema {str} -- shcema name
+        table {str} -- table name from schema
+        uuid {str} -- single identification of sentinel satellite 2 image 
+    
+    Returns:
+        [bool] -- The return value. True if file has metadata saved in database 
+                table, False otherwise.
+    """
+    # Connect to Database
+    con = C.Connection(conn_string)
+    query = f"SELECT index FROM {schema}.{table} WHERE index = '{uuid}'"
+    try:
+        metadado_was_saved_db = (len(con.run_query(query)) == 1)
+        return metadado_was_saved_db
+    except TypeError as error:
+        print(error)
+
+
+def insert_metadata_db(geodataframe, con: str, schema: str, if_exists: str, 
+                    table_name: str, geometry: str):
+    # Connect to Database
+    con = C.Connection(conn_string)
+    geodataframe.postgis.to_postgis(con=con, schema=schema, if_exists=if_exists, 
+                                    table_name=table_name, geometry=geometry)
+
+
+def load_sentinel2metadata_pg(gdf, conn_string: str):
+
+    # Connect to Database
+    con = C.Connection(conn_string)
+
+    for i in range(0, len(gdf)):
+        
+        uuid = gdf['uuid'][i]
+        
+        # Check if file was downloaded anytime
+        metadata_save_db = metadata_img_is_saved_db(conn_string=conn_string, 
+            schema='metadado_img', table='metadado_sentinel', uuid=uuid)
+
+        # Selecionando a linha do geodataframe
+        g = gdf[gdf['uuid'] == uuid].copy()
+        
+        if not metadata_save_db:
+            insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
+                            table_name='metadado_sentinel', geometry='Polygon')
+
+# Create engine to use with sqlalchemy 
+engine_con = f'postgresql://postgres:postgres@localhost:5432/harpia'
+engine = create_engine(engine_con)
+
+load_sentinel2metadata_pg(gdf, conn_string)
