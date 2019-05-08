@@ -193,7 +193,7 @@ CREATE TABLE metadado_img.metadado_sentinel
     processinglevel text,
     identifier text,
     uuid text,
-    geom geometry(Polygon,4326),
+    geom geometry(Geometry,4326),
     id integer NOT NULL DEFAULT nextval('metadado_sentinel_id_seq'::regclass),
     date_download timestamp without time zone,
     level1cpdiidentifier character(250),
