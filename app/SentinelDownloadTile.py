@@ -30,9 +30,9 @@ api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
 
 query_kwargs = {
         'platformname': 'Sentinel-2',
-        'producttype': 'S2MSI1C', # producttype
-        'cloudcoverpercentage': (0, 1), # cloudcoverpercetage (min, max)
-        'date': ('20170101', '20171201')} # date: begindate enddate (ex. 'NOW-14DAYS', 'NOW')
+        'producttype': 'S2MSI1C', 
+        'cloudcoverpercentage': (0, 100), # cloudcoverpercetage (min, max)
+        'date': ('20160101', '20191201')} # date: begindate enddate (ex. 'NOW-14DAYS', 'NOW')
 
 tiles = ['24LVJ'] # *tiles
 products = OrderedDict()
@@ -48,11 +48,13 @@ gdf = api.to_geodataframe(products)
 # Connect to Database
 con = C.Connection(conn_string)
 
+
 def path_output_folder(folder_name: str):
     """Path of folder where files will store.
     
     Arguments:
-        folder_name {str} -- The name of folder where all zip files downloaded from scihub will store.
+        folder_name {str} -- The name of folder where all zip files downloaded
+                            from scihub will store.
     
     Returns:
         [str] -- Path of folder
@@ -60,6 +62,9 @@ def path_output_folder(folder_name: str):
     home_path = str(Path.home())
     dst_folder = join(home_path, folder_name)
     return dst_folder
+
+dst_folder = path_output_folder(FOLDER_NAME)
+
 
 def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: str):
     """Check is metadado from satellite image was saved in postgres database.
@@ -72,7 +77,8 @@ def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: st
         uuid {str} -- single identification of sentinel satellite 2 image 
     
     Returns:
-        [bool] -- The return value. True if file has metadata saved in database table, False otherwise.
+        [bool] -- The return value. True if file has metadata saved in database 
+                table, False otherwise.
     """
     query = f"SELECT index FROM {schema}.{table} WHERE index = '{uuid}'"
     try:
@@ -81,7 +87,6 @@ def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: st
     except TypeError as error:
         print(error)
 
-dst_folder = path_output_folder(FOLDER_NAME)
 
 def is_file_in_folder(folder: str, file_name: str, file_extention: str):
     """Check if file exist in folder.
@@ -102,6 +107,7 @@ def is_file_in_folder(folder: str, file_name: str, file_extention: str):
     """
     file_path = join(folder, file_name)
     return exists(file_path)
+
 
 def insert_date_hour_db(conn_string: str, schema: str, table: str, column: str, uuid: str):
     """Update column date_dowload with YYYY/MM/DD and HH:MM:SSSS
@@ -126,121 +132,56 @@ def insert_date_hour_db(conn_string: str, schema: str, table: str, column: str, 
 engine_con = f'postgresql://postgres:postgres@localhost:5432/harpia'
 engine = create_engine(engine_con)
 
-def insert_metadata_db(geodataframe, con: str, schema: str, if_exists: str, table_name: str, geometry: str):
-    geodataframe.postgis.to_postgis(con=con, schema=schema, if_exists=if_exists, table_name=table_name, geometry=geometry)
+
+def insert_metadata_db(geodataframe, con: str, schema: str, if_exists: str, 
+                    table_name: str, geometry: str):
+    geodataframe.postgis.to_postgis(con=con, schema=schema, if_exists=if_exists, 
+                                    table_name=table_name, geometry=geometry)
 
 
-for i in range(0, len(gdf)):
-    uuid = gdf['uuid'][i]
+def load_sentinel2metadata_pg(gdf):
+        
+    for i in range(0, len(gdf)):
+        
+        uuid = gdf['uuid'][i]
+        
+        # Check if file was downloaded anytime
+        metadata_save_db = metadata_img_is_saved_db(conn_string=conn_string, 
+            schema='metadado_img', table='metadado_sentinel', uuid=uuid)
+
+        # Selecionando a linha do geodataframe
+        g = gdf[gdf['uuid'] == uuid].copy()
+        
+        if not metadata_save_db:
+            print(i)
+            insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
+                            table_name='metadado_sentinel', geometry='Polygon')
+
+load_sentinel2metadata_pg(gdf)
+
+
+# for i in range(0, len(gdf)):
+#     uuid = gdf['uuid'][i]
     
-    # File path to know if it exist
-    file_name = gdf['title'][i]
-    file_path = join(dst_folder, f'{file_name}.zip')
+#     # File path to know if it exist
+#     file_name = gdf['title'][i]
+#     file_path = join(dst_folder, f'{file_name}.zip')
 
-    # Check if file was downloaded anytime
-    metadata_is_save_db = metadata_img_is_saved_db(conn_string=conn_string, 
-        schema='metadado_img', table='metadado_sentinel', uuid=uuid)
+#     # Check if file was downloaded anytime
+#     metadata_is_save_db = metadata_img_is_saved_db(conn_string=conn_string, 
+#         schema='metadado_img', table='metadado_sentinel', uuid=uuid)
 
-    # Selecionando a linha do geodataframe
-    g = gdf[gdf['uuid'] == uuid].copy()
+#     # Selecionando a linha do geodataframe
+#     g = gdf[gdf['uuid'] == uuid].copy()
     
-    if not exists(file_path) and not metadata_is_save_db:
-        # api.download(uuid, directory_path=dst_folder)
+#     if not exists(file_path) and not metadata_is_save_db:
+#         # api.download(uuid, directory_path=dst_folder)
 
-        insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
-                         table_name='metadado_sentinel', geometry='Polygon')
+#         insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
+#                          table_name='metadado_sentinel', geometry='Polygon')
 
-        insert_date_hour_db(conn_string=conn_string, schema='metadado_img', table='metadado_sentinel',column='date_download', uuid=uuid)
+#         insert_date_hour_db(conn_string=conn_string, schema='metadado_img', table='metadado_sentinel',column='date_download', uuid=uuid)
     
-    elif exists(file_path) and not metadata_is_save_db:
-        insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
-                         table_name='metadado_sentinel', geometry='Polygon')
-         
-
-# Create table in order save 
-'''
-DROP SCHEMA metadado_img CASCADE;
-CREATE SCHEMA metadado_img;
-DROP SEQUENCE metadado_sentinel_id_seq CASCADE;
-
-CREATE SEQUENCE metadado_sentinel_id_seq;
-
--- GRANT USAGE ON SCHEMA metadado_img TO grp_consulta;
-
--- GRANT ALL ON SCHEMA metadado_img TO tmzuser;
-
--- Table: metadado_img.metadado_sentinel
-
--- DROP TABLE metadado_img.metadado_sentinel;
-
-CREATE TABLE metadado_img.metadado_sentinel
-(
-    index text COLLATE pg_catalog."default",
-    title text COLLATE pg_catalog."default",
-    link text COLLATE pg_catalog."default",
-    link_alternative text COLLATE pg_catalog."default",
-    link_icon text COLLATE pg_catalog."default",
-    summary text COLLATE pg_catalog."default",
-    datatakesensingstart timestamp without time zone,
-    beginposition timestamp without time zone,
-    endposition timestamp without time zone,
-    ingestiondate timestamp without time zone,
-    orbitnumber bigint,
-    relativeorbitnumber bigint,
-    cloudcoverpercentage double precision,
-    sensoroperationalmode text COLLATE pg_catalog."default",
-    tileid text COLLATE pg_catalog."default",
-    hv_order_tileid text COLLATE pg_catalog."default",
-    format text COLLATE pg_catalog."default",
-    processingbaseline text COLLATE pg_catalog."default",
-    platformname text COLLATE pg_catalog."default",
-    filename text COLLATE pg_catalog."default",
-    instrumentname text COLLATE pg_catalog."default",
-    instrumentshortname text COLLATE pg_catalog."default",
-    size text COLLATE pg_catalog."default",
-    s2datatakeid text COLLATE pg_catalog."default",
-    producttype text COLLATE pg_catalog."default",
-    platformidentifier text COLLATE pg_catalog."default",
-    orbitdirection text COLLATE pg_catalog."default",
-    platformserialidentifier text COLLATE pg_catalog."default",
-    processinglevel text COLLATE pg_catalog."default",
-    identifier text COLLATE pg_catalog."default",
-    uuid text COLLATE pg_catalog."default",
-    geom geometry(Polygon,4326),
-    id integer NOT NULL DEFAULT nextval('metadado_sentinel_id_seq'::regclass),
-    date_download timestamp without time zone,
-    level1cpdiidentifier character(250) COLLATE pg_catalog."default",
-    is_download boolean,
-    is_processed boolean,
-    file_path boolean
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE metadado_img.metadado_sentinel
-    OWNER to tmzuser;
-
--- GRANT SELECT ON TABLE metadado_img.metadado_sentinel TO grp_consulta;
-
--- GRANT ALL ON TABLE metadado_img.metadado_sentinel TO tmzuser;
-
--- Index: idx_metadado_sentinel_geom
-
--- DROP INDEX metadado_img.idx_metadado_sentinel_geom;
-
-CREATE INDEX idx_metadado_sentinel_geom
-    ON metadado_img.metadado_sentinel USING gist
-    (geom)
-    TABLESPACE pg_default;
-
--- Index: idx_metadado_sentinel_index
-
--- DROP INDEX metadado_img.idx_metadado_sentinel_index;
-
-CREATE INDEX idx_metadado_sentinel_index
-    ON metadado_img.metadado_sentinel USING btree
-    (index COLLATE pg_catalog."default", id)
-    TABLESPACE pg_default;
-'''
+#     elif exists(file_path) and not metadata_is_save_db:
+#         insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
+#                          table_name='metadado_sentinel', geometry='Polygon')
