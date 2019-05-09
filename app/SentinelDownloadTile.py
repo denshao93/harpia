@@ -25,12 +25,6 @@ password = data_hub['password'] # password_hub
 
 conn_string = "".join(const['harpia_db_dev'])
 
-# connect to the API
-api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
-
-# Connect to Database
-con = C.Connection(conn_string)
-
 def list_img2download(conn_string: str, schema: str, table: str):
     con = C.Connection(conn_string)
     query = f"SELECT uuid FROM {schema}.{table} WHERE date_download IS NULL"
@@ -39,6 +33,7 @@ def list_img2download(conn_string: str, schema: str, table: str):
         return list_uuid
     except TypeError as error:
         print(error)
+
 
 def path_output_folder(folder_name: str):
     """Path of folder where files will store.
@@ -61,7 +56,6 @@ def path_output_folder(folder_name: str):
     else:
         return dst_folder
     
-dst_folder = path_output_folder(FOLDER_NAME)
 
 def is_file_in_folder(folder: str, file_name: str, file_extention: str):
     """Check if file exist in folder.
@@ -115,5 +109,8 @@ def dowload_img(list_index, dst_folder):
                             table='metadado_sentinel',column='date_download', 
                             uuid=i)
 
+
+dst_folder = path_output_folder(FOLDER_NAME)
 list_index = list_img2download(conn_string, 'metadado_img', 'metadado_sentinel')
+
 dowload_img(list_index, dst_folder)
