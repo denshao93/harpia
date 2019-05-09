@@ -1,5 +1,6 @@
 import datetime
 from collections import OrderedDict
+from os import mkdir
 from os.path import exists, join
 from pathlib import Path
 
@@ -27,27 +28,17 @@ conn_string = "".join(const['harpia_db_dev'])
 # connect to the API
 api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
 
-
-query_kwargs = {
-        'platformname': 'Sentinel-2',
-        'producttype': 'S2MSI1C', 
-        'cloudcoverpercentage': (0, 100), # cloudcoverpercetage (min, max)
-        'date': ('20160101', '20191201')} # date: begindate enddate (ex. 'NOW-14DAYS', 'NOW')
-
-tiles = ['24LVJ'] # *tiles
-products = OrderedDict()
-for tile in tiles:
-    kw = query_kwargs.copy()
-    kw['tileid'] = tile 
-    pp = api.query(**kw)
-    products.update(pp)
-
-# GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
-gdf = api.to_geodataframe(products)
-
 # Connect to Database
 con = C.Connection(conn_string)
 
+def list_img2download(conn_string: str, schema: str, table: str):
+    con = C.Connection(conn_string)
+    query = f"SELECT uuid FROM {schema}.{table} WHERE date_download IS NULL"
+    try:
+        list_uuid = [i[0] for i in con.run_query(query)]
+        return list_uuid
+    except TypeError as error:
+        print(error)
 
 def path_output_folder(folder_name: str):
     """Path of folder where files will store.
@@ -61,32 +52,16 @@ def path_output_folder(folder_name: str):
     """
     home_path = str(Path.home())
     dst_folder = join(home_path, folder_name)
-    return dst_folder
-
+    if not exists(dst_folder):
+        try:
+            mkdir(dst_folder)
+            return dst_folder
+        except:
+            raise FileExistsError(f"Can't create destination directory {dst_folder}")
+    else:
+        return dst_folder
+    
 dst_folder = path_output_folder(FOLDER_NAME)
-
-
-def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: str):
-    """Check is metadado from satellite image was saved in postgres database.
-    
-    Arguments:
-        conn_string {str} -- String to connect to postgres database 
-             conn_stromg --> host=localhost dbname=dbname user=user_db password=password_db port=5432
-        schema {str} -- shcema name
-        table {str} -- table name from schema
-        uuid {str} -- single identification of sentinel satellite 2 image 
-    
-    Returns:
-        [bool] -- The return value. True if file has metadata saved in database 
-                table, False otherwise.
-    """
-    query = f"SELECT index FROM {schema}.{table} WHERE index = '{uuid}'"
-    try:
-        metadado_was_saved_db = (len(con.run_query(query)) == 1)
-        return metadado_was_saved_db
-    except TypeError as error:
-        print(error)
-
 
 def is_file_in_folder(folder: str, file_name: str, file_extention: str):
     """Check if file exist in folder.
@@ -129,59 +104,16 @@ def insert_date_hour_db(conn_string: str, schema: str, table: str, column: str, 
     query = f"UPDATE {schema}.{table} SET {column} = current_timestamp WHERE uuid = '{uuid}'"
     con.run_query(query)
 
-engine_con = f'postgresql://postgres:postgres@localhost:5432/harpia'
-engine = create_engine(engine_con)
 
+def dowload_img(list_index, dst_folder):
+    # connect to the API
+    api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus') 
+    for i in list_index:
+        api.download(i, directory_path=dst_folder)
 
-def insert_metadata_db(geodataframe, con: str, schema: str, if_exists: str, 
-                    table_name: str, geometry: str):
-    geodataframe.postgis.to_postgis(con=con, schema=schema, if_exists=if_exists, 
-                                    table_name=table_name, geometry=geometry)
+        insert_date_hour_db(conn_string=conn_string, schema='metadado_img', 
+                            table='metadado_sentinel',column='date_download', 
+                            uuid=i)
 
-
-def load_sentinel2metadata_pg(gdf):
-        
-    for i in range(0, len(gdf)):
-        
-        uuid = gdf['uuid'][i]
-        
-        # Check if file was downloaded anytime
-        metadata_save_db = metadata_img_is_saved_db(conn_string=conn_string, 
-            schema='metadado_img', table='metadado_sentinel', uuid=uuid)
-
-        # Selecionando a linha do geodataframe
-        g = gdf[gdf['uuid'] == uuid].copy()
-        
-        if not metadata_save_db:
-            print(i)
-            insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
-                            table_name='metadado_sentinel', geometry='Polygon')
-
-load_sentinel2metadata_pg(gdf)
-
-
-# for i in range(0, len(gdf)):
-#     uuid = gdf['uuid'][i]
-    
-#     # File path to know if it exist
-#     file_name = gdf['title'][i]
-#     file_path = join(dst_folder, f'{file_name}.zip')
-
-#     # Check if file was downloaded anytime
-#     metadata_is_save_db = metadata_img_is_saved_db(conn_string=conn_string, 
-#         schema='metadado_img', table='metadado_sentinel', uuid=uuid)
-
-#     # Selecionando a linha do geodataframe
-#     g = gdf[gdf['uuid'] == uuid].copy()
-    
-#     if not exists(file_path) and not metadata_is_save_db:
-#         # api.download(uuid, directory_path=dst_folder)
-
-#         insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
-#                          table_name='metadado_sentinel', geometry='Polygon')
-
-#         insert_date_hour_db(conn_string=conn_string, schema='metadado_img', table='metadado_sentinel',column='date_download', uuid=uuid)
-    
-#     elif exists(file_path) and not metadata_is_save_db:
-#         insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
-#                          table_name='metadado_sentinel', geometry='Polygon')
+list_index = list_img2download(conn_string, 'metadado_img', 'metadado_sentinel')
+dowload_img(list_index, dst_folder)
