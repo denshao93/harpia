@@ -45,6 +45,9 @@ for tile in tiles:
 # GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
 gdf = api.to_geodataframe(products)
 
+# Connect to Database
+con = C.Connection(conn_string)
+
 
 def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: str):
     """Check is metadado from satellite image was saved in postgres database.
@@ -72,17 +75,12 @@ def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: st
 
 def insert_metadata_db(geodataframe, con: str, schema: str, if_exists: str, 
                     table_name: str, geometry: str):
-    # Connect to Database
-    con = C.Connection(conn_string)
     geodataframe.postgis.to_postgis(con=con, schema=schema, if_exists=if_exists, 
                                     table_name=table_name, geometry=geometry)
 
 
-def load_sentinel2metadata_pg(gdf, conn_string: str):
-
-    # Connect to Database
-    con = C.Connection(conn_string)
-
+def load_sentinel2metadata_pg(gdf):
+        
     for i in range(0, len(gdf)):
         
         uuid = gdf['uuid'][i]
@@ -102,4 +100,4 @@ def load_sentinel2metadata_pg(gdf, conn_string: str):
 engine_con = f'postgresql://postgres:postgres@localhost:5432/harpia'
 engine = create_engine(engine_con)
 
-load_sentinel2metadata_pg(gdf, conn_string)
+load_sentinel2metadata_pg(gdf)
