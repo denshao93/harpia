@@ -73,7 +73,7 @@ def insert_metadata_db(geodataframe, con: str, schema: str, if_exists: str,
                                     table_name=table_name, geometry=geometry)
 
 
-def load_sentinel2metadata_pg(gdf, engine):
+def load_sentinel2metadata_pgdb(gdf, engine):
     
     for i in range(0, len(gdf)):
         
@@ -101,4 +101,4 @@ def create_sqlalchemy_engine(user: str, password: str, host: str, port: int,
 
 engine = create_sqlalchemy_engine('postgres', 'postgres', 'localhost', 5432, 'harpia')
 
-load_sentinel2metadata_pg(gdf, engine)
+load_sentinel2metadata_pgdb(gdf, engine)
