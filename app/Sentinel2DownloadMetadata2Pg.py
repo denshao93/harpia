@@ -11,8 +11,6 @@ from sqlalchemy import create_engine
 
 import ConnectionDB as C
 
-FOLDER_NAME = 'BRUTA_DEV'
-
 # Open yaml 
 with open(Path("app/config/const.yaml"), 'r') as f:
         const = yaml.safe_load(f)
@@ -31,10 +29,10 @@ api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
 query_kwargs = {
         'platformname': 'Sentinel-2',
         'producttype': 'S2MSI1C', 
-        'cloudcoverpercentage': (0, 100), # cloudcoverpercetage (min, max)
+        'cloudcoverpercentage': (0, 100),
         'date': ('20160101', '20191201')} # date: begindate enddate (ex. 'NOW-14DAYS', 'NOW')
 
-tiles = ['24LVJ'] # *tiles
+tiles = ['24LVJ']
 products = OrderedDict()
 for tile in tiles:
     kw = query_kwargs.copy()
@@ -44,10 +42,6 @@ for tile in tiles:
 
 # GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
 gdf = api.to_geodataframe(products)
-
-# Connect to Database
-con = C.Connection(conn_string)
-
 
 def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: str):
     """Check is metadado from satellite image was saved in postgres database.
@@ -79,8 +73,8 @@ def insert_metadata_db(geodataframe, con: str, schema: str, if_exists: str,
                                     table_name=table_name, geometry=geometry)
 
 
-def load_sentinel2metadata_pg(gdf):
-        
+def load_sentinel2metadata_pg(gdf, engine):
+    
     for i in range(0, len(gdf)):
         
         uuid = gdf['uuid'][i]
@@ -89,15 +83,22 @@ def load_sentinel2metadata_pg(gdf):
         metadata_save_db = metadata_img_is_saved_db(conn_string=conn_string, 
             schema='metadado_img', table='metadado_sentinel', uuid=uuid)
 
-        # Selecionando a linha do geodataframe
+        # Select row from dataframe
         g = gdf[gdf['uuid'] == uuid].copy()
         
         if not metadata_save_db:
             insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
                             table_name='metadado_sentinel', geometry='Polygon')
 
-# Create engine to use with sqlalchemy 
-engine_con = f'postgresql://postgres:postgres@localhost:5432/harpia'
-engine = create_engine(engine_con)
 
-load_sentinel2metadata_pg(gdf)
+def create_sqlalchemy_engine(user: str, password: str, host: str, port: int,
+                            db_name: str):
+    # Create engine to use with sqlalchemy 
+    engine_con = f'postgresql://{user}:{password}@{host}:{port}/{db_name}'
+    engine = create_engine(engine_con)
+    return engine
+
+
+engine = create_sqlalchemy_engine('postgres', 'postgres', 'localhost', 5432, 'harpia')
+
+load_sentinel2metadata_pg(gdf, engine)
