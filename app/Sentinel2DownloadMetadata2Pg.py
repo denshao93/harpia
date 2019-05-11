@@ -17,20 +17,18 @@ with open(Path("app/config/const.yaml"), 'r') as f:
 
 # Open Datahub parameters
 data_hub = const['data_hub']
-user = data_hub['user'] # user_hub
-password = data_hub['password'] # password_hub
 
-conn_string = "".join(const['harpia_db_dev'])
+conn_string = const['db']
 
 # connect to the API
-api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
-
+api = SentinelAPI(data_hub['user'], data_hub['password'], 'https://scihub.copernicus.eu/dhus')
 
 query_kwargs = {
         'platformname': 'Sentinel-2',
         'producttype': 'S2MSI1C', 
         'cloudcoverpercentage': (0, 100),
-        'date': ('20160101', '20191201')} # date: begindate enddate (ex. 'NOW-14DAYS', 'NOW')
+        'date': ('20160101', '20191201'),
+        'limit': 20} # date: begindate enddate (ex. 'NOW-14DAYS', 'NOW')
 
 tiles = ['24LVJ']
 products = OrderedDict()
@@ -42,6 +40,7 @@ for tile in tiles:
 
 # GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
 gdf = api.to_geodataframe(products)
+
 
 def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: str):
     """Check is metadado from satellite image was saved in postgres database.
@@ -59,7 +58,7 @@ def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: st
     """
     # Connect to Database
     con = C.Connection(conn_string)
-    query = f"SELECT index FROM {schema}.{table} WHERE index = '{uuid}'"
+    query = f"SELECT uuid FROM {schema}.{table} WHERE index = '{uuid}'"
     try:
         metadado_was_saved_db = (len(con.run_query(query)) == 1)
         return metadado_was_saved_db
@@ -67,13 +66,7 @@ def metadata_img_is_saved_db(conn_string: str, schema: str, table: str, uuid: st
         print(error)
 
 
-def insert_metadata_db(geodataframe, con: str, schema: str, if_exists: str, 
-                    table_name: str, geometry: str):
-    geodataframe.postgis.to_postgis(con=con, schema=schema, if_exists=if_exists, 
-                                    table_name=table_name, geometry=geometry)
-
-
-def load_sentinel2metadata_pgdb(gdf, engine):
+def load_sentinel_metadata_db(gdf, engine):
     
     for i in range(0, len(gdf)):
         
@@ -87,7 +80,7 @@ def load_sentinel2metadata_pgdb(gdf, engine):
         g = gdf[gdf['uuid'] == uuid].copy()
         
         if not metadata_save_db:
-            insert_metadata_db(g, con=engine, schema='metadado_img', if_exists='append', 
+            g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
                             table_name='metadado_sentinel', geometry='Polygon')
 
 
@@ -98,7 +91,6 @@ def create_sqlalchemy_engine(user: str, password: str, host: str, port: int,
     engine = create_engine(engine_con)
     return engine
 
-
 engine = create_sqlalchemy_engine('postgres', 'postgres', 'localhost', 5432, 'harpia')
 
-load_sentinel2metadata_pgdb(gdf, engine)
+load_sentinel_metadata_db(gdf, engine)
