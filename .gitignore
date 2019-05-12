@@ -6,12 +6,14 @@
 __pycache__
 app/config/const.yaml
 app/log
-app/data/aoi.dbf
-app/data/aoi.prj
-app/data/aoi.dbf
-app/data/aoi.shp
-app/data/aoi.shx
-app/data/aoi.qpj
+app/data/vector/aoi.dbf
+app/data/vector/aoi.prj
+app/data/vector/aoi.dbf
+app/data/vector/aoi.shp
+app/data/vector/aoi.shx
+app/data/vector/aoi.qpj
+app/data/vector/aoi.cpg
+app/data/vector/aoi.geojson
 app/download/
 pandas
 
