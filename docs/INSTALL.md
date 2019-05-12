@@ -208,15 +208,15 @@ CREATE TABLE metadado_img.metadado_sentinel (
 	geom geometry(Geometry,4326),
     id integer NOT NULL DEFAULT nextval('metadado_sentinel_id_seq'::regclass),
     date_download_img timestamp without time zone,
-    file_path text
+    date_file_processing timestamp without time zone,
+	file_path text
 
 );
 CREATE INDEX idx_metadado_sentinel_geom ON metadado_img.metadado_sentinel USING gist (geom);
 CREATE INDEX ix_metadado_img_metadado_sentinel_index ON metadado_img.metadado_sentinel USING btree (index);
 
 CREATE VIEW metadado_img.vw_metadado_sentinel AS
-SELECT id, substring(title, 1, 3) || '_' || substring(title, 40, 5) || '_' || substring(title,12, 8) AS name,
-	substring(title,12, 8) AS "date", cloudcoverpercentage, title, link, size, 
-	date_download_img, file_path, geom FROM metadado_img.metadado_sentinel;
+SELECT id, substring(title, 1, 3) || '_' || substring(title, 40, 5) || '_' || substring(title,12, 8) AS name, substring(title,12, 8) AS "date", cloudcoverpercentage, title, link, size, 
+	date_download_img, date_file_processing, file_path, geom FROM metadado_img.metadado_sentinel;
 ```
 
