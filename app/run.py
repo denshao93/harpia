@@ -178,7 +178,7 @@ if __name__ == "__main__":
         #####################################################################################
         # Bands: 2 = Blue | 3 = Green | 4 = Red | 8 = Nir |
         if sat.is_sentinel_file():
-            Unzip setinel file
+            # Unzip setinel file
             up.uncompress_zip()
 
             # Compose bands with 10m spatial resolution
@@ -239,10 +239,6 @@ if __name__ == "__main__":
             title = parameter_satellite["scene_file_name"]
             query = f"UPDATE metadado_img.metadado_sentinel SET date_file_proccessing = current_timestamp WHERE title = '{title}';"
             con.run_query(query)
-            
-            
-            # dst = Path(sys.argv[1], 'Sentinel2/processada')
-            # shutil.move(file_path, dst=dst)
             
             shutil.rmtree(tmp_dir)
             
