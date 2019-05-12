@@ -207,7 +207,7 @@ CREATE TABLE metadado_img.metadado_sentinel (
 	uuid text NULL,
 	geom geometry(Geometry,4326),
     id integer NOT NULL DEFAULT nextval('metadado_sentinel_id_seq'::regclass),
-    date_download timestamp without time zone,
+    date_download_img timestamp without time zone,
     file_path text
 
 );
