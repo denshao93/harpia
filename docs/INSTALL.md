@@ -149,7 +149,8 @@ CREATE EXTENSION postgis;
 ```
 
 ### OBS: Create file that set the area of interest from project tha intersect 
-### tiles of sentinel. The file has to be in "app/data/vector/aoi.geojson"
+### tiles of sentinel. It will return files that can ben downloaded to projet.
+### The file has to be in "app/data/vector/aoi.geojson"
 
 ```sql
 -- DROP SCHEMA metadado_img CASCADE;
