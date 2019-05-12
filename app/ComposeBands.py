@@ -66,7 +66,7 @@ class ComposeBands:
                         f'-co COMPRESS=DEFLATE'
         
         elif level == 'L2A':
-            command = f'gdal_translate {scene_file_name}.SAFE/' \
+            command = f'gdal_translate SENTINEL2_L2A:{scene_file_name}.SAFE/' \
                     f'MTD_MSI{level}.xml:10m:EPSG_327{utm_zone} -ot Byte -scale ' \
                     f'{self.output_file_name}.TIF --config ' \
                     f'GDAL_CACHEMAX 1000 --config GDAL_NUM_THREADS ALL_CPUS ' \
