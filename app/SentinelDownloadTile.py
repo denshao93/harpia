@@ -99,6 +99,7 @@ def insert_date_hour_db(conn_string: str, schema: str, table: str, column: str, 
     query = f"UPDATE {schema}.{table} SET {column} = current_timestamp WHERE uuid = '{uuid}'"
     con.run_query(query)
 
+
 def dowload_img(list_index, dst_folder):
     # connect to the API
     api = SentinelAPI(data_hub['user'], data_hub['password'], 'https://scihub.copernicus.eu/dhus') 
