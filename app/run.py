@@ -7,10 +7,12 @@ import sys
 import tempfile  # NOQA
 from pathlib import Path
 
+import yaml
 import ClipRaster as CR
 import CloudShadowLC8 as CL
 import ComposeBands as CB
 import Connection2Database as CDB
+import ConnectionDB as C
 import LoadSegmentationDatabase as LSD
 import OrganizeDirectory as OD
 import PyramidRaster as PR
@@ -19,7 +21,6 @@ import RasterReproject as RR
 import SatelliteFileInfo as SFI
 import Segmetation as SEG
 import UnpackFile as UF
-
 
 if __name__ == "__main__":
     # argv[1] = directory where targz files are stored.
@@ -177,7 +178,7 @@ if __name__ == "__main__":
         #####################################################################################
         # Bands: 2 = Blue | 3 = Green | 4 = Red | 8 = Nir |
         if sat.is_sentinel_file():
-            # Unzip setinel file
+            Unzip setinel file
             up.uncompress_zip()
 
             # Compose bands with 10m spatial resolution
@@ -229,16 +230,19 @@ if __name__ == "__main__":
             
 
             # Write log of scene processed in csv
-            with open(csv_path, 'a', newline='') as csvfile:
-                logwriter = csv.writer(csvfile, delimiter=',')
-                logwriter.writerow([now,
-                                    parameter_satellite['initials_name'],
-                                    parameter_satellite['aquisition_date'],
-                                    parameter_satellite['index']])
+            # Open yaml 
+            with open(Path("/home/diogocaribe/workspace/harpia/app/config/const.yaml"), 'r') as f:
+                    const = yaml.safe_load(f)
+
+            conn_string = const['db']
+            con = C.Connection(conn_string)
+            title = parameter_satellite["scene_file_name"]
+            query = f"UPDATE metadado_img.metadado_sentinel SET date_file_proccessing = current_timestamp WHERE title = '{title}';"
+            con.run_query(query)
             
             
-            dst = Path(sys.argv[1], 'Sentinel2/processada')
-            shutil.move(file_path, dst=dst)
+            # dst = Path(sys.argv[1], 'Sentinel2/processada')
+            # shutil.move(file_path, dst=dst)
             
             shutil.rmtree(tmp_dir)
             
