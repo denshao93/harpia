@@ -25,7 +25,7 @@ api = SentinelAPI(data_hub['user'], data_hub['password'], 'https://scihub.copern
 
 footprint = geojson_to_wkt(read_geojson('app/data/vector/aoi.geojson'))
 products = api.query(footprint,
-                     date=('20160101', '20191201'),
+                     date=('20150101', 'NOW'),
                      platformname='Sentinel-2',
                      producttype='S2MSI2A',
                      cloudcoverpercentage=(0, 100))
