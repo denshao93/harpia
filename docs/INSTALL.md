@@ -59,8 +59,9 @@ mkvirtualenv harpia -a ~/workspace/harpia/app
 ```
 
 ##### Install gdal in VirtualEnvironment
-
+Install gdal grater than 2.4.0 (previous version doesn't work with sentinel level 2A)
 ```bash
+sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get install libgdal-dev g++ gdal-bin python-gdal python3-gdal
 workon harpia
 pip install numpy pygdal==2.2.3.3
