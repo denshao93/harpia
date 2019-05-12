@@ -6,7 +6,7 @@ from pathlib import Path
 import geopandas as gpd
 import yaml
 from geopandas_postgis import PostGIS
-from sentinelsat import SentinelAPI
+from sentinelsat import SentinelAPI, geojson_to_wkt, read_geojson
 from sqlalchemy import create_engine
 
 import ConnectionDB as C
@@ -23,20 +23,13 @@ conn_string = const['db']
 # connect to the API
 api = SentinelAPI(data_hub['user'], data_hub['password'], 'https://scihub.copernicus.eu/dhus')
 
-query_kwargs = {
-        'platformname': 'Sentinel-2',
-        'producttype': 'S2MSI1C', 
-        'cloudcoverpercentage': (0, 100),
-        'date': ('20160101', '20191201'),
-        'limit': 20} # date: begindate enddate (ex. 'NOW-14DAYS', 'NOW')
+footprint = geojson_to_wkt(read_geojson('app/data/vector/aoi.geojson'))
+products = api.query(footprint,
+                     date=('20160101', '20191201'),
+                     platformname='Sentinel-2',
+                     producttype='S2MSI2A',
+                     cloudcoverpercentage=(0, 100))
 
-tiles = ['24LVJ']
-products = OrderedDict()
-for tile in tiles:
-    kw = query_kwargs.copy()
-    kw['tileid'] = tile 
-    pp = api.query(**kw)
-    products.update(pp)
 
 # GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
 gdf = api.to_geodataframe(products)
@@ -81,7 +74,7 @@ def load_sentinel_metadata_db(gdf, engine):
         
         if not metadata_save_db:
             g.postgis.to_postgis(con=engine, schema='metadado_img', if_exists='append', 
-                            table_name='metadado_sentinel', geometry='Polygon')
+                            table_name='metadado_sentinel', geometry='Geometry')
 
 
 def create_sqlalchemy_engine(user: str, password: str, host: str, port: int,
