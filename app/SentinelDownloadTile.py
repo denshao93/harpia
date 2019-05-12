@@ -23,15 +23,23 @@ data_hub = const['data_hub']
 
 conn_string = const['db']
 
-def list_img2download(conn_string: str, schema: str, table: str, limit:int=None):
+def list_img2download(conn_string: str, schema: str, table: str):
     con = C.Connection(conn_string)
-    if limit is not None:
-        limit = f"LIMIT {limit}"
-    
-    query = f"SELECT uuid FROM {schema}.{table} WHERE date_download IS NULL {limit}"
+    query = f"SELECT uuid FROM {schema}.{table} WHERE date_download_img IS NULL {limit}"
     try:
         list_uuid = [i[0] for i in con.run_query(query)]
         return list_uuid
+    except TypeError as error:
+        print(error)
+
+
+def get_title_img(conn_string: str, schema: str, table: str, uuid: str):
+    con = C.Connection(conn_string)
+    
+    query = f"SELECT title FROM {schema}.{table} WHERE uuid = '{uuid}'"
+    try:
+        title_img = [i[0] for i in con.run_query(query)][0]
+        return title_img
     except TypeError as error:
         print(error)
 
@@ -75,7 +83,7 @@ def is_file_in_folder(folder: str, file_name: str, file_extention: str):
     [bool]
         If True file be in folder, False otherwise.
     """
-    file_path = join(folder, file_name)
+    file_path = join(folder, file_name, file_extention)
     return exists(file_path)
 
 
@@ -102,8 +110,8 @@ def insert_date_hour_db(conn_string: str, schema: str, table: str, column: str, 
 
 def dowload_img(list_index, dst_folder):
     # connect to the API
-    api = SentinelAPI(data_hub['user'], data_hub['password'], 'https://scihub.copernicus.eu/dhus') 
-    for i in list_index:
+    api = SentinelAPI(data_hub['user'], data_hub['password'], 'https://scihub.copernicus.eu/dhus')
+    for i in list_index:     
         api.download(i, directory_path=dst_folder)
 
         insert_date_hour_db(conn_string=conn_string, schema='metadado_img', 
@@ -112,6 +120,6 @@ def dowload_img(list_index, dst_folder):
 
 
 dst_folder = path_output_folder(FOLDER_NAME)
-list_index = list_img2download(conn_string, 'metadado_img', 'metadado_sentinel', limit=1)
+list_index = list_img2download(conn_string, 'metadado_img', 'metadado_sentinel')
 
 dowload_img(list_index, dst_folder)
