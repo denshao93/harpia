@@ -161,65 +161,53 @@ CREATE SEQUENCE metadado_sentinel_id_seq;
 
 -- DROP TABLE metadado_img.metadado_sentinel;
 
-CREATE TABLE metadado_img.metadado_sentinel
-(
-    index text,
-    title text,
-    link text,
-    link_alternative text,
-    link_icon text,
-    summary text,
-    datatakesensingstart timestamp without time zone,
-    beginposition timestamp without time zone,
-    endposition timestamp without time zone,
-    ingestiondate timestamp without time zone,
-    orbitnumber int,
-    relativeorbitnumber int,
-    cloudcoverpercentage numeric(5, 2),
-    sensoroperationalmode text,
-    tileid text,
-    hv_order_tileid text,
-    format text,
-    processingbaseline text,
-    platformname text,
-    filename text,
-    instrumentname text,
-    instrumentshortname text,
-    size text,
-    s2datatakeid text,
-    producttype text,
-    platformidentifier text,
-    orbitdirection text,
-    platformserialidentifier text,
-    processinglevel text,
-    identifier text,
-    uuid text,
-    geom geometry(Geometry,4326),
+-- Drop table
+
+-- DROP TABLE metadado_img.metadado_sentinel;
+
+CREATE TABLE metadado_img.metadado_sentinel (
+	"index" text NULL,
+	title text NULL,
+	link text NULL,
+	link_alternative text NULL,
+	link_icon text NULL,
+	summary text NULL,
+	beginposition timestamp NULL,
+	endposition timestamp NULL,
+	ingestiondate timestamp NULL,
+	orbitnumber int8 NULL,
+	relativeorbitnumber int8 NULL,
+	cloudcoverpercentage numeric(5, 2) NULL,
+	highprobacloudspercentage numeric(5, 2) NULL,
+	mediumprobacloudspercentage numeric(5, 2) NULL,
+	snowicepercentage numeric(5, 2) NULL,
+	vegetationpercentage numeric(5, 2) NULL,
+	waterpercentage numeric(5, 2) NULL,
+	notvegetatedpercentage numeric(5, 2) NULL,
+	unclassifiedpercentage numeric(5, 2) NULL,
+	format text NULL,
+	instrumentshortname text NULL,
+	instrumentname text NULL,
+	s2datatakeid text NULL,
+	platformidentifier text NULL,
+	orbitdirection text NULL,
+	platformserialidentifier text NULL,
+	processingbaseline text NULL,
+	processinglevel text NULL,
+	producttype text NULL,
+	platformname text NULL,
+	"size" text NULL,
+	filename text NULL,
+	level1cpdiidentifier text NULL,
+	identifier text NULL,
+	uuid text NULL,
+	geom geometry(Geometry,4326),
     id integer NOT NULL DEFAULT nextval('metadado_sentinel_id_seq'::regclass),
     date_download timestamp without time zone,
-    level1cpdiidentifier character(250),
-    is_download boolean,
-    is_processed boolean,
-    file_path boolean
+    file_path text
+
 );
-
-ALTER TABLE metadado_img.metadado_sentinel
-    OWNER to postgres;
-
--- Index: idx_metadado_sentinel_geom
-
--- DROP INDEX metadado_img.idx_metadado_sentinel_geom;
-
-CREATE INDEX idx_metadado_sentinel_geom
-    ON metadado_img.metadado_sentinel USING gist
-    (geom);
-
--- Index: idx_metadado_sentinel_index
-
--- DROP INDEX metadado_img.idx_metadado_sentinel_index;
-
-CREATE INDEX idx_metadado_sentinel_index
-    ON metadado_img.metadado_sentinel USING btree
-    (index, id);
+CREATE INDEX idx_metadado_sentinel_geom ON metadado_img.metadado_sentinel USING gist (geom);
+CREATE INDEX ix_metadado_img_metadado_sentinel_index ON metadado_img.metadado_sentinel USING btree (index);
 ```
 
