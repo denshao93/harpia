@@ -148,6 +148,9 @@ CREATE DATABASE harpia;
 CREATE EXTENSION postgis;
 ```
 
+### OBS: Create file that set the area of interest from project tha intersect 
+### tiles of sentinel. The file has to be in "app/data/vector/aoi.geojson"
+
 ```sql
 -- DROP SCHEMA metadado_img CASCADE;
 
