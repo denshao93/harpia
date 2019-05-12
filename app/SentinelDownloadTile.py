@@ -20,14 +20,15 @@ with open(Path("app/config/const.yaml"), 'r') as f:
 
 # Open Datahub parameters
 data_hub = const['data_hub']
-user = data_hub['user'] # user_hub
-password = data_hub['password'] # password_hub
 
-conn_string = "".join(const['harpia_db_dev'])
+conn_string = const['db']
 
-def list_img2download(conn_string: str, schema: str, table: str):
+def list_img2download(conn_string: str, schema: str, table: str, limit:int=None):
     con = C.Connection(conn_string)
-    query = f"SELECT uuid FROM {schema}.{table} WHERE date_download IS NULL"
+    if limit is not None:
+        limit = f"LIMIT {limit}"
+    
+    query = f"SELECT uuid FROM {schema}.{table} WHERE date_download IS NULL {limit}"
     try:
         list_uuid = [i[0] for i in con.run_query(query)]
         return list_uuid
@@ -101,7 +102,7 @@ def insert_date_hour_db(conn_string: str, schema: str, table: str, column: str, 
 
 def dowload_img(list_index, dst_folder):
     # connect to the API
-    api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus') 
+    api = SentinelAPI(data_hub['user'], data_hub['password'], 'https://scihub.copernicus.eu/dhus') 
     for i in list_index:
         api.download(i, directory_path=dst_folder)
 
@@ -111,6 +112,6 @@ def dowload_img(list_index, dst_folder):
 
 
 dst_folder = path_output_folder(FOLDER_NAME)
-list_index = list_img2download(conn_string, 'metadado_img', 'metadado_sentinel')
+list_index = list_img2download(conn_string, 'metadado_img', 'metadado_sentinel', limit=1)
 
 dowload_img(list_index, dst_folder)
