@@ -25,21 +25,10 @@ conn_string = const['db']
 
 def list_img2download(conn_string: str, schema: str, table: str):
     con = C.Connection(conn_string)
-    query = f"SELECT uuid FROM {schema}.{table} WHERE date_download_img IS NULL {limit}"
+    query = f"SELECT uuid FROM {schema}.{table} WHERE date_download_img IS NULL"
     try:
         list_uuid = [i[0] for i in con.run_query(query)]
         return list_uuid
-    except TypeError as error:
-        print(error)
-
-
-def get_title_img(conn_string: str, schema: str, table: str, uuid: str):
-    con = C.Connection(conn_string)
-    
-    query = f"SELECT title FROM {schema}.{table} WHERE uuid = '{uuid}'"
-    try:
-        title_img = [i[0] for i in con.run_query(query)][0]
-        return title_img
     except TypeError as error:
         print(error)
 
