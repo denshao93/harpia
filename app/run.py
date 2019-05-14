@@ -6,6 +6,7 @@ import shutil
 import sys
 import tempfile  # NOQA
 from pathlib import Path
+from os.path import join
 
 import yaml
 import ClipRaster as CR
@@ -21,6 +22,18 @@ import RasterReproject as RR
 import SatelliteFileInfo as SFI
 import Segmetation as SEG
 import UnpackFile as UF
+
+# Write log of scene processed in csv
+# Open yaml 
+# Open yaml 
+with open(Path("app/config/const.yaml"), 'r') as f:
+        const = yaml.safe_load(f)
+
+def save_datetime_file_processig(scene_title):
+    conn_string = const['db']
+    con = C.Connection(conn_string)
+    query = f"UPDATE metadado_img.metadado_sentinel SET date_file_processing = current_timestamp WHERE title = '{scene_title}';"
+    con.run_update(query)
 
 if __name__ == "__main__":
     # argv[1] = directory where targz files are stored.
@@ -179,48 +192,48 @@ if __name__ == "__main__":
         # Bands: 2 = Blue | 3 = Green | 4 = Red | 8 = Nir |
         if sat.is_sentinel_file():
             # Unzip setinel file
-            up.uncompress_zip()
+            # up.uncompress_zip()
 
-            # Compose bands with 10m spatial resolution
-            CB.ComposeBands(input_dir=tmp_dir,
-                            output_dir=tmp_dir,
-                            output_file_name=sat.get_output_file_name()) \
-                .stack_sentinel(scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
-                                utm_zone=sat.get_parameter_satellite()["index"])
+            # # Compose bands with 10m spatial resolution
+            # CB.ComposeBands(input_dir=tmp_dir,
+            #                 output_dir=tmp_dir,
+            #                 output_file_name=sat.get_output_file_name()) \
+            #     .stack_sentinel(scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
+            #                     utm_zone=sat.get_parameter_satellite()["index"])
 
-            # Reproject to Sirgas 2000
-            input_img_path = os.path.join(
-                tmp_dir, f'{output_file_name}.TIF')
-            output_img_path = os.path.join(
-                tmp_dir, f"r{output_file_name}.TIF")
+            # # Reproject to Sirgas 2000
+            # input_img_path = os.path.join(
+            #     tmp_dir, f'{output_file_name}.TIF')
+            # output_img_path = os.path.join(
+            #     tmp_dir, f"r{output_file_name}.TIF")
 
-            rprj = RR.RasterReproject(input_img_path, output_img_path)
-            rprj.reproject_raster_to_epsg4674()
+            # rprj = RR.RasterReproject(input_img_path, output_img_path)
+            # rprj.reproject_raster_to_epsg4674()
 
-            # Clip
-            img_path = f"{tmp_dir}/r{output_file_name}.TIF"
+            # # Clip
+            # img_path = f"{tmp_dir}/r{output_file_name}.TIF"
 
-            c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir,
-                              scene_file_name=parameter_satellite["scene_file_name"],
-                              output_dir=output_dir,
-                              output_file_name=output_file_name)
+            # c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir,
+            #                   scene_file_name=parameter_satellite["scene_file_name"],
+            #                   output_dir=output_dir,
+            #                   output_file_name=output_file_name)
 
-            r = R.Raster(img_path=img_path)
+            # r = R.Raster(img_path=img_path)
 
             
-            if r.intersects_trace_outline_aoi():
-                c.clip_raster_by_mask(band_order=[4, 3, 2, 1])
-            else:
-                import RasterTranslate as RT
-                rt = RT.RasterTranslate(img_path=img_path,
-                                        output_dir=output_dir,
-                                        output_file_name=output_file_name)
-                rt.translate_8bit(band_order=[4, 3, 2, 1])
+            # if r.intersects_trace_outline_aoi():
+            #     c.clip_raster_by_mask(band_order=[4, 3, 2, 1])
+            # else:
+            #     import RasterTranslate as RT
+            #     rt = RT.RasterTranslate(img_path=img_path,
+            #                             output_dir=output_dir,
+            #                             output_file_name=output_file_name)
+            #     rt.translate_8bit(band_order=[4, 3, 2, 1])
 
-            # Make pyramid
-            img_path = os.path.join(
-                output_dir, f"{output_file_name}.TIF")
-            PR.PyramidRaster(img_path=img_path).create_img_pyramid()
+            # # Make pyramid
+            # img_path = os.path.join(
+            #     output_dir, f"{output_file_name}.TIF")
+            # PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
             # Segmentation
             # s.get_segmentation(r=10, i=10, algo='SLICO')
@@ -228,18 +241,9 @@ if __name__ == "__main__":
 
             # Cloud/Shadow
             
+            # Save datetime when file was processed
+            save_datetime_file_processig(parameter_satellite["scene_file_name"])
 
-            # Write log of scene processed in csv
-            # Open yaml 
-            with open(Path("/home/diogocaribe/workspace/harpia/app/config/const.yaml"), 'r') as f:
-                    const = yaml.safe_load(f)
-
-            conn_string = const['db']
-            con = C.Connection(conn_string)
-            title = parameter_satellite["scene_file_name"]
-            query = f"UPDATE metadado_img.metadado_sentinel SET date_file_proccessing = current_timestamp WHERE title = '{title}';"
-            con.run_query(query)
-            
             shutil.rmtree(tmp_dir)
             
             continue
