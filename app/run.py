@@ -2,13 +2,14 @@ import csv
 import datetime
 import glob
 import os  # NOQA
+import pathlib
 import shutil
 import sys
 import tempfile  # NOQA
 from pathlib import Path
-import pathlib
 
 import yaml
+
 import ClipRaster as CR
 import CloudShadowLC8 as CL
 import ComposeBands as CB
@@ -33,7 +34,7 @@ path_cwd = pathlib.Path.cwd()
 datetime_now = datetime.datetime.now()
 
 # Open yaml 
-with open(path_cwd/'app/config/const.yaml', 'r') as f:
+with open(path_cwd/'config/const.yaml', 'r') as f:
         const = yaml.safe_load(f)
 
 # Params to connect to postgres database
@@ -288,6 +289,8 @@ if __name__ == "__main__":
                                    sat.get_output_file_name())
             cloud.run_cloud_shadow_fmask_landsat()
             
+            # Save datetime when file was processed
+            save_datetime_img_processing(parameter_satellite["scene_file_name"])
 
             # Save when file was processed in postgres database
             save_datetime_img_processing(scene_title=parameter_satellite["scene_file_name"])

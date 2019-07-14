@@ -96,8 +96,7 @@ class Connection:
         finally:
             if conn is not None:
                 conn.close()
-
-     
+ 
     def run_update(self, query):
         """Run query in Postgres database.
 
