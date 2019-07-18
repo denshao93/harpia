@@ -1,15 +1,19 @@
-### Setting Harpia python 3 enviroment
-
-___________________________________________________
+# Setting Harpia python 3 enviroment
 
 All settings were done in Linux Mint 19.1 with Ubuntu 18.04.
 
-#### Install pyenv
-##### It set aside harpia enviroment from system enviroment in order to don't break linux.
+## Install pyenv
+
+### It set aside harpia enviroment from system enviroment in order to  don't break linux
 
 For more help to install pyenv, see documentation in:
 
 [GitHub of pyenv](http://github.com/pyenv/pyenv)
+
+```bash
+sudo apt-get update; sudo apt-get install --no-install-recommends make \ build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev \ libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev \
+libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+```
 
 Clone pyenv
 
@@ -18,6 +22,7 @@ git clone https://github.com/pyenv/pyenv.git $HOME/.pyenv
 ```
 
 Settings of pyenv in order to bash can recognize its commands.
+
 ```bash
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
 echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
@@ -25,16 +30,16 @@ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nf
 ```
 
 Update bashrc to able pyenv commands works in bash
+
 ```bash
 exec "$SHELL"
 ```
 
 Create python 3 environment with pyenv
 
-
 ```bash
-pyenv install 3.7.3
-pyenv global 3.7.3
+pyenv install 3.7.4
+pyenv global 3.7.4
 ```
 
 Install pyenv-virtualenv and pyenv-virtualwrapper
@@ -44,7 +49,7 @@ git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/py
 echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
 
 git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper
-export PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV="true"
+echo 'pyenv virtualenvwrapper' >> ~/.bashrc
 pyenv virtualenvwrapper_lazy
 pyenv virtualenvwrapper
 exec "$SHELL"
@@ -53,18 +58,22 @@ exec "$SHELL"
 Create dictory to save virtual enviroment of python
 
 ```bash
+export WORKON_HOME=~/.ve
+export PROJECT_HOME=~/workspace
 mkdir ~/.ve
 mkdir ~/workspace/harpia
 mkvirtualenv harpia -a ~/workspace/harpia/app
 ```
 
-##### Install gdal in VirtualEnvironment
+## Install gdal in VirtualEnvironment
+
 Install gdal grater than 2.4.0 (previous version doesn't work with sentinel level 2A)
+
 ```bash
 sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get install libgdal-dev g++ gdal-bin python-gdal python3-gdal
 workon harpia
-pip install numpy pygdal==2.2.3.3
+pip install numpy pygdal==2.4.2.5
 ```
 Obs: Pay attention to pygdal version. It need to be the same as system installed
 
@@ -81,6 +90,11 @@ tar -xvzf python-fmask-0.5.3.tar.gz
 workon harpia
 cd rios-1.4.8 && python setup.py install
 cd ../python-fmask-0.5.3 && python setup.py install
+```
+
+## Install requirements.txt
+```bash
+pip install -r requirements.txt
 ```
 
 #### Install gdal-segment
@@ -105,30 +119,6 @@ mkdir src && cd src && git clone https://github.com/opencv/opencv.git
 cd ~/opencv
 git checkout 3.4.6
 mkdir build && cd build
-```
-
-```bash
-cmake -D CMAKE_BUILD_TYPE=RELEASE \
-	-D CMAKE_INSTALL_PREFIX=/usr/local \
-	-D INSTALL_PYTHON_EXAMPLES=ON \
-	-D INSTALL_C_EXAMPLES=OFF \
-	-D OPENCV_ENABLE_NONFREE=ON \
-	-D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
-	-D PYTHON_EXECUTABLE=~/.ve/harpia/bin/python \
-	-D BUILD_EXAMPLES=ON ..
-make -j6
-sudo make install
-sudo ldconfig
-```
-
-## Compile gdal-segment
-
-```bash
-cd ~/
-git clone https://github.com/cbalint13/gdal-segment.git
-cd gdal-segment && mkdir build && cd build
-cmake ../
-sudo make
 ```
 
 ## Change const.yaml.dist to const.yaml and setting the parameters
