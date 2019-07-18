@@ -25,7 +25,7 @@ import Segmetation as SEG
 import UnpackFile as UF
 
 OUTPUT_FOLDER_NAME = 'PROCESSADA'
-INPUT_FOLDER_NAME = 'BRUTA'
+INPUT_FOLDER_NAME = 'BRUTA_DEV'
 
 path_home = pathlib.Path.home()
 
@@ -34,7 +34,7 @@ path_cwd = pathlib.Path.cwd()
 datetime_now = datetime.datetime.now()
 
 # Open yaml 
-with open(path_cwd/'config/const.yaml', 'r') as f:
+with open(path_cwd/'app/config/const.yaml', 'r') as f:
         const = yaml.safe_load(f)
 
 # Params to connect to postgres database
@@ -46,7 +46,7 @@ def file_list_not_process():
     """
     con = C.Connection(conn_string)
     query = f"SELECT title FROM metadado_img.metadado_sentinel WHERE "\
-            f"date_file_proccessing IS NULL AND date_download_img NOTNULL;"
+            f"date_file_processing IS NULL AND date_download_img NOTNULL;"
     file_list = con.run_query(query)
     file_list = [i[0] for i in file_list]
     return file_list
