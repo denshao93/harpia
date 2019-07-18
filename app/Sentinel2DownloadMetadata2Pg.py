@@ -25,10 +25,10 @@ api = SentinelAPI(data_hub['user'], data_hub['password'], 'https://scihub.copern
 
 footprint = geojson_to_wkt(read_geojson('app/data/vector/aoi.geojson'))
 products = api.query(footprint,
-                     date=('20150101', 'NOW'),
+                     date=('20170101', 'NOW'),
                      platformname='Sentinel-2',
                      producttype='S2MSI2A',
-                     cloudcoverpercentage=(0, 100))
+                     cloudcoverpercentage=(0, 90))
 
 
 # GeoPandas GeoDataFrame with the metadata of the scenes and the footprints as geometries
@@ -84,6 +84,6 @@ def create_sqlalchemy_engine(user: str, password: str, host: str, port: int,
     engine = create_engine(engine_con)
     return engine
 
-engine = create_sqlalchemy_engine('postgres', 'postgres', 'localhost', 5432, 'harpia')
+engine = create_sqlalchemy_engine('postgres', 'postgres', 'localhost', 5432, 'harpia_dev')
 
 load_sentinel_metadata_db(gdf, engine)
