@@ -2,12 +2,14 @@ import csv
 import datetime
 import glob
 import os  # NOQA
+import pathlib
 import shutil
 import sys
 import tempfile  # NOQA
 from pathlib import Path
 
 import yaml
+
 import ClipRaster as CR
 import CloudShadowLC8 as CL
 import ComposeBands as CB
@@ -22,6 +24,59 @@ import SatelliteFileInfo as SFI
 import Segmetation as SEG
 import UnpackFile as UF
 
+OUTPUT_FOLDER_NAME = 'PROCESSADA'
+INPUT_FOLDER_NAME = 'BRUTA'
+
+path_home = pathlib.Path.home()
+
+path_cwd = pathlib.Path.cwd()
+
+datetime_now = datetime.datetime.now()
+
+# Open yaml 
+with open(path_cwd/'config/const.yaml', 'r') as f:
+        const = yaml.safe_load(f)
+
+# Params to connect to postgres database
+conn_string = const['db']
+
+
+def file_list_not_process():
+    """Create list of files wich not processed
+    """
+    con = C.Connection(conn_string)
+    query = f"SELECT title FROM metadado_img.metadado_sentinel WHERE "\
+            f"date_file_proccessing IS NULL AND date_download_img NOTNULL;"
+    file_list = con.run_query(query)
+    file_list = [i[0] for i in file_list]
+    return file_list
+
+
+def get_file_path(file_name):
+
+    return path_home/INPUT_FOLDER_NAME/file_name
+
+
+def save_datetime_img_processing(scene_title):
+    """Update database field where save datetime when img was processed
+    
+    Parameters
+    ----------
+    scene_title : [str]
+        Title from file of satellite image
+    """
+    con = C.Connection(conn_string)
+    query = f"UPDATE metadado_img.metadado_sentinel SET date_file_proccessing ="\
+        f"current_timestamp WHERE title = '{scene_title}';"
+    return con.run_update(query)
+
+
+def cloud_shadow(input_file, output_dir, ouput_file_name):
+    cloud = CL.CloudShadow(tmp_dir, output_dir, sat.get_scene_file_name(),
+                                   sat.get_output_file_name())
+    cloud.run_cloud_shadow_fmask_landsat()
+
+
 if __name__ == "__main__":
     # argv[1] = directory where targz files are stored.
     # argv[2] = directory where folder tree will be created to save processed
@@ -35,24 +90,27 @@ if __name__ == "__main__":
         # output_dir = directory where results will be stored.
         # It is created by OrganizedDirectory class
 
-    # Create list of zip and tar.gz files from folder where they are store.
-    files = [f for f_ in [glob.glob(e)
-                          for e in (sys.argv[1]+'/*/S2*.zip',
-                                    sys.argv[1]+'/*/CBERS*BAND5.zip',
-                                    sys.argv[1]+'/*/CBERS*BAND2.zip',
-                                    sys.argv[1]+'/*/CBERS*BAND13.zip',
-                                    sys.argv[1]+'/*/R2*BAND5*.zip',
-                                    sys.argv[1]+'/*/L*.tar.gz')]
-             for f in f_]
-    
-    
-    for file_path in files:
-        
-        print(file_path)
-        now = datetime.datetime.now()
+    files = file_list_not_process()
 
+    # Create list of zip and tar.gz files from folder where they are store.
+    # files = [f for f_ in [glob.glob(e)
+    #                       for e in (sys.argv[1]+'/*/S2*.zip',
+    #                                 sys.argv[1]+'/*/CBERS*BAND5.zip',
+    #                                 sys.argv[1]+'/*/CBERS*BAND2.zip',
+    #                                 sys.argv[1]+'/*/CBERS*BAND13.zip',
+    #                                 sys.argv[1]+'/*/R2*BAND5*.zip',
+    #                                 sys.argv[1]+'/*/L*.tar.gz')]
+    #          for f in f_]
+    
+    for file in files:
+        file_path = f"{get_file_path(file_name=file)}.zip"
+    
         # Create tmp director to put all temp files
         tmp_dir = tempfile.mkdtemp()
+
+    # for file_path in files:
+        
+        print(file_path)
 
         # Create instance of landsat file where scene features are
         sat = SFI.SatelliteFileInfo(file_path)
@@ -209,13 +267,13 @@ if __name__ == "__main__":
 
             
             if r.intersects_trace_outline_aoi():
-                c.clip_raster_by_mask(band_order=[4, 3, 2, 1])
+                c.clip_raster_by_mask(band_order=[1, 2, 3])
             else:
                 import RasterTranslate as RT
                 rt = RT.RasterTranslate(img_path=img_path,
                                         output_dir=output_dir,
                                         output_file_name=output_file_name)
-                rt.translate_8bit(band_order=[4, 3, 2, 1])
+                rt.translate_8bit(band_order=[1, 2, 3])
 
             # Make pyramid
             img_path = os.path.join(
@@ -227,18 +285,15 @@ if __name__ == "__main__":
             # l.run_load_segmentation()
 
             # Cloud/Shadow
+            # cloud = CL.CloudShadow(tmp_dir, output_dir, sat.get_scene_file_name(),
+            #                        sat.get_output_file_name())
+            # cloud.run_cloud_shadow_fmask_landsat()
             
+            # Save datetime when file was processed
+            save_datetime_img_processing(parameter_satellite["scene_file_name"])
 
-            # Write log of scene processed in csv
-            # Open yaml 
-            with open(Path("/home/diogocaribe/workspace/harpia/app/config/const.yaml"), 'r') as f:
-                    const = yaml.safe_load(f)
-
-            conn_string = const['db']
-            con = C.Connection(conn_string)
-            title = parameter_satellite["scene_file_name"]
-            query = f"UPDATE metadado_img.metadado_sentinel SET date_file_proccessing = current_timestamp WHERE title = '{title}';"
-            con.run_query(query)
+            # Save when file was processed in postgres database
+            save_datetime_img_processing(scene_title=parameter_satellite["scene_file_name"])
             
             shutil.rmtree(tmp_dir)
             
@@ -323,7 +378,7 @@ if __name__ == "__main__":
             # Cloud/Shadow
             cloud = CL.CloudShadow(tmp_dir, output_dir, sat.get_scene_file_name(),
                                    sat.get_output_file_name())
-            cloud.run_cloud_shadow_fmask()
+            cloud.run_cloud_shadow_fmask_landsat()
             pass
 
         # Write log of scene processed in csv

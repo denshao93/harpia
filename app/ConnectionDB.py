@@ -96,7 +96,29 @@ class Connection:
         finally:
             if conn is not None:
                 conn.close()
-                # print('Database connection closed.')
+ 
+    def run_update(self, query):
+        """Run query in Postgres database.
+
+        Parameters
+        ----------
+        self: 
+        query: Query that run update command to postgres
+
+        Returns
+        -------
+        
+        """
+        try:
+            conn = self.open_connect()
+            cursor = conn.cursor()
+            cursor.execute(query)
+            cursor.close()
+        except (Exception, pg.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
         
 
 

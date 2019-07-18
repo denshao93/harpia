@@ -94,7 +94,7 @@ class CloudShadow:
             dst = os.path.join(self.output_dir, f"fmask_{self.scene_file_name}")
             shutil.move(src=rc, dst=dst)
 
-    def run_cloud_shadow_fmask(self):
+    def run_cloud_shadow_fmask_landsat(self):
         """
         Run fsmak that will return classification of image processed which have five classes (cloud, shadow, water,
          "soil")
@@ -109,3 +109,6 @@ class CloudShadow:
         self.cloud_detection()
         self.reproject_cloud_detection()
         self.clip_cloud()
+
+    def run_cloud_shadow_fmask_sentinel(self):
+        pass
