@@ -12,7 +12,9 @@ from sqlalchemy import create_engine
 
 import ConnectionDB as C
 
-FOLDER_NAME = 'BRUTA_DEV'
+FOLDER_NAME = 'BRUTA'
+
+path_home = Path.home()
 
 # Open yaml 
 with open(Path("app/config/const.yaml"), 'r') as f:
@@ -32,6 +34,15 @@ def list_img2download(conn_string: str, schema: str, table: str):
     except TypeError as error:
         print(error)
 
+
+def get_title(conn_string: str, schema: str, table: str, uuid:str):
+    con = C.Connection(conn_string)
+    query = f"SELECT title FROM {schema}.{table} WHERE uuid = '{uuid}'"
+    try:
+        title = con.run_query(query)[0][0]
+        return title
+    except TypeError as error:
+        print(error)
 
 def path_output_folder(folder_name: str):
     """Path of folder where files will store.
@@ -72,7 +83,7 @@ def is_file_in_folder(folder: str, file_name: str, file_extention: str):
     [bool]
         If True file be in folder, False otherwise.
     """
-    file_path = join(folder, file_name, file_extention)
+    file_path = join(folder, file_name+file_extention)
     return exists(file_path)
 
 
@@ -100,13 +111,22 @@ def insert_date_hour_db(conn_string: str, schema: str, table: str, column: str, 
 def dowload_img(list_index, dst_folder):
     # connect to the API
     api = SentinelAPI(data_hub['user'], data_hub['password'], 'https://scihub.copernicus.eu/dhus')
-    for i in list_index:     
-        api.download(i, directory_path=dst_folder)
-
-        insert_date_hour_db(conn_string=conn_string, schema='metadado_img', 
+    for i in list_index: 
+        
+        title = get_title(conn_string, schema='metadado_img', table='metadado_sentinel', uuid=i)
+        
+        file_already_download = is_file_in_folder(folder=path_home/'BRUTA_DEV', file_name=title, file_extention='.zip') 
+        
+        if file_already_download:
+            insert_date_hour_db(conn_string=conn_string, schema='metadado_img', 
                             table='metadado_sentinel',column='date_download_img', 
                             uuid=i)
-
+        else:
+            api.download(i, directory_path=dst_folder)
+            insert_date_hour_db(conn_string=conn_string, schema='metadado_img', 
+                            table='metadado_sentinel',column='date_download_img', 
+                            uuid=i)
+           
 
 dst_folder = path_output_folder(FOLDER_NAME)
 list_index = list_img2download(conn_string, 'metadado_img', 'metadado_sentinel')
