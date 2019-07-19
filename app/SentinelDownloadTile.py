@@ -113,7 +113,7 @@ def insert_date_hour_db(conn_string: str, schema: str, table: str, column: str, 
     """
     con = C.Connection(conn_string)
     query = f"UPDATE {schema}.{table} SET {column} = current_timestamp WHERE uuid = '{uuid}'"
-    con.run_query(query)
+    con.run_update(query)
 
 
 def dowload_img(list_index, dst_folder):
