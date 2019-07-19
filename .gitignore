@@ -14,6 +14,7 @@ app/data/vector/aoi.shx
 app/data/vector/aoi.qpj
 app/data/vector/aoi.cpg
 app/data/vector/aoi.geojson
+app/data/vector/sul.geojson
 app/download/
 pandas
 
