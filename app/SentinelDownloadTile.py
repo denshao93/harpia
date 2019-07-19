@@ -12,7 +12,7 @@ from sqlalchemy import create_engine
 
 import ConnectionDB as C
 
-FOLDER_NAME = 'BRUTA'
+FOLDER_NAME = 'BRUTA_DEV'
 
 path_home = Path.home()
 
@@ -43,6 +43,7 @@ def get_title(conn_string: str, schema: str, table: str, uuid:str):
         return title
     except TypeError as error:
         print(error)
+
 
 def path_output_folder(folder_name: str):
     """Path of folder where files will store.
@@ -83,8 +84,12 @@ def is_file_in_folder(folder: str, file_name: str, file_extention: str):
     [bool]
         If True file be in folder, False otherwise.
     """
-    file_path = join(folder, file_name+file_extention)
-    return exists(file_path)
+        
+    if exists(join(folder, file_name+file_extention+'.incomplete')):
+        return False
+    else:
+        file_path = join(folder, file_name+file_extention)
+        return exists(file_path)
 
 
 def insert_date_hour_db(conn_string: str, schema: str, table: str, column: str, uuid: str):
