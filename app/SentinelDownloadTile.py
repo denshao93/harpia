@@ -3,6 +3,7 @@ from collections import OrderedDict
 from os import mkdir
 from os.path import exists, join
 from pathlib import Path
+import sys
 
 import geopandas as gpd
 import yaml
@@ -12,7 +13,9 @@ from sqlalchemy import create_engine
 
 import ConnectionDB as C
 
-FOLDER_NAME = 'BRUTA_DEV'
+FOLDER_NAME = sys.argv[1]
+
+TO_DOWNLOAD = sys.argv[2].lower() == 'true'
 
 path_home = Path.home()
 
@@ -120,13 +123,13 @@ def dowload_img(list_index, dst_folder):
         
         title = get_title(conn_string, schema='metadado_img', table='metadado_sentinel', uuid=i)
         
-        file_already_download = is_file_in_folder(folder=path_home/'BRUTA_DEV', file_name=title, file_extention='.zip') 
+        file_already_download = is_file_in_folder(folder=path_home/FOLDER_NAME, file_name=title, file_extention='.zip') 
         
         if file_already_download:
             insert_date_hour_db(conn_string=conn_string, schema='metadado_img', 
                             table='metadado_sentinel',column='date_download_img', 
                             uuid=i)
-        else:
+        elif TO_DOWNLOAD:
             api.download(i, directory_path=dst_folder)
             insert_date_hour_db(conn_string=conn_string, schema='metadado_img', 
                             table='metadado_sentinel',column='date_download_img', 
