@@ -1,9 +1,9 @@
 import datetime
+import sys
 from collections import OrderedDict
 from os import mkdir
 from os.path import exists, join
 from pathlib import Path
-import sys
 
 import geopandas as gpd
 import yaml
