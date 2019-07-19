@@ -66,8 +66,8 @@ def save_datetime_img_processing(scene_title):
         Title from file of satellite image
     """
     con = C.Connection(conn_string)
-    query = f"UPDATE metadado_img.metadado_sentinel SET date_file_processing ="\
-        f"current_timestamp WHERE title = '{scene_title}';"
+    query = f"UPDATE metadado_img.metadado_sentinel SET date_file_processing =" \
+            f"current_timestamp WHERE title = '{scene_title}';"
     return con.run_update(query)
 
 
@@ -91,26 +91,12 @@ if __name__ == "__main__":
         # It is created by OrganizedDirectory class
  
     files = file_list_not_process()
-
-    # Create list of zip and tar.gz files from folder where they are store.
-    # files = [f for f_ in [glob.glob(e)
-    #                       for e in (sys.argv[1]+'/*/S2*.zip',
-    #                                 sys.argv[1]+'/*/CBERS*BAND5.zip',
-    #                                 sys.argv[1]+'/*/CBERS*BAND2.zip',
-    #                                 sys.argv[1]+'/*/CBERS*BAND13.zip',
-    #                                 sys.argv[1]+'/*/R2*BAND5*.zip',
-    #                                 sys.argv[1]+'/*/L*.tar.gz')]
-    #          for f in f_]
-    
+   
     for file in files:
         file_path = f"{get_file_path(file_name=file)}.zip"
     
         # Create tmp director to put all temp files
         tmp_dir = tempfile.mkdtemp()
-
-    # for file_path in files:
-        
-        print(file_path)
 
         # Create instance of landsat file where scene features are
         sat = SFI.SatelliteFileInfo(file_path)
@@ -118,12 +104,7 @@ if __name__ == "__main__":
         parameter_satellite = sat.get_parameter_satellite()
         output_file_name = sat.get_output_file_name()
         scene_file_name = parameter_satellite["scene_file_name"]
-
-        # Csv parameters for log
-        home_path = str(Path.home())
-        csv_path = str(Path('workspace/harpia/app/log/log.csv'))
-        csv_path = f'{home_path}/{csv_path}'
-        
+       
         # Create director where files will be saved
         od = OD.OrganizeDirectory(root_dir_path=sys.argv[2],
                                   satellite_name=parameter_satellite["initials_name"],
@@ -135,14 +116,64 @@ if __name__ == "__main__":
         # Create directory to save results
         output_dir = od.create_output_dir()
 
-        # Instatiation segmentation class
-        s = SEG.Segmentation(output_dir=output_dir, tmp_dir=tmp_dir,
-                             output_file_name=sat.get_output_file_name())
+         # Create objet to unpack files
+        up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
 
-        l = LSD.LoadSegmentationDatabase(tmp_dir=tmp_dir,
-                                         satellite_parameters=parameter_satellite,
-                                         output_file_name=sat.get_output_file_name())
+        #####################################################################################
+        ################################### Sentinel2 #######################################
+        #####################################################################################
+        # Bands: 2 = Blue | 3 = Green | 4 = Red | 8 = Nir |
+        if sat.is_sentinel_file():
+            # Unzip setinel file
+            up.uncompress_zip()
 
+            # Compose bands with 10m spatial resolution
+            CB.ComposeBands(input_dir=tmp_dir,
+                            output_dir=tmp_dir,
+                            output_file_name=sat.get_output_file_name()) \
+                .stack_sentinel(scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
+                                utm_zone=sat.get_parameter_satellite()["index"])
+
+            # Reproject to Sirgas 2000
+            input_img_path = os.path.join(
+                tmp_dir, f'{output_file_name}.TIF')
+            output_img_path = os.path.join(
+                tmp_dir, f"r{output_file_name}.TIF")
+
+            rprj = RR.RasterReproject(input_img_path, output_img_path)
+            rprj.reproject_raster_to_epsg4674()
+
+            # Clip
+            img_path = f"{tmp_dir}/r{output_file_name}.TIF"
+
+            c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir,
+                              scene_file_name=parameter_satellite["scene_file_name"],
+                              output_dir=output_dir,
+                              output_file_name=output_file_name)
+
+            r = R.Raster(img_path=img_path)
+
+            
+            if r.intersects_trace_outline_aoi():
+                c.clip_raster_by_mask(band_order=[1, 2, 3])
+            else:
+                import RasterTranslate as RT
+                rt = RT.RasterTranslate(img_path=img_path,
+                                        output_dir=output_dir,
+                                        output_file_name=output_file_name)
+                rt.translate_8bit(band_order=[1, 2, 3])
+
+            # Make pyramid
+            img_path = os.path.join(
+                output_dir, f"{output_file_name}.TIF")
+            PR.PyramidRaster(img_path=img_path).create_img_pyramid()
+
+            # Save when file was processed in postgres database
+            save_datetime_img_processing(scene_title=parameter_satellite["scene_file_name"])
+            
+            shutil.rmtree(tmp_dir)
+            
+            continue
         #####################################################################################
         ################################### Cbers4/ResorceSat2###############################
         #####################################################################################
@@ -216,63 +247,6 @@ if __name__ == "__main__":
 
             continue
 
-        # Create objet to unpack files
-        up = UF.UnpackFile(file_path=file_path, tmp_dir=tmp_dir)
-        #####################################################################################
-        ################################### Sentinel2 #######################################
-        #####################################################################################
-        # Bands: 2 = Blue | 3 = Green | 4 = Red | 8 = Nir |
-        if sat.is_sentinel_file():
-            # Unzip setinel file
-            up.uncompress_zip()
-
-            # Compose bands with 10m spatial resolution
-            CB.ComposeBands(input_dir=tmp_dir,
-                            output_dir=tmp_dir,
-                            output_file_name=sat.get_output_file_name()) \
-                .stack_sentinel(scene_file_name=sat.get_parameter_satellite()["scene_file_name"],
-                                utm_zone=sat.get_parameter_satellite()["index"])
-
-            # Reproject to Sirgas 2000
-            input_img_path = os.path.join(
-                tmp_dir, f'{output_file_name}.TIF')
-            output_img_path = os.path.join(
-                tmp_dir, f"r{output_file_name}.TIF")
-
-            rprj = RR.RasterReproject(input_img_path, output_img_path)
-            rprj.reproject_raster_to_epsg4674()
-
-            # Clip
-            img_path = f"{tmp_dir}/r{output_file_name}.TIF"
-
-            c = CR.ClipRaster(img_path=img_path, tmp_dir=tmp_dir,
-                              scene_file_name=parameter_satellite["scene_file_name"],
-                              output_dir=output_dir,
-                              output_file_name=output_file_name)
-
-            r = R.Raster(img_path=img_path)
-
-            
-            if r.intersects_trace_outline_aoi():
-                c.clip_raster_by_mask(band_order=[1, 2, 3])
-            else:
-                import RasterTranslate as RT
-                rt = RT.RasterTranslate(img_path=img_path,
-                                        output_dir=output_dir,
-                                        output_file_name=output_file_name)
-                rt.translate_8bit(band_order=[1, 2, 3])
-
-            # Make pyramid
-            img_path = os.path.join(
-                output_dir, f"{output_file_name}.TIF")
-            PR.PyramidRaster(img_path=img_path).create_img_pyramid()
-
-            # Save when file was processed in postgres database
-            save_datetime_img_processing(scene_title=parameter_satellite["scene_file_name"])
-            
-            shutil.rmtree(tmp_dir)
-            
-            continue
         #####################################################################################
         ################################### Landsat 8 #######################################
         #####################################################################################
@@ -342,10 +316,9 @@ if __name__ == "__main__":
             output_dir, f"{output_file_name}.TIF")
         PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
-        # Segmentation
+        # Cloud/Shadow
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
 
-            # Cloud/Shadow
             cloud = CL.CloudShadow(tmp_dir, output_dir, sat.get_scene_file_name(),
                                    sat.get_output_file_name())
             cloud.run_cloud_shadow_fmask_landsat()
