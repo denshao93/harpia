@@ -66,7 +66,7 @@ def save_datetime_img_processing(scene_title):
         Title from file of satellite image
     """
     con = C.Connection(conn_string)
-    query = f"UPDATE metadado_img.metadado_sentinel SET date_file_proccessing ="\
+    query = f"UPDATE metadado_img.metadado_sentinel SET date_file_processing ="\
         f"current_timestamp WHERE title = '{scene_title}';"
     return con.run_update(query)
 
@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
         # output_dir = directory where results will be stored.
         # It is created by OrganizedDirectory class
-
+ 
     files = file_list_not_process()
 
     # Create list of zip and tar.gz files from folder where they are store.
@@ -212,19 +212,6 @@ if __name__ == "__main__":
                 output_dir, f"{sat.get_output_file_name()}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
 
-            # Segmentation
-            # s.get_segmentation(r=5, i=13, algo='SLIC')
-            # Load segmentation
-            # l.run_load_segmentation()
-            
-            # Write log of cene processed in csv            
-            # with open(csv_path, 'a', newline='') as csvfile:
-            #     logwriter = csv.writer(csvfile, delimiter=',')
-            #     logwriter.writerow([sat.get_parameter_satellite()['initials_name'],
-            #                         sat.get_parameter_satellite()[
-            #         'aquisition_date'],
-            #         sat.get_parameter_satellite()['index']])
-
             shutil.rmtree(tmp_dir)
 
             continue
@@ -279,18 +266,6 @@ if __name__ == "__main__":
             img_path = os.path.join(
                 output_dir, f"{output_file_name}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
-
-            # Segmentation
-            # s.get_segmentation(r=10, i=10, algo='SLICO')
-            # l.run_load_segmentation()
-
-            # Cloud/Shadow
-            # cloud = CL.CloudShadow(tmp_dir, output_dir, sat.get_scene_file_name(),
-            #                        sat.get_output_file_name())
-            # cloud.run_cloud_shadow_fmask_landsat()
-            
-            # Save datetime when file was processed
-            save_datetime_img_processing(parameter_satellite["scene_file_name"])
 
             # Save when file was processed in postgres database
             save_datetime_img_processing(scene_title=parameter_satellite["scene_file_name"])
@@ -370,23 +345,11 @@ if __name__ == "__main__":
         # Segmentation
         if sat.get_parameter_satellite()['initials_name'] == 'LC08':
 
-            # s.get_segmentation(r=5, i=10, algo='SLICO')
-
-            # Load database
-            l.run_load_segmentation()
-
             # Cloud/Shadow
             cloud = CL.CloudShadow(tmp_dir, output_dir, sat.get_scene_file_name(),
                                    sat.get_output_file_name())
             cloud.run_cloud_shadow_fmask_landsat()
             pass
-
-        # Write log of scene processed in csv
-        with open(csv_path, 'a', newline='') as csvfile:
-            logwriter = csv.writer(csvfile, delimiter=',')
-            logwriter.writerow([parameter_satellite['initials_name'],
-                                parameter_satellite['aquisition_date'],
-                                parameter_satellite['index']])
         
         dst = Path(sys.argv[1], 'Landsat/processada')
         shutil.move(file_path, dst=dst)
