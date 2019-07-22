@@ -133,7 +133,7 @@ def add_task_to_terraamazon_project(conn_string: str,
     if check_if_task_in_project:
         insert_query = f"INSERT INTO terraamazon.ta_project_scene (project_id, scene_id, locked) values ({project_id}, {scene_id},false)"
 
-        return con.run_query(insert_query) 
+        con.run_query(insert_query) 
 
 
 def cloud_shadow(input_file, output_dir, ouput_file_name):
@@ -196,9 +196,6 @@ if __name__ == "__main__":
                 satellite_name = 'sentinel'
             satellite_index = sat.get_parameter_satellite()["index"]
             
-            create_task_terraamazon_poject(conn_string,  aquisition_date, satellite_name, satellite_index)
-            add_task_to_terraamazon_project(conn_string,  aquisition_date, satellite_index, project_name='MONITORAMENTO')
-
             # Unzip setinel file
             up.uncompress_zip()
 
