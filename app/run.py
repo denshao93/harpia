@@ -1,11 +1,12 @@
 import csv
-import datetime
+# import datetime
 import glob
-import os  # NOQA
+import os 
 import pathlib
 import shutil
 import sys
-import tempfile  # NOQA
+import tempfile
+from datetime import datetime
 from pathlib import Path
 
 import yaml
@@ -31,7 +32,7 @@ path_home = pathlib.Path.home()
 
 path_cwd = pathlib.Path.cwd()
 
-datetime_now = datetime.datetime.now()
+datetime_now = datetime.now()
 
 # Open yaml 
 with open(path_cwd/'app/config/const.yaml', 'r') as f:
@@ -69,6 +70,44 @@ def save_datetime_img_processing(scene_title):
     query = f"UPDATE metadado_img.metadado_sentinel SET date_file_processing =" \
             f"current_timestamp WHERE title = '{scene_title}';"
     return con.run_update(query)
+
+
+def create_task_terraamazon_poject(conn_string: str, 
+                            aquisition_date: str, 
+                            satellite_name: str,
+                            satellite_index: str):
+    """
+        -- aqui retorna o id para o aoi_layer_id (ta_catalog)
+        select * from terraamazon.ta_aoi_layer  
+
+        -- insere dados na tabela de cenas
+        insert into ta_scene (view_date, julday, inclusion,ai_object_id, aoi_layer_id)
+        select  to_date('02/01/2018','dd/mm/yyyy'), extract(doy from to_date('02/01/2018','dd/mm/yyyy')), current_timestamp(0), 1, 40 
+
+        -- insere dado na tabela que amarra a cena ao projeto, para criar a tarefa.
+        insert into terraamazon.ta_project_scene (project_id, scene_id, locked) values (1,1,false)
+    """
+    con = C.Connection(conn_string)
+    
+    view_date = datetime.strptime(aquisition_date, '%Y%m%d').strftime('%Y-%m-%d')
+
+    # O ai_object_id é o pathrow, tile.
+    ai_object_id = satellite_index
+    
+    # É o id do terraamazon.ta_catalog.
+    aoi_layer_id_query = f"SELECT id FROM terraamazon.ta_catalog WHERE name LIKE '%{satellite_name}%';"
+    aoi_layer_id = con.run_query(aoi_layer_id_query)[0][0]
+
+    check_if_task_was_created_query = f"SELECT * FROM terraamazon.ta_scene WHERE view_date = '{view_date}' AND ai_object_id = '{ai_object_id}';"
+    check_if_task_was_created = len(con.run_query(check_if_task_was_created_query)) == 0
+    
+    if check_if_task_was_created:
+
+        insert_query = f"INSERT INTO terraamazon.ta_scene (view_date, julday, inclusion, ai_object_id, aoi_layer_id) " \
+                f"select  to_date('{view_date}','yyyy-mm-dd'), extract(doy from to_date('{view_date}', 'yyyy-mm-dd')), " \
+                f" current_timestamp(0), '{ai_object_id}', {aoi_layer_id};"
+
+        return con.run_query(insert_query)
 
 
 def cloud_shadow(input_file, output_dir, ouput_file_name):
@@ -124,6 +163,14 @@ if __name__ == "__main__":
         #####################################################################################
         # Bands: 2 = Blue | 3 = Green | 4 = Red | 8 = Nir |
         if sat.is_sentinel_file():
+            
+            aquisition_date = parameter_satellite['aquisition_date']
+            # satellite_name
+            if sat.is_sentinel_file():
+                satellite_name = 'sentinel'
+            satellite_index = sat.get_parameter_satellite()["index"]
+            
+            
             # Unzip setinel file
             up.uncompress_zip()
 
@@ -170,6 +217,8 @@ if __name__ == "__main__":
 
             # Save when file was processed in postgres database
             save_datetime_img_processing(scene_title=parameter_satellite["scene_file_name"])
+            
+            create_task_terraamazon_poject(conn_string,  aquisition_date, satellite_name, satellite_index)
             
             shutil.rmtree(tmp_dir)
             
