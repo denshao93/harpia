@@ -26,7 +26,7 @@ import Segmetation as SEG
 import UnpackFile as UF
 
 OUTPUT_FOLDER_NAME = 'PROCESSADA'
-INPUT_FOLDER_NAME = 'BRUTA_DEV'
+INPUT_FOLDER_NAME = 'BRUTA'
 
 path_home = pathlib.Path.home()
 
@@ -83,9 +83,6 @@ def create_task_terraamazon_poject(conn_string: str,
         -- insere dados na tabela de cenas
         insert into ta_scene (view_date, julday, inclusion,ai_object_id, aoi_layer_id)
         select  to_date('02/01/2018','dd/mm/yyyy'), extract(doy from to_date('02/01/2018','dd/mm/yyyy')), current_timestamp(0), 1, 40 
-
-        -- insere dado na tabela que amarra a cena ao projeto, para criar a tarefa.
-        insert into terraamazon.ta_project_scene (project_id, scene_id, locked) values (1,1,false)
     """
     con = C.Connection(conn_string)
     
@@ -108,6 +105,34 @@ def create_task_terraamazon_poject(conn_string: str,
                 f" current_timestamp(0), '{ai_object_id}', {aoi_layer_id};"
 
         return con.run_query(insert_query)
+
+
+def add_task_to_terraamazon_project(conn_string: str, 
+                            aquisition_date: str, 
+                            satellite_index: str,
+                            project_name: str):
+    """
+    -- insere dado na tabela que amarra a cena ao projeto, para criar a tarefa.
+        insert into terraamazon.ta_project_scene (project_id, scene_id, locked) values (1,1,false)
+    """
+    con = C.Connection(conn_string)
+    
+    view_date = datetime.strptime(aquisition_date, '%Y%m%d').strftime('%Y-%m-%d')
+    
+    project_id_query = f"SELECT id FROM terraamazon.ta_project WHERE name LIKE '{project_name}';"
+    project_id = con.run_query(project_id_query)[0][0]
+
+    # id scene_id
+    scene_id_query = f"SELECT id FROM terraamazon.ta_scene WHERE ai_object_id = '{satellite_index}' AND view_date = '{view_date}';"
+    scene_id = con.run_query(scene_id_query)[0][0]
+
+    check_if_task_in_project_query = f"SELECT id FROM terraamazon.ta_project_scene WHERE project_id = '{project_id}' AND view_date = '{scene_id}';"
+    check_if_task_in_project = len(con.run_query(check_if_task_in_project_query)) == 0
+    
+    if check_if_task_in_project:
+        insert_query = f"INSERT INTO terraamazon.ta_project_scene (project_id, scene_id, locked) values ({project_id}, {scene_id},false)"
+
+        return con.run_query(insert_query) 
 
 
 def cloud_shadow(input_file, output_dir, ouput_file_name):
@@ -170,7 +195,8 @@ if __name__ == "__main__":
                 satellite_name = 'sentinel'
             satellite_index = sat.get_parameter_satellite()["index"]
             
-            
+            add_task_to_terraamazon_project(conn_string,  aquisition_date, satellite_index, project_name='MONITORAMENTO')
+
             # Unzip setinel file
             up.uncompress_zip()
 
@@ -214,12 +240,13 @@ if __name__ == "__main__":
             img_path = os.path.join(
                 output_dir, f"{output_file_name}.TIF")
             PR.PyramidRaster(img_path=img_path).create_img_pyramid()
-
-            # Save when file was processed in postgres database
-            save_datetime_img_processing(scene_title=parameter_satellite["scene_file_name"])
             
             create_task_terraamazon_poject(conn_string,  aquisition_date, satellite_name, satellite_index)
+            add_task_to_terraamazon_project(conn_string,  aquisition_date, satellite_index, project_name='MONITORAMENTO')
             
+             # Save when file was processed in postgres database
+            save_datetime_img_processing(scene_title=parameter_satellite["scene_file_name"])
+
             shutil.rmtree(tmp_dir)
             
             continue
