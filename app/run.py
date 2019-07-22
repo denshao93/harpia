@@ -47,7 +47,8 @@ def file_list_not_process():
     """
     con = C.Connection(conn_string)
     query = f"SELECT title FROM metadado_img.metadado_sentinel WHERE "\
-            f"date_file_processing IS NULL AND date_download_img NOTNULL;"
+            f"date_file_processing IS NULL AND date_download_img NOTNULL " \
+            f"ORDER BY substring(title, 40 , 5), substring(title, 12 , 8);"
     file_list = con.run_query(query)
     file_list = [i[0] for i in file_list]
     return file_list
