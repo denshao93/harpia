@@ -127,7 +127,7 @@ def add_task_to_terraamazon_project(conn_string: str,
     scene_id_query = f"SELECT id FROM terraamazon.ta_scene WHERE ai_object_id = '{satellite_index}' AND view_date = '{view_date}';"
     scene_id = con.run_query(scene_id_query)[0][0]
 
-    check_if_task_in_project_query = f"SELECT id FROM terraamazon.ta_project_scene WHERE project_id = '{project_id}' AND view_date = '{scene_id}';"
+    check_if_task_in_project_query = f"SELECT * FROM terraamazon.ta_project_scene WHERE project_id = '{project_id}' AND scene_id = '{scene_id}';"
     check_if_task_in_project = len(con.run_query(check_if_task_in_project_query)) == 0
     
     if check_if_task_in_project:
@@ -196,6 +196,7 @@ if __name__ == "__main__":
                 satellite_name = 'sentinel'
             satellite_index = sat.get_parameter_satellite()["index"]
             
+            create_task_terraamazon_poject(conn_string,  aquisition_date, satellite_name, satellite_index)
             add_task_to_terraamazon_project(conn_string,  aquisition_date, satellite_index, project_name='MONITORAMENTO')
 
             # Unzip setinel file
